@@ -36,7 +36,7 @@ class _MyCustomFormState extends State<MyCustomForm> {
   }
 
   final List<People> people = [People(name: 'john')];
-  String nameInput; // name variable to be stored
+  String nameInput = (''); // name variable to be stored
 
   @override
   Widget build(BuildContext context) {
