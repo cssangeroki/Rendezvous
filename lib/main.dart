@@ -1,6 +1,22 @@
 import 'package:flutter/material.dart';
 import './people.dart';
+import 'dart:async';
+import 'dart:io';
 
+import 'package:flutter/material.dart';
+import 'package:google_maps_flutter/google_maps_flutter.dart';
+//import 'src/locations.dart' as locations;
+
+import 'package:geolocator/geolocator.dart';
+
+//Below are some the libraries I use for the map implementation - Adarsh
+import 'dart:async';
+import 'dart:io';
+import 'package:flutter/material.dart';
+import 'package:google_maps_flutter/google_maps_flutter.dart';
+import 'src/locations.dart' as locations;
+import 'package:geolocator/geolocator.dart'; //Library used for location services
+//
 void main() {
   runApp(MyApp());
 }
@@ -118,5 +134,242 @@ class _MyCustomFormState extends State<MyCustomForm> {
         // child: Icon(Icons.text_fields),
       ),
     );
+  }
+}
+
+
+//Map rendering stuff
+//Note: This does not work on android for some reason. I was not able to find out why, but the source of the problem had something to do with starting at the user's location.
+//Going to create a function that gets the users current location, or last known location.
+//The function will return a Position variable
+Future<Position> currentLocation() async {
+  //First, I want to check if location services are available
+  //Lines below are to check if location services are enabled
+  GeolocationStatus geolocationStatus =
+  await Geolocator().checkGeolocationPermissionStatus();
+  //If we get access to the location services, we should get the current location, and return it
+  if (geolocationStatus == GeolocationStatus.granted) {
+    print("Using location services to find current location");
+    //Get the current location and return it
+    Position position = await Geolocator()
+        .getCurrentPosition(desiredAccuracy: LocationAccuracy.high);
+    return position;
+  }
+  //Else, if we get any other value, we will return the last known position
+  else {
+    print("Using last known location");
+    Position position = await Geolocator()
+        .getLastKnownPosition(desiredAccuracy: LocationAccuracy.high);
+    return position;
+  }
+}
+
+class MapRender extends StatefulWidget {
+  @override
+  _MapRenderState createState() => _MapRenderState();
+}
+
+class _MapRenderState extends State<MapRender> {
+  GoogleMapController mapController;
+
+  //Get the current position, and store it in the variable currPosition
+  //Need to learn how to get return value from future class
+  Position currPosition;
+
+  //const int longitude = currPosition.longitude;
+
+  MapType _currentMapType = MapType.normal;
+
+  //Initializing center of map
+  static LatLng _center; //= LatLng(45.521563, -122.677433)
+  //Using another LatLng variable to track the current center of the map, to place markers
+  static LatLng _lastMapPosition = _center;
+
+  //String that will be used to store the address
+  String searchAddr;
+
+  //Creating a variable markers that will be used to implement a marker in google maps
+  Set<Marker> _markers = {};
+
+  //Marker _markers;
+  //Function initState initialises the state of variables
+  @override
+  void initState(){
+    super.initState();
+    _getUserLocation();
+    _lastMapPosition = _center;
+    _getUserAddress();
+    _onAddMarkerButtonPressed();
+    print("Done initialising variabels for map");
+    print(_center);
+  }
+
+  //Function used to get users original position
+  void _getUserLocation() async {
+    currPosition = await currentLocation();
+    print("Current Position = " + currPosition.toString());
+    setState(() {
+      _center = LatLng(currPosition.latitude, currPosition.longitude);
+    });
+    print("Center = " + _center.toString());
+  }
+
+  //Getting the user address from the location coordinates
+  void _getUserAddress() async {
+    try {
+      List<Placemark> p = await Geolocator().placemarkFromCoordinates(
+          _center.latitude, _center.longitude);
+
+      Placemark place = p[0];
+
+      setState(() {
+        searchAddr =
+        "${place.name}, ${place.subLocality}, ${place.locality}, ${place.postalCode}, ${place.country}";
+      });
+    } catch (e) {
+      print(e);
+    }
+  }
+
+  void _onCameraMove(CameraPosition position) {
+    _center = position.target;
+    _lastMapPosition = position.target;
+  }
+
+  void _onMapCreated(GoogleMapController controller) async {
+    print("Creating Map");
+    mapController = controller;
+    print("Done creating Map!");
+    _lastMapPosition = _center;
+    _onAddMarkerButtonPressed();
+    //We wait to receive the users current position
+    //The initial position of the map should now be set to the users initial position
+    //_center = LatLng(currPosition.latitude, currPosition.longitude);
+  }
+
+  void _onAddMarkerButtonPressed() async{
+    //deleting the current marker and replacing it with the new one
+    _markers = {};
+    //Getting the correct address in searchAddr. Using await to ensure we get the right address.
+    await _getUserAddress();
+    setState(() {
+      _markers.add(Marker(
+        markerId: MarkerId(_lastMapPosition.toString()),
+        position: _lastMapPosition,
+        infoWindow: InfoWindow(title: searchAddr, snippet: ''),
+        //infoWindow: InfoWindow(),
+        icon: BitmapDescriptor.defaultMarker,
+      ));
+    });
+  }
+
+//Function to update the appearance of the map when a button is pressed
+//https://medium.com/@rajesh.muthyala/flutter-with-google-maps-and-google-place-85ccee3f0371
+  void _onMapTypeButtonPressed() {
+    setState(() {
+      _currentMapType = _currentMapType == MapType.normal
+          ? MapType.satellite
+          : MapType.normal;
+    });
+  }
+
+  void _searchandNavigate() {
+    //In case nothing was entered
+    Geolocator().placemarkFromAddress(searchAddr).then((value) {
+      mapController.animateCamera(CameraUpdate.newCameraPosition(CameraPosition(
+          target:
+          LatLng(value[0].position.latitude, value[0].position.longitude),
+          zoom: 15.0)));
+      _center = LatLng(value[0].position.latitude, value[0].position.longitude);
+      _lastMapPosition = _center;
+      _getUserAddress();
+      _onAddMarkerButtonPressed();
+    });
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return MaterialApp(
+        home: Scaffold(
+            appBar: AppBar(
+              title: Text('Maps'),
+              backgroundColor: Colors.lightBlue,
+            ),
+            body: _center == null
+                ? Container(
+              child: Center(
+                child: Text(
+                  'loading map..',
+                  style: TextStyle(
+                      fontFamily: 'Avenir-Medium',
+                      color: Colors.grey[400]),
+                ),
+              ),
+            )
+                : Container(
+              child: Stack(children: <Widget>[
+                GoogleMap(
+                  onMapCreated: _onMapCreated,
+                  initialCameraPosition: CameraPosition(
+                    target: _center,
+                    zoom: 11.0,
+                  ),
+                  markers: _markers,
+                  //Adding the marker property to Google Maps Widget
+                  onCameraMove:
+                  _onCameraMove, //Moving the center each time we move on the map, by calling _onCameraMove
+                ),
+                Positioned(
+                  top: 30,
+                  right: 15,
+                  left: 15,
+                  child: Container(
+                    height: 50.0,
+                    width: double.infinity,
+                    decoration: BoxDecoration(
+                      borderRadius: BorderRadius.circular(5.0),
+                      color: Colors.white,
+                    ),
+                    child: TextField(
+                      decoration: InputDecoration(
+                          hintText: "Enter address...",
+                          border: InputBorder.none,
+                          contentPadding:
+                          EdgeInsets.only(left: 15.0, top: 15.0),
+                          suffixIcon: IconButton(
+                            icon: Icon(Icons.search),
+                            onPressed: _searchandNavigate,
+                            iconSize: 30.0,
+                          )),
+                      onChanged: (val) {
+                        setState(() {
+                          searchAddr = val;
+                        });
+                      },
+                    ),
+                  ),
+                ),
+                Padding(
+                  padding:
+                  const EdgeInsets.fromLTRB(16.0, 100.0, 16.0, 16.0),
+                  child: Align(
+                    alignment: Alignment.topRight,
+                    child: Column(children: <Widget>[
+                      //Adding another floating button to mark locations
+                      FloatingActionButton(
+                        onPressed: _onAddMarkerButtonPressed,
+                        materialTapTargetSize:
+                        MaterialTapTargetSize.padded,
+                        backgroundColor: Colors.redAccent,
+                        child: const Icon(
+                          Icons.add_location,
+                          size: 36.0,
+                        ),
+                      )
+                    ]),
+                  ),
+                )
+              ]),
+            )));
   }
 }

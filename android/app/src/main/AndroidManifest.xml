@@ -7,8 +7,11 @@
          FlutterApplication and put your custom class here. -->
     <application
         android:name="io.flutter.app.FlutterApplication"
-        android:label="flutter_complete_guide"
+        android:label="Rendezvous"
         android:icon="@mipmap/ic_launcher">
+        <meta-data
+            android:name="com.google.android.geo.API_KEY"
+            android:value="AIzaSyCWiD_UhJO573Mc5RoKjRbzu8r_YYKl30M" />
         <activity
             android:name=".MainActivity"
             android:launchMode="singleTop"
