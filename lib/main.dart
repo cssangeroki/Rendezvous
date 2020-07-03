@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import './people.dart';
+//Below are some the libraries I use for the map implementation - Adarsh
 import 'dart:async';
 import 'dart:io';
 
@@ -9,16 +10,10 @@ import 'package:google_maps_flutter/google_maps_flutter.dart';
 
 import 'package:geolocator/geolocator.dart';
 
-//Below are some the libraries I use for the map implementation - Adarsh
-import 'dart:async';
-import 'dart:io';
-import 'package:flutter/material.dart';
-import 'package:google_maps_flutter/google_maps_flutter.dart';
-import 'src/locations.dart' as locations;
-import 'package:geolocator/geolocator.dart'; //Library used for location services
-//
+
 void main() {
-  runApp(MyApp());
+  //runApp(MyApp());
+  runApp(MapRender());
 }
 
 class MyApp extends StatelessWidget {
