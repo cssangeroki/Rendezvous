@@ -3,8 +3,6 @@ import './people.dart';
 //Below are some the libraries I use for the map implementation - Adarsh
 import 'dart:async';
 import 'dart:io';
-
-import 'package:flutter/material.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
 //import 'src/locations.dart' as locations;
 
@@ -134,6 +132,8 @@ class _MyCustomFormState extends State<MyCustomForm> {
 
 
 //Map rendering stuff
+//Check the below link for some explanation of how a lot of the methods work
+//https://medium.com/@rajesh.muthyala/flutter-with-google-maps-and-google-place-85ccee3f0371
 //Note: This does not work on android for some reason. I was not able to find out why, but the source of the problem had something to do with starting at the user's location.
 //Going to create a function that gets the users current location, or last known location.
 //The function will return a Position variable
@@ -203,7 +203,7 @@ class _MapRenderState extends State<MapRender> {
     print(_center);
   }
   //Function used to get users original position
-  void _getUserLocation() async {
+  Future <void> _getUserLocation() async {
     currPosition = await currentLocation();
     print("Current Position = " + currPosition.toString());
     setState(() {
@@ -213,7 +213,7 @@ class _MapRenderState extends State<MapRender> {
   }
 
   //Getting the user address from the location coordinates
-  void _getUserAddress() async {
+  Future <void> _getUserAddress() async {
     try {
       List<Placemark> p = await Geolocator().placemarkFromCoordinates(
           _center.latitude, _center.longitude);
@@ -261,19 +261,9 @@ class _MapRenderState extends State<MapRender> {
     });
   }
 
-//Function to update the appearance of the map when a button is pressed
-//https://medium.com/@rajesh.muthyala/flutter-with-google-maps-and-google-place-85ccee3f0371
-  void _onMapTypeButtonPressed() {
-    setState(() {
-      _currentMapType = _currentMapType == MapType.normal
-          ? MapType.satellite
-          : MapType.normal;
-    });
-  }
-
-  void _searchandNavigate() {
+  void _searchandNavigate(){
     //Get the placemark from the search address, and then store the center and userAddress
-    Geolocator().placemarkFromAddress(searchAddr).then((value) {
+    Geolocator().placemarkFromAddress(searchAddr).then((value) async{
       mapController.animateCamera(CameraUpdate.newCameraPosition(CameraPosition(
           target:
           LatLng(value[0].position.latitude, value[0].position.longitude),
@@ -281,7 +271,7 @@ class _MapRenderState extends State<MapRender> {
       _center = LatLng(value[0].position.latitude, value[0].position.longitude);
       _lastMapPosition = _center;
       _getUserAddress();
-      _onAddMarkerButtonPressed();
+      await _onAddMarkerButtonPressed();
     });
   }
 
