@@ -1,5 +1,8 @@
 import 'package:flutter/material.dart';
 import './people.dart';
+import 'pages/page1.dart';
+
+/*
 //Below are some the libraries I use for the map implementation - Adarsh
 import 'dart:async';
 import 'dart:io';
@@ -7,11 +10,10 @@ import 'package:google_maps_flutter/google_maps_flutter.dart';
 //import 'src/locations.dart' as locations;
 
 import 'package:geolocator/geolocator.dart';
-
-
+*/
 void main() {
   //runApp(MyApp());
-  runApp(MapRender());
+  runApp(MyApp());
 }
 
 class MyApp extends StatelessWidget {
@@ -19,11 +21,12 @@ class MyApp extends StatelessWidget {
   Widget build(BuildContext context) {
     return MaterialApp(
       title: 'Retrieve Text Input',
-      home: MyCustomForm(),
+      home: Page1(),
     );
   }
 }
 
+/*
 // Define a custom Form widget.
 class MyCustomForm extends StatefulWidget {
   @override
@@ -128,9 +131,9 @@ class _MyCustomFormState extends State<MyCustomForm> {
       ),
     );
   }
-}
+}*/
 
-
+/*
 //Map rendering stuff
 //Check the below link for some explanation of how a lot of the methods work
 //https://medium.com/@rajesh.muthyala/flutter-with-google-maps-and-google-place-85ccee3f0371
@@ -360,4 +363,4 @@ class _MapRenderState extends State<MapRender> {
               ]),
             )));
   }
-}
+}*/

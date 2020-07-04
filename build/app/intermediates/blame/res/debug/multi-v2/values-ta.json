@@ -1,10 +1,10 @@
 {
     "logs": [
         {
-            "outputFile": "/Users/adarshsekar/Documents/CSE115/Rendezvous/build/app/intermediates/incremental/mergeDebugResources/merged.dir/values-ta/values-ta.xml",
+            "outputFile": "C:\\Users\\Ulysses\\Development\\Rendezvous\\build\\app\\intermediates\\incremental\\mergeDebugResources\\merged.dir\\values-ta\\values-ta.xml",
             "map": [
                 {
-                    "source": "/Users/adarshsekar/.gradle/caches/transforms-2/files-2.1/f81e9fffe318fdc5660099e12e35729e/play-services-base-17.2.1/res/values-ta/values.xml",
+                    "source": "C:\\Users\\Ulysses\\.gradle\\caches\\transforms-2\\files-2.1\\f81e9fffe318fdc5660099e12e35729e\\play-services-base-17.2.1\\res\\values-ta\\values.xml",
                     "from": {
                         "startLines": "4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19,20",
                         "startColumns": "0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0",
@@ -21,7 +21,7 @@
                     }
                 },
                 {
-                    "source": "/Users/adarshsekar/.gradle/caches/transforms-2/files-2.1/5a3fddbb95afcf2edc24f2f12510e8f4/jetified-play-services-basement-17.2.1/res/values-ta/values.xml",
+                    "source": "C:\\Users\\Ulysses\\.gradle\\caches\\transforms-2\\files-2.1\\ef8d3119e0eacc93b7cb1d74d0844504\\jetified-play-services-basement-17.2.1\\res\\values-ta\\values.xml",
                     "from": {
                         "startLines": "4",
                         "startColumns": "0",
@@ -38,7 +38,7 @@
                     }
                 },
                 {
-                    "source": "/Users/adarshsekar/.gradle/caches/transforms-2/files-2.1/b6252bb7f30c7dceb20e97dfa6dfae00/core-1.2.0/res/values-ta/values-ta.xml",
+                    "source": "C:\\Users\\Ulysses\\.gradle\\caches\\transforms-2\\files-2.1\\b6252bb7f30c7dceb20e97dfa6dfae00\\core-1.2.0\\res\\values-ta\\values-ta.xml",
                     "from": {
                         "startLines": "2",
                         "startColumns": "4",
