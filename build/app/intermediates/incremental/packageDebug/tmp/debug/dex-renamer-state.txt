@@ -1,4 +1,4 @@
-#Thu Jul 02 15:37:34 PDT 2020
-base.0=C\:\\Users\\Ulysses\\Development\\Rendezvous\\build\\app\\intermediates\\dex\\debug\\mergeDexDebug\\out\\classes.dex
+#Fri Jul 03 19:33:42 PDT 2020
+base.0=/Users/adarshsekar/Documents/CSE115/Rendezvous/build/app/intermediates/dex/debug/mergeDexDebug/out/classes.dex
 path.0=classes.dex
 renamed.0=classes.dex

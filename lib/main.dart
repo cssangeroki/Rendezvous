@@ -176,7 +176,7 @@ class _MapRenderState extends State<MapRender> {
   MapType _currentMapType = MapType.normal;
 
   //Initializing center of map
-  static LatLng _center; //= LatLng(45.521563, -122.677433)
+  static LatLng _center; //= LatLng(45.521563, -122.677433);
   //Using another LatLng variable to track the current center of the map, to place markers
   static LatLng _lastMapPosition = _center;
 
@@ -191,14 +191,17 @@ class _MapRenderState extends State<MapRender> {
   @override
   void initState(){
     super.initState();
-    _getUserLocation();
+    initFunctionCaller();
+  }
+
+  void initFunctionCaller() async{
+    await _getUserLocation();
     _lastMapPosition = _center;
-    _getUserAddress();
+    //_getUserAddress();
     _onAddMarkerButtonPressed();
     print("Done initialising variabels for map");
     print(_center);
   }
-
   //Function used to get users original position
   void _getUserLocation() async {
     currPosition = await currentLocation();
@@ -242,11 +245,11 @@ class _MapRenderState extends State<MapRender> {
     //_center = LatLng(currPosition.latitude, currPosition.longitude);
   }
 
-  void _onAddMarkerButtonPressed() async{
+  void _onAddMarkerButtonPressed(){
     //deleting the current marker and replacing it with the new one
     _markers = {};
     //Getting the correct address in searchAddr. Using await to ensure we get the right address.
-    await _getUserAddress();
+    _getUserAddress();
     setState(() {
       _markers.add(Marker(
         markerId: MarkerId(_lastMapPosition.toString()),
@@ -269,7 +272,7 @@ class _MapRenderState extends State<MapRender> {
   }
 
   void _searchandNavigate() {
-    //In case nothing was entered
+    //Get the placemark from the search address, and then store the center and userAddress
     Geolocator().placemarkFromAddress(searchAddr).then((value) {
       mapController.animateCamera(CameraUpdate.newCameraPosition(CameraPosition(
           target:
