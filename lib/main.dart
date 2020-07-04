@@ -245,11 +245,11 @@ class _MapRenderState extends State<MapRender> {
     //_center = LatLng(currPosition.latitude, currPosition.longitude);
   }
 
-  void _onAddMarkerButtonPressed(){
+  void _onAddMarkerButtonPressed() async{
     //deleting the current marker and replacing it with the new one
     _markers = {};
     //Getting the correct address in searchAddr. Using await to ensure we get the right address.
-    _getUserAddress();
+    await _getUserAddress();
     setState(() {
       _markers.add(Marker(
         markerId: MarkerId(_lastMapPosition.toString()),
