@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import './people.dart';
+
 import 'pages/page1.dart';
 
 /*

@@ -21,10 +21,12 @@ class _Page1State extends State<Page1> {
   final formKey = GlobalKey<FormState>();
 
   String userName;
+
   _Page1State(this.userName);
   // Create a text controller and use it to retrieve the current value
   // of the TextField.
   final userNameController = TextEditingController();
+
 //  TextEditingController userNameTextEditingController =
 //      new TextEditingController();
 
@@ -40,10 +42,19 @@ class _Page1State extends State<Page1> {
 //      };
 
       //databaseMethods.uploadUserInfo(userInfoMap);
-
-      Navigator.pushReplacement(
-          context, MaterialPageRoute(builder: (context) => Page2()));
+      _sendDataToPage2(context);
     }
+  }
+
+  void _sendDataToPage2(BuildContext context) {
+    String personName = userName;
+    Navigator.pushReplacement(
+        context,
+        MaterialPageRoute(
+          builder: (context) => Page2(
+            name: personName,
+          ),
+        ));
   }
 
   @override
@@ -59,20 +70,25 @@ class _Page1State extends State<Page1> {
                 child: Column(children: <Widget>[
                   CircleAvatar(
                     backgroundColor: Colors.blueGrey,
-                    minRadius: 170,
+                    minRadius: 160,
                     backgroundImage: AssetImage('images/Rendezvous_logo.png'),
                   ),
-                  Form(
-                    key: formKey,
-                    child: TextFormField(
-                      validator: (val) {
-                        return val.isEmpty ? "Please Enter a Name" : null;
-                      },
-                      onChanged: (text) {
-                        userName = text;
-                      },
-                      //controller: userNameController,
-                      decoration: InputDecoration(hintText: 'Enter Your Name:'),
+                  Container(
+                    margin: EdgeInsets.all(30.0),
+                    width: 300.0,
+                    child: Form(
+                      key: formKey,
+                      child: TextFormField(
+                        validator: (val) {
+                          return val.isEmpty ? "Please Enter a Name" : null;
+                        },
+                        onChanged: (text) {
+                          userName = text;
+                        },
+                        //controller: userNameController,
+                        decoration:
+                            InputDecoration(hintText: 'Enter Your Name:'),
+                      ),
                     ),
                   ),
                 ]),

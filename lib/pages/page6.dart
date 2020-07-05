@@ -19,7 +19,11 @@ class Page6 extends StatelessWidget {
         // the text that the user has entered into the text field.
         onPressed: () {
           Navigator.push(
-              context, MaterialPageRoute(builder: (context) => Page1()));
+              context,
+              MaterialPageRoute(
+                  builder: (context) => Page1(
+                        userName: "Test",
+                      )));
         },
         child: Text('Home'), // to show Go text in button
       ),

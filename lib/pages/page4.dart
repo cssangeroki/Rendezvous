@@ -22,10 +22,23 @@ class Page4 extends StatelessWidget {
               minRadius: 170,
               backgroundImage: AssetImage('images/Rendezvous_logo.png'),
             ),
-            TextField(
-              decoration: InputDecoration(hintText: 'Enter Code:'),
-              // connected to textField, listen and save user input
-              controller: codeController,
+            Container(
+              child: Text(
+                "Enter Code Below:",
+                style: new TextStyle(
+                  fontSize: 25.0,
+                ),
+              ),
+              padding: EdgeInsets.all(25.0),
+            ),
+            Container(
+              margin: EdgeInsets.all(5.0),
+              width: 200.0,
+              child: TextField(
+                decoration: InputDecoration(hintText: 'Enter Code:'),
+                // connected to textField, listen and save user input
+                controller: codeController,
+              ),
             ),
           ]),
         ),
