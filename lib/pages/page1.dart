@@ -74,7 +74,16 @@ class _Page1State extends State<Page1> {
                     backgroundImage: AssetImage('images/Rendezvous_logo.png'),
                   ),
                   Container(
-                    margin: EdgeInsets.all(30.0),
+                    padding: EdgeInsets.fromLTRB(20.0, 20.0, 20.0, 0),
+                    child: Text(
+                      "Enter a display name:",
+                      style: TextStyle(
+                        fontSize: 30.0,
+                      ),
+                    ),
+                  ),
+                  Container(
+                    margin: EdgeInsets.fromLTRB(0, 20.0, 0, 0),
                     width: 300.0,
                     child: Form(
                       key: formKey,
@@ -87,7 +96,7 @@ class _Page1State extends State<Page1> {
                         },
                         //controller: userNameController,
                         decoration:
-                            InputDecoration(hintText: 'Enter Your Name:'),
+                            InputDecoration(hintText: 'Enter text here'),
                       ),
                     ),
                   ),

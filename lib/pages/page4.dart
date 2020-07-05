@@ -35,9 +35,9 @@ class Page4 extends StatelessWidget {
               margin: EdgeInsets.all(5.0),
               width: 200.0,
               child: TextField(
-                decoration: InputDecoration(hintText: 'Enter Code:'),
                 // connected to textField, listen and save user input
                 controller: codeController,
+                decoration: InputDecoration(hintText: "Enter text here"),
               ),
             ),
           ]),
