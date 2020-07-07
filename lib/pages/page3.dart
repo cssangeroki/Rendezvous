@@ -38,6 +38,38 @@ Future<Position> currentLocation() async {
   }
 }
 
+
+
+
+LatLng midpoint(List<Position> locations ){
+
+  double currentMidLat=0;
+  double currentMidLon=0;
+
+//   var newLoc = locations[0]; 
+  
+  
+   for( var location in locations ) {  
+     currentMidLat = (location.latitude + currentMidLat)/2;
+     currentMidLon = (location.longitude + currentMidLon)/2;
+
+
+   }
+  
+
+  // myLatLng = new google.maps.LatLng({lat: -34, lng: 151}); 
+
+  return new LatLng(currentMidLat, currentMidLon);
+  
+  // return currentMid;
+
+}
+
+
+
+
+
+
 class MapRender extends StatefulWidget {
   @override
   _MapRenderState createState() => _MapRenderState();
@@ -127,7 +159,9 @@ class _MapRenderState extends State<MapRender> {
 
   void _onAddMarkerButtonPressed() async {
     //deleting the current marker and replacing it with the new one
-    _markers = {};
+    
+    //Comment this out to get multiple markers
+    //_markers = {};
     //Getting the correct address in searchAddr. Using await to ensure we get the right address.
     await _getUserAddress();
     setState(() {
