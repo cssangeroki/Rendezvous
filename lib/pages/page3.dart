@@ -1,4 +1,3 @@
-//map 8-3
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 
@@ -20,19 +19,19 @@ import 'package:sliding_up_panel/sliding_up_panel.dart';
 //Going to create a function that gets the users current location, or last known location.
 //The function will return a Position variable
 Future<Position> currentLocation() async {
-  //First, I want to check if location services are available
-  //Lines below are to check if location services are enabled
+//First, I want to check if location services are available
+//Lines below are to check if location services are enabled
   GeolocationStatus geolocationStatus =
       await Geolocator().checkGeolocationPermissionStatus();
-  //If we get access to the location services, we should get the current location, and return it
+//If we get access to the location services, we should get the current location, and return it
   if (geolocationStatus == GeolocationStatus.granted) {
     print("Using location services to find current location");
-    //Get the current location and return it
+//Get the current location and return it
     Position position = await Geolocator()
         .getCurrentPosition(desiredAccuracy: LocationAccuracy.high);
     return position;
   }
-  //Else, if we get any other value, we will return the last known position
+//Else, if we get any other value, we will return the last known position
   else {
     print("Using last known location");
     Position position = await Geolocator()
@@ -41,26 +40,12 @@ Future<Position> currentLocation() async {
   }
 }
 
-LatLng midpoint(List<Position> locations) {
-  double currentMidLat = 0;
-  double currentMidLon = 0;
-
-//   var newLoc = locations[0];
-
-  for (var location in locations) {
-    currentMidLat = (location.latitude + currentMidLat) / 2;
-    currentMidLon = (location.longitude + currentMidLon) / 2;
-  }
-
-  // myLatLng = new google.maps.LatLng({lat: -34, lng: 151});
-
-  return new LatLng(currentMidLat, currentMidLon);
-
-  // return currentMid;
-}
+//A string that will store the category searched for on the Yelp search
+String category;
 
 class MapRender extends StatefulWidget {
   final String roomCode;
+
   MapRender({Key key, @required this.roomCode}) : super(key: key);
 
   @override
@@ -70,27 +55,30 @@ class MapRender extends StatefulWidget {
 class _MapRenderState extends State<MapRender> {
   GoogleMapController mapController;
 
-  //Get the current position, and store it in the variable currPosition
-  //Need to learn how to get return value from future class
+//Get the current position, and store it in the variable currPosition
+//Need to learn how to get return value from future class
   Position currPosition;
 
-  //const int longitude = currPosition.longitude;
+//const int longitude = currPosition.longitude;
 
   MapType _currentMapType = MapType.normal;
 
-  //Initializing center of map
+//Initializing center of map
   static LatLng _center; //= LatLng(45.521563, -122.677433);
-  //Using another LatLng variable to track the current center of the map, to place markers
+//Using another LatLng variable to track the current center of the map, to place markers
   static LatLng _lastMapPosition = _center;
 
-  //String that will be used to store the address
+//String that will be used to store the address
   String searchAddr;
 
-  //Creating a variable markers that will be used to implement a marker in google maps
+//Creating a variable markers that will be used to implement a marker in google maps
   Set<Marker> _markers = {};
 
-  //Marker _markers;
-  //Function initState initialises the state of variables
+//Going to create a string which will store the midpoint address
+  String midAddress;
+
+//Marker _markers;
+//Function initState initialises the state of variables
   @override
   void initState() {
     super.initState();
@@ -100,13 +88,13 @@ class _MapRenderState extends State<MapRender> {
   void initFunctionCaller() async {
     await _getUserLocation();
     _lastMapPosition = _center;
-    //_getUserAddress();
+//_getUserAddress();
     _onAddMarkerButtonPressed();
     print("Done initialising variabels for map");
     print(_center);
   }
 
-  //Function used to get users original position
+//Function used to get users original position
   Future<void> _getUserLocation() async {
     currPosition = await currentLocation();
     print("Current Position = " + currPosition.toString());
@@ -116,7 +104,7 @@ class _MapRenderState extends State<MapRender> {
     print("Center = " + _center.toString());
   }
 
-  //Getting the user address from the location coordinates
+//Getting the user address from the location coordinates
   Future<void> _getUserAddress() async {
     try {
       List<Placemark> p = await Geolocator()
@@ -144,38 +132,92 @@ class _MapRenderState extends State<MapRender> {
     print("Done creating Map!");
     _lastMapPosition = _center;
     _onAddMarkerButtonPressed();
-    //We wait to receive the users current position
-    //The initial position of the map should now be set to the users initial position
-    //_center = LatLng(currPosition.latitude, currPosition.longitude);
+//We wait to receive the users current position
+//The initial position of the map should now be set to the users initial position
+//_center = LatLng(currPosition.latitude, currPosition.longitude);
+  }
+
+//Function to get the address for the midpoint from the
+  Future<void> placefromLatLng(LatLng mid) async {
+//Here, I will get the placemark from the coordinates
+    List<Placemark> p = await Geolocator()
+        .placemarkFromCoordinates(mid.latitude, mid.longitude);
+
+    Placemark place = p[0];
+    setState(() {
+      midAddress =
+          "${place.name}, ${place.subLocality}, ${place.locality}, ${place.postalCode}, ${place.country}";
+    });
+  }
+
+  void findMidpoint(Set<Marker> locations) {
+    double currentMidLat = 0;
+    double currentMidLon = 0;
+
+//   var newLoc = locations[0];
+    Marker toRemove;
+    for (var location in locations) {
+//Want to skip the midpoint so that it doesn't affect the position of the new midpoint.
+//If there is a Midpoint marker, I will store it in toRemove so I can remove it later
+      if (location.markerId == MarkerId("Midpoint")) {
+//print("Found Midpoint marker");
+//print(location.toString());
+        toRemove = _markers.firstWhere(
+            (marker) => marker.markerId.value == "Midpoint",
+            orElse: () => null);
+        continue;
+      }
+      currentMidLat = (location.position.latitude + currentMidLat);
+      currentMidLon = (location.position.longitude + currentMidLon);
+    }
+//Over here I remove the current midpoint marker, so I can add it again later
+    setState(() {
+      _markers.remove(toRemove);
+      currentMidLat = currentMidLat / (locations.length);
+      currentMidLon = currentMidLon / (locations.length);
+      placefromLatLng(LatLng(currentMidLat, currentMidLon));
+      _markers.add(Marker(
+        markerId: MarkerId('Midpoint'),
+        position: LatLng(currentMidLat, currentMidLon),
+        infoWindow: InfoWindow(title: midAddress, snippet: 'Midpoint'),
+        icon: BitmapDescriptor.defaultMarkerWithHue(BitmapDescriptor
+            .hueBlue), //Setting midpoint marker to blue so it's identifiable
+      ));
+    });
   }
 
   void _onAddMarkerButtonPressed() async {
-    //deleting the current marker and replacing it with the new one
+//deleting the current marker and replacing it with the new one
 
-    //Comment this out to get multiple markers
-    //_markers = {};
-    //Getting the correct address in searchAddr. Using await to ensure we get the right address.
+//Comment this out to get multiple markers
+//_markers = {};
+//Getting the correct address in searchAddr. Using await to ensure we get the right address.
     await _getUserAddress();
     setState(() {
       _markers.add(Marker(
         markerId: MarkerId(_lastMapPosition.toString()),
         position: _lastMapPosition,
         infoWindow: InfoWindow(title: searchAddr, snippet: ''),
-        //infoWindow: InfoWindow(),
+//infoWindow: InfoWindow(),
         icon: BitmapDescriptor.defaultMarker,
       ));
+      findMidpoint(_markers);
     });
   }
 
   void _searchandNavigate() {
-    //Get the placemark from the search address, and then store the center and userAddress
+//Get the placemark from the search address, and then store the center and userAddress
     Geolocator().placemarkFromAddress(searchAddr).then((value) async {
+//With the placemark that will be stored in 'value', we move our camera to that position.
       mapController.animateCamera(CameraUpdate.newCameraPosition(CameraPosition(
           target:
               LatLng(value[0].position.latitude, value[0].position.longitude),
           zoom: 15.0)));
+//Set our _center location to the new position
       _center = LatLng(value[0].position.latitude, value[0].position.longitude);
+//Set our _lastMapPosition also to the new position
       _lastMapPosition = _center;
+//Then get the actual full address of that location, and finally call _onAddMarkerButtonPressed so that a marker is added at that location
       _getUserAddress();
       await _onAddMarkerButtonPressed();
     });
@@ -192,11 +234,11 @@ class _MapRenderState extends State<MapRender> {
           backgroundColor: Colors.lightBlue,
         ),
         body: SlidingUpPanel(
-          //maxHeight: 600,
+//maxHeight: 600,
           backdropEnabled: true,
           borderRadius: radius,
           panel: Center(
-            // yelp info will display here
+// yelp info will display here
             child: Text("Yelp info will be found here"),
           ),
           collapsed: Container(
@@ -227,7 +269,7 @@ class _MapRenderState extends State<MapRender> {
                           zoom: 11.0,
                         ),
                         markers: _markers,
-                        //Adding the marker property to Google Maps Widget
+//Adding the marker property to Google Maps Widget
                         onCameraMove:
                             _onCameraMove, //Moving the center each time we move on the map, by calling _onCameraMove
                       ),
@@ -268,7 +310,7 @@ class _MapRenderState extends State<MapRender> {
                           alignment: Alignment.topRight,
                           child: Column(
                             children: <Widget>[
-                              //Adding another floating button to mark locations
+//Adding another floating button to mark locations
                               FloatingActionButton(
                                 onPressed: _onAddMarkerButtonPressed,
                                 materialTapTargetSize:
@@ -288,12 +330,12 @@ class _MapRenderState extends State<MapRender> {
                 ),
         ),
         drawer: Drawer(
-          // Add a ListView to the drawer. This ensures the user can scroll
-          // through the options in the drawer if there isn't enough vertical
-          // space to fit everything.
+// Add a ListView to the drawer. This ensures the user can scroll
+// through the options in the drawer if there isn't enough vertical
+// space to fit everything.
           child: ListView(
-            // Important: Remove any padding from the ListView.
-            padding: EdgeInsets.only(),
+// Important: Remove any padding from the ListView.
+//padding: EdgeInsets.only(),
             children: <Widget>[
               DrawerHeader(
                 child: Text('Settings'),
@@ -304,26 +346,62 @@ class _MapRenderState extends State<MapRender> {
               ListTile(
                 title: Text('People in this room:'),
                 onTap: () {
-                  // Update the state of the app
-                  // ...
-                  // Then close the drawer
-                  //Navigator.pop(context);
+// Update the state of the app
+// ...
+// Then close the drawer
+//Navigator.pop(context);
                 },
               ),
               ListTile(
                 title: Text('Searching for:'),
                 onTap: () {
-                  // Update the state of the app
-                  // ...
-                  // Then close the drawer
-                  //Navigator.pop(context);
+// Update the state of the app
+// ...
+// Then close the drawer
+//Navigator.pop(context);
                 },
+              ),
+//This is supposed to be the yelp search bar.
+//I just copied what I did for google maps, and we can adjust it to how we want.
+              Positioned(
+                top: 30,
+                right: 15,
+                left: 15,
+                child: Container(
+                  height: 50.0,
+                  width: double.infinity,
+                  decoration: BoxDecoration(
+                    borderRadius: BorderRadius.circular(5.0),
+                    color: Colors.white,
+                  ),
+                  child: TextField(
+                    decoration: InputDecoration(
+                        hintText: "Enter category...",
+                        border: InputBorder.none,
+                        contentPadding: EdgeInsets.only(left: 15.0, top: 15.0),
+                        suffixIcon: IconButton(
+                          icon: Icon(Icons.search),
+                          onPressed: _findingPlaces,
+                          iconSize: 30.0,
+                        )),
+                    onChanged: (val) {
+                      setState(() {
+                        category = val;
+                      });
+                    },
+                  ),
+                ),
               ),
             ],
           ),
         ),
       ),
     );
-    //);
+//);
   }
+}
+
+//Function that will connect to yelp API
+void _findingPlaces() {
+  print("Searching for your place");
 }
