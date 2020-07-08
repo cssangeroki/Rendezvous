@@ -1,4 +1,5 @@
 //map 8-3
+import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 
 import 'dart:async';
@@ -9,6 +10,8 @@ import 'package:google_maps_flutter/google_maps_flutter.dart';
 import 'package:geolocator/geolocator.dart';
 
 import 'page4.dart';
+
+import 'package:sliding_up_panel/sliding_up_panel.dart';
 
 //Map rendering stuff
 //Check the below link for some explanation of how a lot of the methods work
@@ -38,39 +41,28 @@ Future<Position> currentLocation() async {
   }
 }
 
+LatLng midpoint(List<Position> locations) {
+  double currentMidLat = 0;
+  double currentMidLon = 0;
 
+//   var newLoc = locations[0];
 
+  for (var location in locations) {
+    currentMidLat = (location.latitude + currentMidLat) / 2;
+    currentMidLon = (location.longitude + currentMidLon) / 2;
+  }
 
-LatLng midpoint(List<Position> locations ){
-
-  double currentMidLat=0;
-  double currentMidLon=0;
-
-//   var newLoc = locations[0]; 
-  
-  
-   for( var location in locations ) {  
-     currentMidLat = (location.latitude + currentMidLat)/2;
-     currentMidLon = (location.longitude + currentMidLon)/2;
-
-
-   }
-  
-
-  // myLatLng = new google.maps.LatLng({lat: -34, lng: 151}); 
+  // myLatLng = new google.maps.LatLng({lat: -34, lng: 151});
 
   return new LatLng(currentMidLat, currentMidLon);
-  
-  // return currentMid;
 
+  // return currentMid;
 }
 
-
-
-
-
-
 class MapRender extends StatefulWidget {
+  final String roomCode;
+  MapRender({Key key, @required this.roomCode}) : super(key: key);
+
   @override
   _MapRenderState createState() => _MapRenderState();
 }
@@ -159,7 +151,7 @@ class _MapRenderState extends State<MapRender> {
 
   void _onAddMarkerButtonPressed() async {
     //deleting the current marker and replacing it with the new one
-    
+
     //Comment this out to get multiple markers
     //_markers = {};
     //Getting the correct address in searchAddr. Using await to ensure we get the right address.
@@ -191,102 +183,147 @@ class _MapRenderState extends State<MapRender> {
 
   @override
   Widget build(BuildContext context) {
+    BorderRadiusGeometry radius = BorderRadius.only(
+        topLeft: Radius.circular(75.0), topRight: Radius.circular(75.0));
     return MaterialApp(
       home: Scaffold(
         appBar: AppBar(
           title: Text('Maps'),
           backgroundColor: Colors.lightBlue,
         ),
-        body: _center == null
-            ? Container(
-                child: Center(
-                  child: Text(
-                    'loading map..',
-                    style: TextStyle(
-                        fontFamily: 'Avenir-Medium', color: Colors.grey[400]),
+        body: SlidingUpPanel(
+          //maxHeight: 600,
+          backdropEnabled: true,
+          borderRadius: radius,
+          panel: Center(
+            // yelp info will display here
+            child: Text("Yelp info will be found here"),
+          ),
+          collapsed: Container(
+            decoration:
+                BoxDecoration(color: Colors.lightBlue, borderRadius: radius),
+            child: Center(
+              child: Text('Swipe up for menu'),
+            ),
+          ),
+          minHeight: 15,
+          body: _center == null
+              ? Container(
+                  child: Center(
+                    child: Text(
+                      'loading map..',
+                      style: TextStyle(
+                          fontFamily: 'Avenir-Medium', color: Colors.grey[400]),
+                    ),
+                  ),
+                )
+              : Container(
+                  child: Stack(
+                    children: <Widget>[
+                      GoogleMap(
+                        onMapCreated: _onMapCreated,
+                        initialCameraPosition: CameraPosition(
+                          target: _center,
+                          zoom: 11.0,
+                        ),
+                        markers: _markers,
+                        //Adding the marker property to Google Maps Widget
+                        onCameraMove:
+                            _onCameraMove, //Moving the center each time we move on the map, by calling _onCameraMove
+                      ),
+                      Positioned(
+                        top: 30,
+                        right: 15,
+                        left: 15,
+                        child: Container(
+                          height: 50.0,
+                          width: double.infinity,
+                          decoration: BoxDecoration(
+                            borderRadius: BorderRadius.circular(5.0),
+                            color: Colors.white,
+                          ),
+                          child: TextField(
+                            decoration: InputDecoration(
+                                hintText: "Enter address...",
+                                border: InputBorder.none,
+                                contentPadding:
+                                    EdgeInsets.only(left: 15.0, top: 15.0),
+                                suffixIcon: IconButton(
+                                  icon: Icon(Icons.search),
+                                  onPressed: _searchandNavigate,
+                                  iconSize: 30.0,
+                                )),
+                            onChanged: (val) {
+                              setState(() {
+                                searchAddr = val;
+                              });
+                            },
+                          ),
+                        ),
+                      ),
+                      Padding(
+                        padding:
+                            const EdgeInsets.fromLTRB(16.0, 100.0, 16.0, 16.0),
+                        child: Align(
+                          alignment: Alignment.topRight,
+                          child: Column(
+                            children: <Widget>[
+                              //Adding another floating button to mark locations
+                              FloatingActionButton(
+                                onPressed: _onAddMarkerButtonPressed,
+                                materialTapTargetSize:
+                                    MaterialTapTargetSize.padded,
+                                backgroundColor: Colors.redAccent,
+                                child: const Icon(
+                                  Icons.add_location,
+                                  size: 36.0,
+                                ),
+                              )
+                            ],
+                          ),
+                        ),
+                      ),
+                    ],
                   ),
                 ),
-              )
-            : Container(
-                child: Stack(
-                  children: <Widget>[
-                    GoogleMap(
-                      onMapCreated: _onMapCreated,
-                      initialCameraPosition: CameraPosition(
-                        target: _center,
-                        zoom: 11.0,
-                      ),
-                      markers: _markers,
-                      //Adding the marker property to Google Maps Widget
-                      onCameraMove:
-                          _onCameraMove, //Moving the center each time we move on the map, by calling _onCameraMove
-                    ),
-                    Positioned(
-                      top: 30,
-                      right: 15,
-                      left: 15,
-                      child: Container(
-                        height: 50.0,
-                        width: double.infinity,
-                        decoration: BoxDecoration(
-                          borderRadius: BorderRadius.circular(5.0),
-                          color: Colors.white,
-                        ),
-                        child: TextField(
-                          decoration: InputDecoration(
-                              hintText: "Enter address...",
-                              border: InputBorder.none,
-                              contentPadding:
-                                  EdgeInsets.only(left: 15.0, top: 15.0),
-                              suffixIcon: IconButton(
-                                icon: Icon(Icons.search),
-                                onPressed: _searchandNavigate,
-                                iconSize: 30.0,
-                              )),
-                          onChanged: (val) {
-                            setState(() {
-                              searchAddr = val;
-                            });
-                          },
-                        ),
-                      ),
-                    ),
-                    Padding(
-                      padding:
-                          const EdgeInsets.fromLTRB(16.0, 100.0, 16.0, 16.0),
-                      child: Align(
-                        alignment: Alignment.topRight,
-                        child: Column(
-                          children: <Widget>[
-                            //Adding another floating button to mark locations
-                            FloatingActionButton(
-                              onPressed: _onAddMarkerButtonPressed,
-                              materialTapTargetSize:
-                                  MaterialTapTargetSize.padded,
-                              backgroundColor: Colors.redAccent,
-                              child: const Icon(
-                                Icons.add_location,
-                                size: 36.0,
-                              ),
-                            )
-                          ],
-                        ),
-                      ),
-                    )
-                  ],
+        ),
+        drawer: Drawer(
+          // Add a ListView to the drawer. This ensures the user can scroll
+          // through the options in the drawer if there isn't enough vertical
+          // space to fit everything.
+          child: ListView(
+            // Important: Remove any padding from the ListView.
+            padding: EdgeInsets.only(),
+            children: <Widget>[
+              DrawerHeader(
+                child: Text('Settings'),
+                decoration: BoxDecoration(
+                  color: Colors.blue,
                 ),
               ),
-        floatingActionButton: FloatingActionButton(
-          heroTag: "btn3",
-          // When the user presses the button, show an alert dialog containing
-          // the text that the user has entered into the text field.
-          onPressed: () {
-            Navigator.push(
-                context, MaterialPageRoute(builder: (context) => Page4()));
-          },
-          child: Text('Page 4'), // to show Go text in button
+              ListTile(
+                title: Text('People in this room:'),
+                onTap: () {
+                  // Update the state of the app
+                  // ...
+                  // Then close the drawer
+                  //Navigator.pop(context);
+                },
+              ),
+              ListTile(
+                title: Text('Searching for:'),
+                onTap: () {
+                  // Update the state of the app
+                  // ...
+                  // Then close the drawer
+                  //Navigator.pop(context);
+                },
+              ),
+            ],
+          ),
         ),
       ),
     );
+    //);
   }
 }
