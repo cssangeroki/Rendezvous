@@ -1,0 +1,18 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project version="4">
+  <component name="ProjectModuleManager">
+    <modules>
+      <module fileurl="file://$PROJECT_DIR$/.idea/modules/android.iml" filepath="$PROJECT_DIR$/.idea/modules/android.iml" group="android" />
+      <module fileurl="file://$PROJECT_DIR$/.idea/modules/app/app.iml" filepath="$PROJECT_DIR$/.idea/modules/app/app.iml" group="android/app" />
+      <module fileurl="file://$PROJECT_DIR$/.idea/modules/-1665275986/cloud_firestore.iml" filepath="$PROJECT_DIR$/.idea/modules/-1665275986/cloud_firestore.iml" group="android/cloud_firestore" />
+      <module fileurl="file://$PROJECT_DIR$/.idea/modules/726854694/firebase_analytics.iml" filepath="$PROJECT_DIR$/.idea/modules/726854694/firebase_analytics.iml" group="android/firebase_analytics" />
+      <module fileurl="file://$PROJECT_DIR$/.idea/modules/-2061301581/firebase_auth.iml" filepath="$PROJECT_DIR$/.idea/modules/-2061301581/firebase_auth.iml" group="android/firebase_auth" />
+      <module fileurl="file://$PROJECT_DIR$/.idea/modules/942902802/firebase_core.iml" filepath="$PROJECT_DIR$/.idea/modules/942902802/firebase_core.iml" group="android/firebase_core" />
+      <module fileurl="file://$PROJECT_DIR$/.idea/modules/-866147626/flutter_plugin_android_lifecycle.iml" filepath="$PROJECT_DIR$/.idea/modules/-866147626/flutter_plugin_android_lifecycle.iml" group="android/flutter_plugin_android_lifecycle" />
+      <module fileurl="file://$PROJECT_DIR$/.idea/modules/-1475193006/geolocator.iml" filepath="$PROJECT_DIR$/.idea/modules/-1475193006/geolocator.iml" group="android/geolocator" />
+      <module fileurl="file://$PROJECT_DIR$/.idea/modules/-1760912674/google_api_availability.iml" filepath="$PROJECT_DIR$/.idea/modules/-1760912674/google_api_availability.iml" group="android/google_api_availability" />
+      <module fileurl="file://$PROJECT_DIR$/.idea/modules/-1849855669/google_maps_flutter.iml" filepath="$PROJECT_DIR$/.idea/modules/-1849855669/google_maps_flutter.iml" group="android/google_maps_flutter" />
+      <module fileurl="file://$PROJECT_DIR$/.idea/modules/-1492378273/location_permissions.iml" filepath="$PROJECT_DIR$/.idea/modules/-1492378273/location_permissions.iml" group="android/location_permissions" />
+    </modules>
+  </component>
+</project>
