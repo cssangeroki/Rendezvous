@@ -68,10 +68,8 @@ class _Page1State extends State<Page1> {
           : SafeArea(
               child: SingleChildScrollView(
                 child: Column(children: <Widget>[
-                  CircleAvatar(
-                    backgroundColor: Colors.blueGrey,
-                    minRadius: 160,
-                    backgroundImage: AssetImage('images/Rendezvous_logo.png'),
+                  Image(
+                    image: AssetImage('images/Rendezvous_logo.png'),
                   ),
                   Container(
                     padding: EdgeInsets.fromLTRB(20.0, 20.0, 20.0, 0),

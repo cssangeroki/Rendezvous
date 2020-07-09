@@ -17,10 +17,8 @@ class Page2 extends StatelessWidget {
       body: SafeArea(
         child: SingleChildScrollView(
           child: Column(children: <Widget>[
-            CircleAvatar(
-              backgroundColor: Colors.blueGrey,
-              minRadius: 160,
-              backgroundImage: AssetImage('images/Rendezvous_logo.png'),
+            Image(
+              image: AssetImage('images/Rendezvous_logo.png'),
             ),
             Container(
               padding: EdgeInsets.all(10.0),

@@ -117,10 +117,8 @@ class _Page4State extends State<Page4> {
           : SafeArea(
               child: SingleChildScrollView(
                 child: Column(children: <Widget>[
-                  CircleAvatar(
-                    backgroundColor: Colors.blueGrey,
-                    minRadius: 170,
-                    backgroundImage: AssetImage('images/Rendezvous_logo.png'),
+                  Image(
+                    image: AssetImage('images/Rendezvous_logo.png'),
                   ),
                   Container(
                     child: Text(

@@ -242,13 +242,18 @@ class _MapRenderState extends State<MapRender> {
             child: Text("Yelp info will be found here"),
           ),
           collapsed: Container(
-            decoration:
-                BoxDecoration(color: Colors.lightBlue, borderRadius: radius),
+            decoration: BoxDecoration(
+              color: Colors.white,
+              borderRadius: radius,
+            ),
             child: Center(
-              child: Text('Swipe up for menu'),
+              child: Text(
+                'Swipe up for menu',
+                style: TextStyle(fontSize: 20),
+              ),
             ),
           ),
-          minHeight: 15,
+          minHeight: 100,
           body: _center == null
               ? Container(
                   child: Center(
@@ -329,70 +334,93 @@ class _MapRenderState extends State<MapRender> {
                   ),
                 ),
         ),
-        drawer: Drawer(
+        drawer: Theme(
+          data: Theme.of(context).copyWith(
+            canvasColor:
+                Colors.blue, //This will change the drawer background to blue.
+            //other styles
+          ),
+          child: Drawer(
 // Add a ListView to the drawer. This ensures the user can scroll
 // through the options in the drawer if there isn't enough vertical
 // space to fit everything.
-          child: ListView(
+            child: ListView(
 // Important: Remove any padding from the ListView.
 //padding: EdgeInsets.only(),
-            children: <Widget>[
-              DrawerHeader(
-                child: Text('Settings'),
-                decoration: BoxDecoration(
-                  color: Colors.blue,
-                ),
-              ),
-              ListTile(
-                title: Text('People in this room:'),
-                onTap: () {
-// Update the state of the app
-// ...
-// Then close the drawer
-//Navigator.pop(context);
-                },
-              ),
-              ListTile(
-                title: Text('Searching for:'),
-                onTap: () {
-// Update the state of the app
-// ...
-// Then close the drawer
-//Navigator.pop(context);
-                },
-              ),
-//This is supposed to be the yelp search bar.
-//I just copied what I did for google maps, and we can adjust it to how we want.
-              Positioned(
-                top: 30,
-                right: 15,
-                left: 15,
-                child: Container(
-                  height: 50.0,
-                  width: double.infinity,
-                  decoration: BoxDecoration(
-                    borderRadius: BorderRadius.circular(5.0),
-                    color: Colors.white,
-                  ),
-                  child: TextField(
-                    decoration: InputDecoration(
-                        hintText: "Enter category...",
-                        border: InputBorder.none,
-                        contentPadding: EdgeInsets.only(left: 15.0, top: 15.0),
-                        suffixIcon: IconButton(
-                          icon: Icon(Icons.search),
-                          onPressed: _findingPlaces,
-                          iconSize: 30.0,
-                        )),
-                    onChanged: (val) {
-                      setState(() {
-                        category = val;
-                      });
-                    },
+              children: <Widget>[
+                Container(
+                  height: 80.0,
+                  margin: EdgeInsets.all(0),
+                  child: DrawerHeader(
+                    child: Text(
+                      'Settings',
+                      style: TextStyle(
+                        fontSize: 30,
+                      ),
+                    ),
                   ),
                 ),
-              ),
-            ],
+                Container(
+                  child: ListTile(
+                    title: Text(
+                      'People in this room:',
+                      style: TextStyle(
+                        fontSize: 20,
+                      ),
+                    ),
+                    onTap: null,
+                  ),
+                ),
+                Container(
+                  child: ListTile(
+                    title: Text(
+                      'Searching for:',
+                      style: TextStyle(
+                        fontSize: 20,
+                      ),
+                    ),
+                    onTap: null,
+                  ),
+                ),
+                Positioned(
+                  top: 30,
+                  right: 15,
+                  left: 15,
+                  child: Container(
+                    margin: EdgeInsets.all(15),
+                    width: double.infinity,
+                    decoration: BoxDecoration(
+                      borderRadius: BorderRadius.circular(10.0),
+                      color: Colors.white,
+                    ),
+                    child: TextField(
+                      decoration: InputDecoration(
+                          focusedBorder: OutlineInputBorder(
+                            borderSide:
+                                BorderSide(color: Colors.black, width: 1.5),
+                          ),
+                          enabledBorder: OutlineInputBorder(
+                            borderSide:
+                                BorderSide(color: Colors.black, width: 1.5),
+                          ),
+                          hintText: "Enter category...",
+                          contentPadding:
+                              EdgeInsets.only(left: 15.0, top: 15.0),
+                          suffixIcon: IconButton(
+                            icon: Icon(Icons.search),
+                            onPressed: _findingPlaces,
+                            iconSize: 20.0,
+                          )),
+                      onChanged: (val) {
+                        setState(() {
+                          category = val;
+                        });
+                      },
+                    ),
+                  ),
+                ),
+              ],
+            ),
           ),
         ),
       ),
