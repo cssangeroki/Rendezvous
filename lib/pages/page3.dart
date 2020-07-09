@@ -45,8 +45,10 @@ String category;
 
 class MapRender extends StatefulWidget {
   final String roomCode;
+  final String name;
 
-  MapRender({Key key, @required this.roomCode}) : super(key: key);
+  MapRender({Key key, @required this.roomCode, @required this.name})
+      : super(key: key);
 
   @override
   _MapRenderState createState() => _MapRenderState();
@@ -419,6 +421,9 @@ class _MapRenderState extends State<MapRender> {
                     ),
                   ),
                 ),
+                Container(
+                  child: Text("Your Code:"),
+                )
               ],
             ),
           ),

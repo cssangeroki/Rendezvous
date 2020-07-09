@@ -43,8 +43,12 @@ class Page2 extends StatelessWidget {
                       style:
                           new TextStyle(fontSize: 20.0, color: Colors.black)),
                   onPressed: () {
-                    Navigator.push(context,
-                        MaterialPageRoute(builder: (context) => MapRender()));
+                    Navigator.push(
+                        context,
+                        MaterialPageRoute(
+                            builder: (context) => MapRender(
+                                  name: name,
+                                )));
                   },
                 ),
               ),
@@ -59,8 +63,10 @@ class Page2 extends StatelessWidget {
                 child: Text("Join a Room",
                     style: new TextStyle(fontSize: 20.0, color: Colors.black)),
                 onPressed: () {
-                  Navigator.push(context,
-                      MaterialPageRoute(builder: (context) => Page4()));
+                  Navigator.push(
+                      context,
+                      MaterialPageRoute(
+                          builder: (context) => Page4(name: name)));
                 },
               ),
             ),

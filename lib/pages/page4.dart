@@ -62,7 +62,9 @@ class Page4 extends StatelessWidget {
 
 class Page4 extends StatefulWidget {
   String roomCode;
-  Page4({Key key, @required this.roomCode}) : super(key: key);
+  Page4({Key key, @required this.roomCode, @required this.name})
+      : super(key: key);
+  String name;
 
   @override
   _Page4State createState() => _Page4State(roomCode);
