@@ -13,7 +13,7 @@ import 'page2.dart';
 import 'page4.dart';
 
 import 'package:sliding_up_panel/sliding_up_panel.dart';
-
+import 'package:cloud_firestore/cloud_firestore.dart';
 //Map rendering stuff
 //Check the below link for some explanation of how a lot of the methods work
 //https://medium.com/@rajesh.muthyala/flutter-with-google-maps-and-google-place-85ccee3f0371
@@ -49,11 +49,14 @@ String category;
 double midSliderVal = 5;
 double userSliderVal = 25;
 
+//Here I'm creating a reference to our firebase
+final firebase = Firestore.instance;
+
 class MapRender extends StatefulWidget {
   final String roomCode;
   final String name;
-
-  MapRender({Key key, @required this.roomCode, @required this.name})
+  final String documentID;
+  MapRender({Key key, @required this.roomCode, @required this.name, @required this.documentID})
       : super(key: key);
 
   @override
@@ -84,7 +87,6 @@ class _MapRenderState extends State<MapRender> {
 
 //Going to create a string which will store the midpoint address
   String midAddress;
-
 //Marker _markers;
 //Function initState initialises the state of variables
   @override
@@ -93,6 +95,7 @@ class _MapRenderState extends State<MapRender> {
     initFunctionCaller();
     getRoomCodePreference().then(_updateRoomCode); // initialize stored roomCode
     getNamePreference().then(_updateName);
+    //I also want to update the users location in the database
   }
 
   void initFunctionCaller() async {
@@ -148,7 +151,7 @@ class _MapRenderState extends State<MapRender> {
   }
 
 //Function to get the address for the midpoint from the
-  Future<void> placefromLatLng(LatLng mid) async {
+  Future<void> placefromLatLng(LatLng mid) async{
 //Here, I will get the placemark from the coordinates
     List<Placemark> p = await Geolocator()
         .placemarkFromCoordinates(mid.latitude, mid.longitude);
@@ -158,9 +161,10 @@ class _MapRenderState extends State<MapRender> {
       midAddress =
           "${place.name}, ${place.subLocality}, ${place.locality}, ${place.postalCode}, ${place.country}";
     });
+    print("MidAddress updated to $midAddress");
   }
 
-  void findMidpoint(Set<Marker> locations) {
+  void findMidpoint(Set<Marker> locations) async{
     double currentMidLat = 0;
     double currentMidLon = 0;
 
@@ -180,12 +184,18 @@ class _MapRenderState extends State<MapRender> {
       currentMidLat = (location.position.latitude + currentMidLat);
       currentMidLon = (location.position.longitude + currentMidLon);
     }
-//Over here I remove the current midpoint marker, so I can add it again later
     setState(() {
       _markers.remove(toRemove);
-      currentMidLat = currentMidLat / (locations.length);
-      currentMidLon = currentMidLon / (locations.length);
-      placefromLatLng(LatLng(currentMidLat, currentMidLon));
+    });
+    currentMidLat = currentMidLat / (locations.length);
+    currentMidLon = currentMidLon / (locations.length);
+    await placefromLatLng(LatLng(currentMidLat, currentMidLon));
+//Over here I remove the current midpoint marker, so I can add it again later
+    setState(() {
+//      _markers.remove(toRemove);
+//      currentMidLat = currentMidLat / (locations.length);
+//      currentMidLon = currentMidLon / (locations.length);
+//      placefromLatLng(LatLng(currentMidLat, currentMidLon));
       _markers.add(Marker(
         markerId: MarkerId('Midpoint'),
         position: LatLng(currentMidLat, currentMidLon),
@@ -194,6 +204,7 @@ class _MapRenderState extends State<MapRender> {
             .hueBlue), //Setting midpoint marker to blue so it's identifiable
       ));
     });
+    print("Midpoint address = " + midAddress);
   }
 
   void _onAddMarkerButtonPressed() async {
