@@ -8,6 +8,7 @@ import 'package:google_maps_flutter/google_maps_flutter.dart';
 
 import 'package:geolocator/geolocator.dart';
 
+import 'page1.dart';
 import 'page4.dart';
 
 import 'package:sliding_up_panel/sliding_up_panel.dart';
@@ -346,117 +347,222 @@ class _MapRenderState extends State<MapRender> {
                 Colors.blue, //This will change the drawer background to blue.
             //other styles
           ),
-          child: Drawer(
+          child: Container(
+            width: 350,
+            child: Drawer(
 // Add a ListView to the drawer. This ensures the user can scroll
 // through the options in the drawer if there isn't enough vertical
 // space to fit everything.
-            child: ListView(
+              child: ListView(
 // Important: Remove any padding from the ListView.
 //padding: EdgeInsets.only(),
-              children: <Widget>[
-                Container(
-                  height: 80.0,
-                  margin: EdgeInsets.all(0),
-                  child: DrawerHeader(
-                    child: Text(
-                      'Settings',
-                      style: TextStyle(
-                        fontSize: 30,
-                      ),
-                    ),
-                  ),
-                ),
-                Container(
-                  child: ListTile(
-                    title: Text(
-                      'People in this room:',
-                      style: TextStyle(
-                        fontSize: 20,
-                      ),
-                    ),
-                    onTap: null,
-                  ),
-                ),
-                Container(
-                  child: ListTile(
-                    title: Text(
-                      'Searching for:',
-                      style: TextStyle(
-                        fontSize: 20,
-                      ),
-                    ),
-                    onTap: null,
-                  ),
-                ),
-                //Search bar
-                Container(
-                  margin: EdgeInsets.all(15),
-                  width: double.infinity,
-                  decoration: BoxDecoration(
-                    borderRadius: BorderRadius.circular(10.0),
-                    color: Colors.white,
-                  ),
-                  child: TextField(
-                    decoration: InputDecoration(
-                        focusedBorder: OutlineInputBorder(
-                          borderSide:
-                              BorderSide(color: Colors.black, width: 1.5),
+                children: <Widget>[
+                  Container(
+                    height: 80.0,
+                    margin: EdgeInsets.all(0),
+                    child: DrawerHeader(
+                      child: Container(
+                        child: Text(
+                          'Settings',
+                          style: TextStyle(
+                            fontSize: 30,
+                          ),
                         ),
-                        enabledBorder: OutlineInputBorder(
-                          borderSide:
-                              BorderSide(color: Colors.black, width: 1.5),
-                        ),
-                        hintText: "Enter category...",
-                        contentPadding: EdgeInsets.only(left: 15.0, top: 15.0),
-                        suffixIcon: IconButton(
-                          icon: Icon(Icons.search),
-                          onPressed: _findingPlaces,
-                          iconSize: 20.0,
-                        )),
-                    onChanged: (val) {
-                      setState(() {
-                        category = val;
-                      });
-                    },
+                      ),
+                    ),
                   ),
-                ),
-                //Below are the sliders
-                Text("Range from your location:"),
-                CupertinoSlider(
-                  value: userSliderVal,
-                  onChanged: (double val) {
-                    //We need to connect the yelp API here
-                    print(val);
-                    setState(() {
-                      userSliderVal = val;
-                    });
-                  },
-                  min: 1,
-                  max: 25,
-                  divisions: 24,
-                  activeColor: Colors.green,
-                  thumbColor: Colors.white,
-                ),
-                Text("Range from midpoint:"),
-                CupertinoSlider(
-                  value: midSliderVal,
-                  onChanged: (double val) {
-                    //We need to connect the yelp API here
-                    print(val);
-                    setState(() {
-                      midSliderVal = val;
-                    });
-                  },
-                  min: 1,
-                  max: 25,
-                  divisions: 24,
-                  activeColor: Colors.green,
-                  thumbColor: Colors.white,
-                ),
-                Container(
-                  child: Text("Your Code:"),
-                )
-              ],
+                  Container(
+                    child: ListTile(
+                      title: Text(
+                        'People in this room:',
+                        style: TextStyle(
+                          fontSize: 20,
+                        ),
+                      ),
+                      onTap: null,
+                    ),
+                  ),
+                  Container(
+                    child: ListTile(
+                      title: Text(
+                        'Searching for:',
+                        style: TextStyle(
+                          fontSize: 20,
+                        ),
+                      ),
+                      onTap: null,
+                    ),
+                  ),
+                  //Search bar
+
+                  Container(
+                    margin: EdgeInsets.all(15),
+                    width: double.infinity,
+                    decoration: BoxDecoration(
+                      borderRadius: BorderRadius.circular(10.0),
+                      color: Colors.white,
+                    ),
+                    child: TextField(
+                      decoration: InputDecoration(
+                          focusedBorder: OutlineInputBorder(
+                            borderSide:
+                                BorderSide(color: Colors.black, width: 1.5),
+                          ),
+                          enabledBorder: OutlineInputBorder(
+                            borderSide:
+                                BorderSide(color: Colors.black, width: 1.5),
+                          ),
+                          hintText: "Enter category...",
+                          contentPadding:
+                              EdgeInsets.only(left: 15.0, top: 15.0),
+                          suffixIcon: IconButton(
+                            icon: Icon(Icons.search),
+                            onPressed: _findingPlaces,
+                            iconSize: 20.0,
+                          )),
+                      onChanged: (val) {
+                        setState(() {
+                          category = val;
+                        });
+                      },
+                    ),
+                  ),
+                  //Below are the sliders
+                  Container(
+                    child: ListTile(
+                      title: Text(
+                        'Range from your location: ${userSliderVal} mi',
+                        style: TextStyle(
+                          fontSize: 18,
+                        ),
+                      ),
+                      onTap: null,
+                    ),
+                  ),
+                  SliderTheme(
+                    data: SliderTheme.of(context).copyWith(
+                      activeTrackColor: Colors.red[500],
+                      inactiveTrackColor: Colors.red[100],
+                      trackShape: RectangularSliderTrackShape(),
+                      trackHeight: 4.0,
+                      thumbColor: Colors.white,
+                      thumbShape:
+                          RoundSliderThumbShape(enabledThumbRadius: 10.0),
+                      overlayColor: Colors.red.withAlpha(32),
+                      overlayShape:
+                          RoundSliderOverlayShape(overlayRadius: 28.0),
+                    ),
+                    child: Container(
+                      margin: EdgeInsets.all(5),
+                      /*
+                      decoration: BoxDecoration(
+                          border: Border.all(
+                            color: Colors.black,
+                          ),
+                          borderRadius: BorderRadius.all(Radius.circular(20))), */
+                      child: Slider(
+                        value: userSliderVal,
+                        onChanged: (double val) {
+                          //We need to connect the yelp API here
+                          setState(() {
+                            userSliderVal = val;
+                          });
+                        },
+                        min: 1,
+                        max: 25,
+                        divisions: 24,
+                      ),
+                    ),
+                  ),
+                  Container(
+                    child: ListTile(
+                      title: Text(
+                        'Range from midpoint: ${midSliderVal} mi',
+                        style: TextStyle(
+                          fontSize: 18,
+                        ),
+                      ),
+                      onTap: null,
+                    ),
+                  ),
+                  SliderTheme(
+                      data: SliderTheme.of(context).copyWith(
+                        activeTrackColor: Colors.red[500],
+                        inactiveTrackColor: Colors.red[100],
+                        trackShape: RectangularSliderTrackShape(),
+                        trackHeight: 4.0,
+                        thumbColor: Colors.white,
+                        thumbShape:
+                            RoundSliderThumbShape(enabledThumbRadius: 10.0),
+                        overlayColor: Colors.red.withAlpha(32),
+                        overlayShape:
+                            RoundSliderOverlayShape(overlayRadius: 28.0),
+                      ),
+                      child: Container(
+                        margin: EdgeInsets.all(5),
+                        /*decoration: BoxDecoration(
+                            border: Border.all(
+                              color: Colors.black,
+                            ),
+                            borderRadius:
+                                BorderRadius.all(Radius.circular(20))),
+                                */
+                        child: Slider(
+                          value: midSliderVal,
+                          onChanged: (double val) {
+                            //We need to connect the yelp API here
+                            setState(() {
+                              midSliderVal = val;
+                            });
+                          },
+                          min: 1,
+                          max: 25,
+                          divisions: 24,
+                        ),
+                      )),
+                  Container(
+                    child: ListTile(
+                      title: Text(
+                        'Your Code:',
+                        style: TextStyle(
+                          fontSize: 20,
+                        ),
+                      ),
+                      onTap: null,
+                    ),
+                  ),
+                  Container(
+                    padding: EdgeInsets.fromLTRB(0, 0, 0, 0),
+                    child: ListTile(
+                      title: Text(
+                        'H3LL0',
+                        style: TextStyle(
+                          fontSize: 30,
+                        ),
+                      ),
+                      onTap: null,
+                    ),
+                  ),
+                  Container(
+                    padding: EdgeInsets.fromLTRB(20.0, 20.0, 20.0, 15.0),
+                    width: 50,
+                    child: ButtonTheme(
+                      minWidth: double.infinity,
+                      height: 60.0,
+                      padding: EdgeInsets.all(10.0),
+                      buttonColor: Colors.white,
+                      child: RaisedButton(
+                        child: Text("Leave Room",
+                            style: new TextStyle(
+                                fontSize: 20.0, color: Colors.black)),
+                        onPressed: () {
+                          Navigator.pop(context);
+                        },
+                      ),
+                    ),
+                  ),
+                ],
+              ),
             ),
           ),
         ),
