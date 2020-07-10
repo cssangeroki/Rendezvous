@@ -43,6 +43,10 @@ Future<Position> currentLocation() async {
 //A string that will store the category searched for on the Yelp search
 String category;
 
+//Below are variables we will use for the sliders
+double midSliderVal = 5;
+double userSliderVal = 25;
+
 class MapRender extends StatefulWidget {
   final String roomCode;
   final String name;
@@ -384,42 +388,70 @@ class _MapRenderState extends State<MapRender> {
                     onTap: null,
                   ),
                 ),
-                Positioned(
-                  top: 30,
-                  right: 15,
-                  left: 15,
-                  child: Container(
-                    margin: EdgeInsets.all(15),
-                    width: double.infinity,
-                    decoration: BoxDecoration(
-                      borderRadius: BorderRadius.circular(10.0),
-                      color: Colors.white,
-                    ),
-                    child: TextField(
-                      decoration: InputDecoration(
-                          focusedBorder: OutlineInputBorder(
-                            borderSide:
-                                BorderSide(color: Colors.black, width: 1.5),
-                          ),
-                          enabledBorder: OutlineInputBorder(
-                            borderSide:
-                                BorderSide(color: Colors.black, width: 1.5),
-                          ),
-                          hintText: "Enter category...",
-                          contentPadding:
-                              EdgeInsets.only(left: 15.0, top: 15.0),
-                          suffixIcon: IconButton(
-                            icon: Icon(Icons.search),
-                            onPressed: _findingPlaces,
-                            iconSize: 20.0,
-                          )),
-                      onChanged: (val) {
-                        setState(() {
-                          category = val;
-                        });
-                      },
-                    ),
+                //Search bar
+                Container(
+                  margin: EdgeInsets.all(15),
+                  width: double.infinity,
+                  decoration: BoxDecoration(
+                    borderRadius: BorderRadius.circular(10.0),
+                    color: Colors.white,
                   ),
+                  child: TextField(
+                    decoration: InputDecoration(
+                        focusedBorder: OutlineInputBorder(
+                          borderSide:
+                              BorderSide(color: Colors.black, width: 1.5),
+                        ),
+                        enabledBorder: OutlineInputBorder(
+                          borderSide:
+                              BorderSide(color: Colors.black, width: 1.5),
+                        ),
+                        hintText: "Enter category...",
+                        contentPadding: EdgeInsets.only(left: 15.0, top: 15.0),
+                        suffixIcon: IconButton(
+                          icon: Icon(Icons.search),
+                          onPressed: _findingPlaces,
+                          iconSize: 20.0,
+                        )),
+                    onChanged: (val) {
+                      setState(() {
+                        category = val;
+                      });
+                    },
+                  ),
+                ),
+                //Below are the sliders
+                Text("Range from your location:"),
+                CupertinoSlider(
+                  value: userSliderVal,
+                  onChanged: (double val) {
+                    //We need to connect the yelp API here
+                    print(val);
+                    setState(() {
+                      userSliderVal = val;
+                    });
+                  },
+                  min: 1,
+                  max: 25,
+                  divisions: 24,
+                  activeColor: Colors.green,
+                  thumbColor: Colors.white,
+                ),
+                Text("Range from midpoint:"),
+                CupertinoSlider(
+                  value: midSliderVal,
+                  onChanged: (double val) {
+                    //We need to connect the yelp API here
+                    print(val);
+                    setState(() {
+                      midSliderVal = val;
+                    });
+                  },
+                  min: 1,
+                  max: 25,
+                  divisions: 24,
+                  activeColor: Colors.green,
+                  thumbColor: Colors.white,
                 ),
                 Container(
                   child: Text("Your Code:"),
