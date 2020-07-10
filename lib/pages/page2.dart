@@ -21,6 +21,7 @@ Future<String> getRoomCodePreference() async {
   return roomCode;
 }
 
+
 class Page2 extends StatefulWidget {
   //final String name;
   //Page2({Key key, @required this.name}) : super(key: key);
@@ -77,7 +78,7 @@ class _Page2State extends State<Page2> {
     });
 
     // create a room, send user to room
-
+    String documentID = "ThisNeedsToBeUpdatedWithActualValue";
     //databaseMethods.createMapRoom(roomCode, name);
     print("roomCode is: " + roomCode);
     saveRoomCodePreference(roomCode).then((_) {
