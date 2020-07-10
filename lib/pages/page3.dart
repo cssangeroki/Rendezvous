@@ -9,6 +9,7 @@ import 'package:google_maps_flutter/google_maps_flutter.dart';
 import 'package:geolocator/geolocator.dart';
 
 import 'page1.dart';
+import 'page2.dart';
 import 'page4.dart';
 
 import 'package:sliding_up_panel/sliding_up_panel.dart';
@@ -90,6 +91,8 @@ class _MapRenderState extends State<MapRender> {
   void initState() {
     super.initState();
     initFunctionCaller();
+    getRoomCodePreference().then(_updateRoomCode); // initialize stored roomCode
+    getNamePreference().then(_updateName);
   }
 
   void initFunctionCaller() async {
@@ -227,6 +230,21 @@ class _MapRenderState extends State<MapRender> {
 //Then get the actual full address of that location, and finally call _onAddMarkerButtonPressed so that a marker is added at that location
       _getUserAddress();
       await _onAddMarkerButtonPressed();
+    });
+  }
+
+  String _roomCode = "";
+
+  void _updateRoomCode(String roomCode) {
+    setState(() {
+      this._roomCode = roomCode;
+    });
+  }
+
+  String _name = "";
+  void _updateName(String name) {
+    setState(() {
+      this._name = name;
     });
   }
 
@@ -377,6 +395,18 @@ class _MapRenderState extends State<MapRender> {
                         'People in this room:',
                         style: TextStyle(
                           fontSize: 20,
+                        ),
+                      ),
+                      onTap: null,
+                    ),
+                  ),
+                  Container(
+                    padding: EdgeInsets.fromLTRB(0, 0, 0, 0),
+                    child: ListTile(
+                      title: Text(
+                        "$_name:" ?? "Name is Null",
+                        style: TextStyle(
+                          fontSize: 30,
                         ),
                       ),
                       onTap: null,
@@ -535,7 +565,7 @@ class _MapRenderState extends State<MapRender> {
                     padding: EdgeInsets.fromLTRB(0, 0, 0, 0),
                     child: ListTile(
                       title: Text(
-                        'H3LL0',
+                        "$_roomCode:" ?? "roomCode is Null",
                         style: TextStyle(
                           fontSize: 30,
                         ),

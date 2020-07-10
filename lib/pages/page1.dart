@@ -1,31 +1,39 @@
 // page 1, this is start/home page
 
 import 'package:flutter/material.dart';
-
+import 'package:shared_preferences/shared_preferences.dart';
 import 'page2.dart';
 
+Future<void> saveNamePreference(String userName) async {
+  SharedPreferences userNamePrefs = await SharedPreferences.getInstance();
+  userNamePrefs.setString("userName", userName);
+}
+
+// to load shared string
+Future<String> getNamePreference() async {
+  SharedPreferences userNamePrefs = await SharedPreferences.getInstance();
+  String userName = userNamePrefs.getString("userName");
+  return userName;
+}
+
 class Page1 extends StatefulWidget {
-  String userName;
-  Page1({Key key, @required this.userName}) : super(key: key);
+  //String userName;
+  //Page1({Key key, @required this.userName}) : super(key: key);
 
   @override
-  _Page1State createState() => _Page1State(userName);
+  _Page1State createState() => _Page1State();
 }
 
 class _Page1State extends State<Page1> {
   bool isLoading = false;
 
-  // for firebase data storage
-  //DatabaseMethods databaseMethods = new DatabaseMethods();
-
   final formKey = GlobalKey<FormState>();
 
-  String userName;
-
-  _Page1State(this.userName);
+  //_Page1State(this.userName);
   // Create a text controller and use it to retrieve the current value
   // of the TextField.
   final userNameController = TextEditingController();
+  String userName;
 
 //  TextEditingController userNameTextEditingController =
 //      new TextEditingController();
@@ -42,11 +50,21 @@ class _Page1State extends State<Page1> {
 //      };
 
       //databaseMethods.uploadUserInfo(userInfoMap);
-      _sendDataToPage2(context);
+      //_sendDataToPage2(context);
+      _saveName();
     }
   }
 
-  void _sendDataToPage2(BuildContext context) {
+  // method saves the local variable name
+  void _saveName() {
+    String userName = userNameController.text;
+    saveNamePreference(userName).then((_) {
+      Navigator.pushReplacement(
+          context, MaterialPageRoute(builder: (context) => Page2()));
+    });
+  }
+
+  /*void _sendDataToPage2(BuildContext context) {
     String personName = userName;
     Navigator.pushReplacement(
         context,
@@ -55,7 +73,7 @@ class _Page1State extends State<Page1> {
             name: personName,
           ),
         ));
-  }
+  }*/
 
   @override
   Widget build(BuildContext context) {
@@ -89,6 +107,7 @@ class _Page1State extends State<Page1> {
                         validator: (val) {
                           return val.isEmpty ? "Please Enter a Name" : null;
                         },
+                        controller: userNameController,
                         onChanged: (text) {
                           userName = text;
                         },
