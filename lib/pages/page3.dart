@@ -14,6 +14,7 @@ import 'page4.dart';
 
 import 'package:sliding_up_panel/sliding_up_panel.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
+
 //Map rendering stuff
 //Check the below link for some explanation of how a lot of the methods work
 //https://medium.com/@rajesh.muthyala/flutter-with-google-maps-and-google-place-85ccee3f0371
@@ -56,7 +57,11 @@ class MapRender extends StatefulWidget {
   final String roomCode;
   final String name;
   final String documentID;
-  MapRender({Key key, @required this.roomCode, @required this.name, @required this.documentID})
+  MapRender(
+      {Key key,
+      @required this.roomCode,
+      @required this.name,
+      @required this.documentID})
       : super(key: key);
 
   @override
@@ -151,7 +156,7 @@ class _MapRenderState extends State<MapRender> {
   }
 
 //Function to get the address for the midpoint from the
-  Future<void> placefromLatLng(LatLng mid) async{
+  Future<void> placefromLatLng(LatLng mid) async {
 //Here, I will get the placemark from the coordinates
     List<Placemark> p = await Geolocator()
         .placemarkFromCoordinates(mid.latitude, mid.longitude);
@@ -164,7 +169,7 @@ class _MapRenderState extends State<MapRender> {
     print("MidAddress updated to $midAddress");
   }
 
-  void findMidpoint(Set<Marker> locations) async{
+  void findMidpoint(Set<Marker> locations) async {
     double currentMidLat = 0;
     double currentMidLon = 0;
 
@@ -412,12 +417,12 @@ class _MapRenderState extends State<MapRender> {
                     ),
                   ),
                   Container(
-                    padding: EdgeInsets.fromLTRB(0, 0, 0, 0),
+                    padding: EdgeInsets.fromLTRB(30, 0, 0, 0),
                     child: ListTile(
                       title: Text(
-                        "$_name:" ?? "Name is Null",
+                        "${_name}" ?? "Name is Null",
                         style: TextStyle(
-                          fontSize: 30,
+                          fontSize: 20,
                         ),
                       ),
                       onTap: null,
@@ -576,9 +581,9 @@ class _MapRenderState extends State<MapRender> {
                     padding: EdgeInsets.fromLTRB(0, 0, 0, 0),
                     child: ListTile(
                       title: Text(
-                        "$_roomCode:" ?? "roomCode is Null",
+                        "${_roomCode}" ?? "roomCode is Null",
                         style: TextStyle(
-                          fontSize: 30,
+                          fontSize: 35,
                         ),
                       ),
                       onTap: null,
