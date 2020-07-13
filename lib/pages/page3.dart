@@ -1,5 +1,6 @@
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
+import 'package:geoflutterfire/geoflutterfire.dart';
 
 import 'dart:async';
 import 'dart:io';
@@ -100,7 +101,23 @@ class _MapRenderState extends State<MapRender> {
     initFunctionCaller();
     getRoomCodePreference().then(_updateRoomCode); // initialize stored roomCode
     getNamePreference().then(_updateName);
+
     //I also want to update the users location in the database
+  }
+
+  String _roomCode = "";
+
+  void _updateRoomCode(String roomCode) {
+    setState(() {
+      this._roomCode = roomCode;
+    });
+  }
+
+  String _name = "";
+  void _updateName(String name) {
+    setState(() {
+      this._name = name;
+    });
   }
 
   void initFunctionCaller() async {
@@ -120,6 +137,7 @@ class _MapRenderState extends State<MapRender> {
       _center = LatLng(currPosition.latitude, currPosition.longitude);
     });
     print("Center = " + _center.toString());
+    _pushUserLocation();
   }
 
 //Getting the user address from the location coordinates
@@ -249,7 +267,30 @@ class _MapRenderState extends State<MapRender> {
     });
   }
 
-  String _roomCode = "";
+  void _pushUserLocation() {
+    GeoFirePoint point = Geoflutterfire().point(
+        latitude: currPosition.latitude, longitude: currPosition.longitude);
+
+    Firestore.instance
+        .collection("rooms")
+        .document(_roomCode)
+        .setData({"roomCode": _roomCode}, merge: true);
+
+    Firestore.instance
+        .collection("rooms")
+        .document(_roomCode)
+        .collection("users")
+        .add({
+      "name": _name,
+      "location": point.data,
+    }).catchError((e) {
+      print(e.toString());
+    }).then((value) {
+      print(value.documentID);
+    });
+  }
+
+  /* String _roomCode = "";
 
   void _updateRoomCode(String roomCode) {
     setState(() {
@@ -263,7 +304,7 @@ class _MapRenderState extends State<MapRender> {
       this._name = name;
     });
   }
-
+*/
   @override
   Widget build(BuildContext context) {
     BorderRadiusGeometry radius = BorderRadius.only(
