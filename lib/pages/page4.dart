@@ -1,64 +1,8 @@
 // 8-4, the enter code page
 
 import 'package:flutter/material.dart';
-
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'page3.dart';
-import 'page5.dart';
-/*
-class Page4 extends StatelessWidget {
-  final codeController = TextEditingController();
-
-  @override
-  Widget build(BuildContext context) {
-    return Scaffold(
-      appBar: AppBar(
-        title: Text('Rendezvous Page 4'),
-      ),
-      body: isLoading
-          ? Container(child: Center(child: CircularProgressIndicator()))
-          : SafeArea(
-              child: SingleChildScrollView(
-                child: Column(children: <Widget>[
-                  CircleAvatar(
-                    backgroundColor: Colors.blueGrey,
-                    minRadius: 170,
-                    backgroundImage: AssetImage('images/Rendezvous_logo.png'),
-                  ),
-                  Container(
-                    child: Text(
-                      "Enter Code Below:",
-                      style: new TextStyle(
-                        fontSize: 25.0,
-                      ),
-                    ),
-                    padding: EdgeInsets.all(25.0),
-                  ),
-                  Container(
-                    margin: EdgeInsets.all(5.0),
-                    width: 200.0,
-                    child: TextField(
-                      // connected to textField, listen and save user input
-                      controller: codeController,
-                      decoration: InputDecoration(hintText: "Enter text here"),
-                    ),
-                  ),
-                ]),
-              ),
-            ),
-      floatingActionButton: FloatingActionButton(
-        heroTag: "btn4",
-        // When the user presses the button, show an alert dialog containing
-        // the text that the user has entered into the text field.
-        onPressed: () {
-          Navigator.push(
-              context, MaterialPageRoute(builder: (context) => Page5()));
-        },
-        child: Text('Page 5'), // to show Go text in button
-      ),
-    );
-  }
-}
- */
 
 class Page4 extends StatefulWidget {
   String roomCode;
@@ -73,38 +17,45 @@ class Page4 extends StatefulWidget {
 class _Page4State extends State<Page4> {
   bool isLoading = false;
 
+  @override
   final formKey = GlobalKey<FormState>();
-
+  final firestoreInstance = Firestore.instance;
   String roomCode;
+  String roomCodeValidate = "";
 
   _Page4State(this.roomCode);
 
   final codeController = TextEditingController();
 
-  sendToRoom() {
+  checkIfRoomValid(roomCodeValidate) {
     if (formKey.currentState.validate()) {
       setState(() {
         isLoading = true;
       });
-      // this can be used for future login with firebase
-//      Map<String, String> userInfoMap = {
-//        "name": userNameTextEditingController.text,
-//        "email": userNameTextEditingController.text
-//      };
 
-      //databaseMethods.uploadUserInfo(userInfoMap);
-      _sendDataToPage5(context);
+      // find roomCode on firebase
+      Firestore.instance
+          .collection('rooms')
+          .where('roomCode', isEqualTo: roomCodeValidate)
+          .getDocuments()
+          .then((QuerySnapshot docs) {
+        if (docs.documents.isNotEmpty) {
+          print('room found');
+          _sendToRoom(context);
+        } else if (docs.documents.isEmpty) {
+          // still working on code for this condition
+          print('room not found');
+        }
+      });
     }
   }
 
-  void _sendDataToPage5(BuildContext context) {
-    String chatRoomCode = roomCode;
+  void _sendToRoom(BuildContext context) {
+    //String chatRoomCode = roomCode;
     Navigator.pushReplacement(
         context,
         MaterialPageRoute(
-          builder: (context) => MapRender(
-            roomCode: chatRoomCode,
-          ),
+          builder: (context) => MapRender(),
         ));
   }
 
@@ -143,7 +94,7 @@ class _Page4State extends State<Page4> {
                               : null;
                         },
                         onChanged: (text) {
-                          roomCode = text;
+                          roomCodeValidate = text;
                         },
                         // connected to textField, listen and save user input
                         controller: codeController,
@@ -160,7 +111,7 @@ class _Page4State extends State<Page4> {
         // When the user presses the button, show an alert dialog containing
         // the text that the user has entered into the text field.
         onPressed: () {
-          sendToRoom();
+          checkIfRoomValid(roomCodeValidate);
 //          Navigator.push(
 //              context, MaterialPageRoute(builder: (context) => Page5()));
         },
