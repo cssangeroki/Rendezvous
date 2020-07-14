@@ -1,6 +1,6 @@
 // page 2, create room or join a room
-
 import 'package:flutter/material.dart';
+
 //import 'package:shared_preferences/shared_preferences.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'page1.dart';
@@ -19,7 +19,6 @@ Future<String> getRoomCodePreference() async {
   String roomCode = roomCodePrefs.getString("roomCode");
   return roomCode;
 }
-
 
 class Page2 extends StatefulWidget {
   //final String name;
@@ -54,9 +53,22 @@ class _Page2State extends State<Page2> {
       isLoading = true;
     });
 
+    String userDocID = FirebaseFunctions?.currentUID;
+    //This also needs to be updated to the current rooms DocID. Right now, I am using a DocID that I created
+    String roomDocID = FirebaseFunctions?.roomData["roomCode"];
+    //databaseMethods.createMapRoom(roomCode, name);
+    print("roomCode is: " + roomCode);
+
     saveRoomCodePreference(roomCode).then((_) {
       Navigator.push(
-          context, MaterialPageRoute(builder: (context) => MapRender()));
+          context,
+          MaterialPageRoute(
+              builder: (context) => MapRender(
+                    name: _name,
+                    roomCode: roomCode,
+                    userDocID: userDocID,
+                    roomDocID: roomDocID,
+                  )));
     });
 
 //    Navigator.pushReplacement(

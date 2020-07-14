@@ -1,5 +1,6 @@
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
+//import 'package:geoflutterfire/geoflutterfire.dart';
 
 import 'dart:async';
 import 'dart:io';
@@ -57,12 +58,15 @@ final firebase = Firestore.instance;
 class MapRender extends StatefulWidget {
   final String roomCode;
   final String name;
-  final String documentID;
+  final String userDocID;
+  final String roomDocID;
+
   MapRender(
       {Key key,
       @required this.roomCode,
       @required this.name,
-      @required this.documentID})
+      @required this.userDocID,
+      @required this.roomDocID})
       : super(key: key);
 
   @override
@@ -93,6 +97,7 @@ class _MapRenderState extends State<MapRender> {
 
 //Going to create a string which will store the midpoint address
   String midAddress;
+
 //Marker _markers;
 //Function initState initialises the state of variables
   @override
@@ -101,16 +106,34 @@ class _MapRenderState extends State<MapRender> {
     initFunctionCaller();
     getRoomCodePreference().then(_updateRoomCode); // initialize stored roomCode
     getNamePreference().then(_updateName);
+
     //I also want to update the users location in the database
   }
 
+  String _roomCode = "";
+
+  void _updateRoomCode(String roomCode) {
+    setState(() {
+      this._roomCode = roomCode;
+    });
+  }
+
+  String _name = "";
+
+  void _updateName(String name) {
+    setState(() {
+      this._name = name;
+    });
+  }
+
   void initFunctionCaller() async {
+    await _initMarkers();
     await _getUserLocation();
     _lastMapPosition = _center;
 //_getUserAddress();
     _onAddMarkerButtonPressed();
-    print("Done initialising variabels for map");
-    print(_center);
+    //print("Done initialising variabels for map");
+    //print(_center);
   }
 
 //Function used to get users original position
@@ -121,6 +144,7 @@ class _MapRenderState extends State<MapRender> {
       _center = LatLng(currPosition.latitude, currPosition.longitude);
     });
     print("Center = " + _center.toString());
+    _pushUserLocation();
   }
 
 //Getting the user address from the location coordinates
@@ -138,6 +162,56 @@ class _MapRenderState extends State<MapRender> {
     } catch (e) {
       print(e);
     }
+  }
+
+  //This function will be used to initialise my markers, by accessing the user data from firebase
+  Future<void> _initMarkers() async {
+    print("initMarkers called");
+    int i = 1;
+    firebase
+        .collection("rooms")
+        .document(widget.roomDocID)
+        .collection("users")
+        .snapshots()
+        .listen((snapshot) {
+      snapshot.documents.forEach((user) async {
+        //Id the user is not equal to the current user, then we need to add that users location to markers
+        if (user.documentID != widget.userDocID) {
+          await addOtherUserMarkers(user);
+          //print(i);
+          //i++;
+        }
+      });
+    });
+    print("Markers = $_markers");
+  }
+
+  //In this function, I iterate through every user in the document, and get there location and add it to markers
+  //All other users will have their BitMapDescriptor as Magenta in color, so that we can differentiate from other users
+  void addOtherUserMarkers(DocumentSnapshot userLocations) async {
+    //print("Users doc ID = " + userLocations.documentID);
+    GeoPoint newUserLoc = userLocations.data["location"];
+    //If for some reason the user doesn't have a location yet, simply return
+    if (newUserLoc == null) {
+      return;
+    }
+    var newUserinfo = await firebase
+        .collection("users")
+        .document(userLocations.documentID)
+        .get();
+    String newUserName = newUserinfo.data["userName"];
+    //if the user is already in our markers array, I will just update their position
+//    Marker toRemove = _markers.firstWhere(
+//        (marker) => marker.markerId.value == userLocations.documentID,
+//        orElse: () => null);
+    _markers.removeWhere(
+        (marker) => marker.markerId.value == userLocations.documentID);
+    _markers.add(Marker(
+      markerId: MarkerId(userLocations.documentID),
+      position: LatLng(newUserLoc.latitude, newUserLoc.longitude),
+      infoWindow: InfoWindow(title: newUserName, snippet: ""),
+      icon: BitmapDescriptor.defaultMarkerWithHue(BitmapDescriptor.hueMagenta),
+    ));
   }
 
   void _onCameraMove(CameraPosition position) {
@@ -176,25 +250,32 @@ class _MapRenderState extends State<MapRender> {
 
 //   var newLoc = locations[0];
     Marker toRemove;
+    int i = 1;
     for (var location in locations) {
 //Want to skip the midpoint so that it doesn't affect the position of the new midpoint.
 //If there is a Midpoint marker, I will store it in toRemove so I can remove it later
-      if (location.markerId == MarkerId("Midpoint")) {
+      if (location.markerId.value == "Midpoint") {
 //print("Found Midpoint marker");
 //print(location.toString());
-        toRemove = _markers.firstWhere(
-            (marker) => marker.markerId.value == "Midpoint",
-            orElse: () => null);
+//        toRemove = _markers.firstWhere(
+//            (marker) => marker.markerId.value == "Midpoint",
+//            orElse: () => null);
         continue;
       }
+      print("Marker $i = ${location.toString()}");
+      i++;
       currentMidLat = (location.position.latitude + currentMidLat);
       currentMidLon = (location.position.longitude + currentMidLon);
     }
     setState(() {
-      _markers.remove(toRemove);
+      print("toRemove = $toRemove");
+      _markers.removeWhere((marker) => marker.markerId.value == "Midpoint");
+      //print("Value removed = $removed");
     });
+    print("Number of markers = ${locations.length})");
     currentMidLat = currentMidLat / (locations.length);
     currentMidLon = currentMidLon / (locations.length);
+    print("Lat = $currentMidLat, and Long = $currentMidLon");
     await placefromLatLng(LatLng(currentMidLat, currentMidLon));
 //Over here I remove the current midpoint marker, so I can add it again later
     setState(() {
@@ -213,23 +294,41 @@ class _MapRenderState extends State<MapRender> {
     print("Midpoint address = " + midAddress);
   }
 
-  void _onAddMarkerButtonPressed() async {
-//deleting the current marker and replacing it with the new one
+  //Need to test updateUserLocation, as the userDocID currently is an invalid ID, so it doesn't work
+  //This function will be used to update the users location on firebase
+  void updateUserLocation() async {
+    await firebase
+        .collection("rooms")
+        .document(widget.roomDocID)
+        .collection("users")
+        .document(widget.userDocID)
+        .updateData(
+            {"location": GeoPoint(_center.latitude, _center.longitude)});
+  }
 
-//Comment this out to get multiple markers
-//_markers = {};
+  //This function will change the marker of the current user, so that a user can only edit their own marker
+  void _onAddMarkerButtonPressed() async {
+    //Here I find if there is already a user marker. If there is, toRemove is set to that marker. Otherwise toRemove is set to NULL
+//    Marker toRemove = _markers.firstWhere(
+//        (marker) => marker.markerId.value == "User",
+//        orElse: () => null);
 //Getting the correct address in searchAddr. Using await to ensure we get the right address.
     await _getUserAddress();
     setState(() {
+      //First I remove the toRemove marker from _markers
+      _markers.removeWhere((marker) => marker.markerId.value == "User");
+      //Then I add the Users new location
       _markers.add(Marker(
-        markerId: MarkerId(_lastMapPosition.toString()),
+        markerId: MarkerId("User"),
         position: _lastMapPosition,
         infoWindow: InfoWindow(title: searchAddr, snippet: ''),
 //infoWindow: InfoWindow(),
         icon: BitmapDescriptor.defaultMarker,
       ));
-      findMidpoint(_markers);
     });
+    //print("Markers length before midpoint = ${_markers.length}");
+    findMidpoint(_markers);
+    updateUserLocation();
   }
 
   void _searchandNavigate() {
@@ -250,7 +349,30 @@ class _MapRenderState extends State<MapRender> {
     });
   }
 
-  String _roomCode = "";
+  void _pushUserLocation() {
+    //GeoFirePoint point = Geoflutterfire.point(
+      //  latitude: currPosition.latitude, longitude: currPosition.longitude);
+    GeoPoint point = GeoPoint(currPosition.latitude, currPosition.longitude);
+    Firestore.instance
+        .collection("rooms")
+        .document(_roomCode)
+        .setData({"roomCode": _roomCode}, merge: true);
+
+    Firestore.instance
+        .collection("rooms")
+        .document(_roomCode)
+        .collection("users")
+        .add({
+      "name": _name,
+      "location": point,
+    }).catchError((e) {
+      print(e.toString());
+    }).then((value) {
+      print(value.documentID);
+    });
+  }
+
+  /* String _roomCode = "";
 
   void _updateRoomCode(String roomCode) {
     setState(() {
@@ -264,7 +386,7 @@ class _MapRenderState extends State<MapRender> {
       this._name = name;
     });
   }
-
+*/
   @override
   Widget build(BuildContext context) {
     BorderRadiusGeometry radius = BorderRadius.only(
