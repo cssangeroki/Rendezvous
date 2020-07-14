@@ -14,6 +14,7 @@ import 'page4.dart';
 
 import 'package:sliding_up_panel/sliding_up_panel.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:Rendezvous/firebaseFunctions.dart';
 
 //Map rendering stuff
 //Check the below link for some explanation of how a lot of the methods work
@@ -581,7 +582,7 @@ class _MapRenderState extends State<MapRender> {
                     padding: EdgeInsets.fromLTRB(0, 0, 0, 0),
                     child: ListTile(
                       title: Text(
-                        "${_roomCode}" ?? "roomCode is Null",
+                        "${FirebaseFunctions.roomData["roomCode"]}" ?? "roomCode is Null",
                         style: TextStyle(
                           fontSize: 35,
                         ),
@@ -602,7 +603,9 @@ class _MapRenderState extends State<MapRender> {
                             style: new TextStyle(
                                 fontSize: 20.0, color: Colors.black)),
                         onPressed: () {
-                          Navigator.pop(context);
+                          FirebaseFunctions.removeCurrentUserFromRoom(FirebaseFunctions.roomData["roomCode"]);
+                          // BUGG HERE
+                          //Navigator.pop(context);
                         },
                       ),
                     ),
