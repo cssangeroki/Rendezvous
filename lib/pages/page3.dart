@@ -1,6 +1,6 @@
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
-import 'package:geoflutterfire/geoflutterfire.dart';
+//import 'package:geoflutterfire/geoflutterfire.dart';
 
 import 'dart:async';
 import 'dart:io';
@@ -137,7 +137,7 @@ class _MapRenderState extends State<MapRender> {
       _center = LatLng(currPosition.latitude, currPosition.longitude);
     });
     print("Center = " + _center.toString());
-    _pushUserLocation();
+    //_pushUserLocation();
   }
 
 //Getting the user address from the location coordinates
@@ -267,7 +267,7 @@ class _MapRenderState extends State<MapRender> {
     });
   }
 
-  void _pushUserLocation() {
+ /* void _pushUserLocation() {
     GeoFirePoint point = Geoflutterfire().point(
         latitude: currPosition.latitude, longitude: currPosition.longitude);
 
@@ -289,7 +289,7 @@ class _MapRenderState extends State<MapRender> {
       print(value.documentID);
     });
   }
-
+*/
   /* String _roomCode = "";
 
   void _updateRoomCode(String roomCode) {
