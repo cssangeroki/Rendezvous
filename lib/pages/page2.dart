@@ -92,7 +92,12 @@ class _Page2State extends State<Page2> {
     print("documentID is: " + documentID);
     saveRoomCodePreference(roomCode).then((_) {
       Navigator.push(
-          context, MaterialPageRoute(builder: (context) => MapRender()));
+          context,
+          MaterialPageRoute(
+              builder: (context) => MapRender(
+                    name: _name,
+                    roomCode: roomCode,
+                  )));
     });
 
 //    Navigator.pushReplacement(
