@@ -67,7 +67,7 @@ class Page4 extends StatefulWidget {
   String name;
 
   @override
-  _Page4State createState() => _Page4State(roomCode);
+  _Page4State createState() => _Page4State(roomCode, name);
 }
 
 class _Page4State extends State<Page4> {
@@ -76,8 +76,9 @@ class _Page4State extends State<Page4> {
   final formKey = GlobalKey<FormState>();
 
   String roomCode;
+  String name;
 
-  _Page4State(this.roomCode);
+  _Page4State(this.roomCode, this.name);
 
   final codeController = TextEditingController();
 
@@ -93,16 +94,18 @@ class _Page4State extends State<Page4> {
 //      };
 
       //databaseMethods.uploadUserInfo(userInfoMap);
-      _sendDataToPage5(context);
+      _sendDataToPage3(context);
     }
   }
 
-  void _sendDataToPage5(BuildContext context) {
+  void _sendDataToPage3(BuildContext context) {
+    String userName = name;
     String chatRoomCode = roomCode;
     Navigator.pushReplacement(
         context,
         MaterialPageRoute(
           builder: (context) => MapRender(
+            name: userName,
             roomCode: chatRoomCode,
           ),
         ));

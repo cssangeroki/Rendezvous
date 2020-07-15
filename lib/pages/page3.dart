@@ -1,7 +1,7 @@
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 //import 'package:geoflutterfire/geoflutterfire.dart';
-
+import 'firebaseFunctions.dart';
 import 'dart:async';
 import 'dart:io';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
@@ -137,7 +137,7 @@ class _MapRenderState extends State<MapRender> {
       _center = LatLng(currPosition.latitude, currPosition.longitude);
     });
     print("Center = " + _center.toString());
-    //_pushUserLocation();
+    _pushUserLocation();
   }
 
 //Getting the user address from the location coordinates
@@ -267,9 +267,8 @@ class _MapRenderState extends State<MapRender> {
     });
   }
 
- /* void _pushUserLocation() {
-    GeoFirePoint point = Geoflutterfire().point(
-        latitude: currPosition.latitude, longitude: currPosition.longitude);
+  void _pushUserLocation() {
+    GeoPoint point = GeoPoint(currPosition.latitude, currPosition.longitude);
 
     Firestore.instance
         .collection("rooms")
@@ -282,14 +281,14 @@ class _MapRenderState extends State<MapRender> {
         .collection("users")
         .add({
       "name": _name,
-      "location": point.data,
+      "location": point,
     }).catchError((e) {
       print(e.toString());
     }).then((value) {
       print(value.documentID);
     });
   }
-*/
+
   /* String _roomCode = "";
 
   void _updateRoomCode(String roomCode) {
