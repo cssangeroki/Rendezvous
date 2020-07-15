@@ -1,6 +1,7 @@
 // 8-4, the enter code page
 
 import 'package:flutter/material.dart';
+import 'package:cloud_firestore/cloud_firestore.dart';
 
 import 'page3.dart';
 import 'page5.dart';
@@ -111,6 +112,21 @@ class _Page4State extends State<Page4> {
         ));
   }
 
+  static Future<bool> checkExist(String roomName) async {
+    bool exists = false;
+    try {
+      await Firestore.instance.document("rooms/$roomName").get().then((doc) {
+        if (doc.exists)
+          exists = true;
+        else
+          exists = false;
+      });
+      return exists;
+    } catch (e) {
+      return false;
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -140,14 +156,13 @@ class _Page4State extends State<Page4> {
                     child: Form(
                       key: formKey,
                       child: TextFormField(
-                        validator: (val) {
-                          return val.isEmpty
-                              ? "Please enter a correct code"
-                              : null;
-                        },
                         onChanged: (text) {
                           roomCode = text;
                         },
+                        /*validator: (val) {
+                          var check = checkExist(roomCode);
+                          return check ? "Please enter a correct code" : null;
+                        },*/
                         // connected to textField, listen and save user input
                         controller: codeController,
                         decoration:
