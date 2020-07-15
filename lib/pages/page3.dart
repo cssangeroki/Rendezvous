@@ -16,6 +16,24 @@ import 'page4.dart';
 import 'package:sliding_up_panel/sliding_up_panel.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 
+
+
+import '../backendFunctions.dart';
+import 'dart:convert';
+
+//lib/backendFunctions.dart
+
+double finalLon;
+double finalLat;
+// double finalRad;
+
+
+
+List resultCords = []; 
+List names=[];
+List locations=[];
+List urls=[];
+
 //Map rendering stuff
 //Check the below link for some explanation of how a lot of the methods work
 //https://medium.com/@rajesh.muthyala/flutter-with-google-maps-and-google-place-85ccee3f0371
@@ -49,6 +67,8 @@ String category;
 
 //Below are variables we will use for the sliders
 double midSliderVal = 5;
+double finalRad=midSliderVal;
+
 double userSliderVal = 25;
 
 //Here I'm creating a reference to our firebase
@@ -267,6 +287,11 @@ class _MapRenderState extends State<MapRender> {
     print("Number of markers = ${locations.length})");
     currentMidLat = currentMidLat / (locations.length);
     currentMidLon = currentMidLon / (locations.length);
+
+
+     finalLat=currentMidLat;
+     finalLon=currentMidLon;
+
     print("Lat = $currentMidLat, and Long = $currentMidLon");
     await placefromLatLng(LatLng(currentMidLat, currentMidLon));
 //Over here I remove the current midpoint marker, so I can add it again later
@@ -673,6 +698,11 @@ class _MapRenderState extends State<MapRender> {
                             //We need to connect the yelp API here
                             setState(() {
                               midSliderVal = val;
+
+                              //can I do this
+                              finalRad=midSliderVal;
+                              
+                              _findingPlaces();
                             });
                           },
                           min: 1,
@@ -733,6 +763,74 @@ class _MapRenderState extends State<MapRender> {
 }
 
 //Function that will connect to yelp API
-void _findingPlaces() {
-  print("Searching for your place");
+void _findingPlaces() async {
+  print("Searching for your place");  
+                                    //finalRad.toInt()
+
+
+
+  double finalRadMiles= finalRad*1609.344;
+
+  var businesses="";
+  
+  businesses = await BackendMethods.getLocations(finalLon, finalLat, "", finalRadMiles.toInt());
+
+
+                 //var buss = "";
+                 //buss = await BackendMethods.getLocations( -118.30198471, 34.16972651);
+
+
+  //print(buss);
+  var lat;
+  var lon;
+  var name;
+  var address;
+  var url;
+
+ for(var place in jsonDecode(businesses)){
+   lat = place['coordinates']['latitude'];
+   lon = place['coordinates']['longitude'];
+
+  //  print(lat);
+  //  print(lon);
+
+   var myLatlng = new LatLng(lat, lon);
+   resultCords.add(myLatlng);
+
+
+
+   name = place['name'];
+   names.add(name);
+
+   address = place['location'];
+   locations.add(address);
+
+   url = place['url'];
+   urls.add(url);
+
+
+  // print(names);
+  // print(address);
+
+
+   //names.add(name);
+
+
+
+
+
+ }
+
+    
+
+   
+
+   
+
+
+
+print(names);
+  
+  print("testing if I got a response:");
+  //print(businesses==null);
 }
