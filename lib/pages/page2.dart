@@ -77,13 +77,22 @@ class _Page2State extends State<Page2> {
       isLoading = true;
     });
 
-    // create a room, send user to room
-    String documentID = "ThisNeedsToBeUpdatedWithActualValue";
+    //This needs to be updated to an actual value, but right now I am using a dummy value
+    String userDocID = "user5";
+    //This also needs to be updated to the current rooms DocID. Right now, I am using a DocID that I created
+    String roomDocID = "room1";
     //databaseMethods.createMapRoom(roomCode, name);
     print("roomCode is: " + roomCode);
     saveRoomCodePreference(roomCode).then((_) {
       Navigator.push(
-          context, MaterialPageRoute(builder: (context) => MapRender()));
+          context,
+          MaterialPageRoute(
+              builder: (context) => MapRender(
+                name: _name,
+                roomCode: roomCode,
+                userDocID: userDocID,
+                roomDocID: roomDocID,
+              )));
     });
 
 //    Navigator.pushReplacement(
