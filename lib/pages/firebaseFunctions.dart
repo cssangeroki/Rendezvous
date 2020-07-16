@@ -77,7 +77,7 @@ class FirebaseFunctions {
       await Firestore.instance.collection("rooms").document(roomCode)
           .collection("users")
           .document(FirebaseFunctions?.currentUID)
-          .setData({"userID":FirebaseFunctions?.currentUID}).then((value) {
+          .setData({"userID":FirebaseFunctions?.currentUID, "userName":FirebaseFunctions.currentUserData["userName"]}).then((value) {
                 FirebaseFunctions.currentUserData["roomCode"] = roomCode;
                 Firestore.instance.collection("users").document(FirebaseFunctions?.currentUID).updateData({"roomCode":roomCode}).then((result) {
                     return true;
