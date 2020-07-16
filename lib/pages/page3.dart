@@ -8,15 +8,14 @@ import 'package:google_maps_flutter/google_maps_flutter.dart';
 //import 'src/locations.dart' as locations;
 
 import 'package:geolocator/geolocator.dart';
+import 'package:cloud_firestore/cloud_firestore.dart';
 
+import 'firebaseFunctions.dart';
 import 'page1.dart';
 import 'page2.dart';
 import 'page4.dart';
 
 import 'package:sliding_up_panel/sliding_up_panel.dart';
-import 'package:cloud_firestore/cloud_firestore.dart';
-
-
 
 import '../backendFunctions.dart';
 import 'dart:convert';
@@ -162,7 +161,7 @@ class _MapRenderState extends State<MapRender> {
       _center = LatLng(currPosition.latitude, currPosition.longitude);
     });
     print("Center = " + _center.toString());
-    _pushUserLocation();
+    bool pushedLocation = await FirebaseFunctions.pushUserLocation(currPosition.latitude, currPosition.longitude);
   }
 
 //Getting the user address from the location coordinates
@@ -366,28 +365,6 @@ class _MapRenderState extends State<MapRender> {
     });
   }
 
-  void _pushUserLocation() {
-    GeoPoint point = GeoPoint(currPosition.latitude, currPosition.longitude);
-
-    Firestore.instance
-        .collection("rooms")
-        .document(_roomCode)
-        .setData({"roomCode": _roomCode}, merge: true);
-
-    Firestore.instance
-        .collection("rooms")
-        .document(_roomCode)
-        .collection("users")
-        .add({
-      "name": _name,
-      "location": point,
-    }).catchError((e) {
-      print(e.toString());
-    }).then((value) {
-      print(value.documentID);
-    });
-  }
-
   /* String _roomCode = "";
 
   void _updateRoomCode(String roomCode) {
@@ -559,7 +536,7 @@ class _MapRenderState extends State<MapRender> {
                     padding: EdgeInsets.fromLTRB(30, 0, 0, 0),
                     child: ListTile(
                       title: Text(
-                        "${_name}" ?? "Name is Null",
+                        "${FirebaseFunctions.currentUserData["userName"]}" ?? "Name is Null",
                         style: TextStyle(
                           fontSize: 20,
                         ),
@@ -725,7 +702,7 @@ class _MapRenderState extends State<MapRender> {
                     padding: EdgeInsets.fromLTRB(0, 0, 0, 0),
                     child: ListTile(
                       title: Text(
-                        "${_roomCode}" ?? "roomCode is Null",
+                        "${FirebaseFunctions.roomData["roomCode"]}" ?? "roomCode is Null",
                         style: TextStyle(
                           fontSize: 35,
                         ),
@@ -746,7 +723,9 @@ class _MapRenderState extends State<MapRender> {
                             style: new TextStyle(
                                 fontSize: 20.0, color: Colors.black)),
                         onPressed: () {
-                          Navigator.pop(context);
+                          FirebaseFunctions.removeCurrentUserFromRoom(FirebaseFunctions.roomData["roomCode"]);
+                          // BUGG HERE for me 
+                          //Navigator.pop(context);
                         },
                       ),
                     ),

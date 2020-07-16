@@ -3,6 +3,9 @@
 import 'package:flutter/material.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 
+import 'firebaseFunctions.dart';
+import 'firebaseFunctions.dart';
+import 'firebaseFunctions.dart';
 import 'page3.dart';
 import 'page5.dart';
 /*
@@ -78,6 +81,7 @@ class _Page4State extends State<Page4> {
 
   String roomCode;
   String name;
+  String validationMessage = "Enter a valid code";
 
   _Page4State(this.roomCode, this.name);
 
@@ -88,16 +92,12 @@ class _Page4State extends State<Page4> {
       setState(() {
         isLoading = true;
       });
-      // this can be used for future login with firebase
-//      Map<String, String> userInfoMap = {
-//        "name": userNameTextEditingController.text,
-//        "email": userNameTextEditingController.text
-//      };
 
-      //databaseMethods.uploadUserInfo(userInfoMap);
       _sendDataToPage3(context);
     }
   }
+
+
 
   void _sendDataToPage3(BuildContext context) {
     String userName = name;
@@ -112,20 +112,6 @@ class _Page4State extends State<Page4> {
         ));
   }
 
-  static Future<bool> checkExist(String roomName) async {
-    bool exists = false;
-    try {
-      await Firestore.instance.document("rooms/$roomName").get().then((doc) {
-        if (doc.exists)
-          exists = true;
-        else
-          exists = false;
-      });
-      return exists;
-    } catch (e) {
-      return false;
-    }
-  }
 
   @override
   Widget build(BuildContext context) {
@@ -157,13 +143,19 @@ class _Page4State extends State<Page4> {
                       key: formKey,
                       child: TextFormField(
                         onChanged: (text) {
+                          String msg = null;
+                          if(text == "") {
+                            msg = "Enter a valid code";
+                          }
                           roomCode = text;
+                          this.setState(() {
+                            roomCode = text;
+                            validationMessage = msg;
+                          });
                         },
-                        /*validator: (val) {
-                          var check = checkExist(roomCode);
-                          return check ? "Please enter a correct code" : null;
-                        },*/
-                        // connected to textField, listen and save user input
+                        validator: (val) {
+                          return this.validationMessage;
+                        },
                         controller: codeController,
                         decoration:
                             InputDecoration(hintText: "Enter text here"),
@@ -177,8 +169,17 @@ class _Page4State extends State<Page4> {
         heroTag: "btn4",
         // When the user presses the button, show an alert dialog containing
         // the text that the user has entered into the text field.
-        onPressed: () {
-          sendToRoom();
+        onPressed: () async {
+          bool isSuccess = await FirebaseFunctions.addCurrentUserToRoom(this.roomCode);
+          if(isSuccess) {
+              await FirebaseFunctions.refreshFirebaseRoomData();
+              sendToRoom();
+          } else {
+            this.setState(() {
+                validationMessage = "Invalid code entered";
+            });
+          }
+         
 //          Navigator.push(
 //              context, MaterialPageRoute(builder: (context) => Page5()));
         },

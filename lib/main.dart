@@ -1,6 +1,11 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import 'pages/firebaseFunctions.dart';
+import 'pages/firebaseFunctions.dart';
 import 'pages/page1.dart';
+import 'pages/page3.dart';
+import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:firebase_auth/firebase_auth.dart';
 
 /*
 //Below are some the libraries I use for the map implementation - Adarsh
@@ -11,10 +16,36 @@ import 'package:google_maps_flutter/google_maps_flutter.dart';
 
 import 'package:geolocator/geolocator.dart';
 */
-void main() {
+void main() async {
   //runApp(MyApp());
+  WidgetsFlutterBinding.ensureInitialized();
+  await _signInAnonymously();
+  print("Hello");
+  print(FirebaseFunctions?.currentUID);
+  print(FirebaseFunctions.roomData);
   runApp(MyApp());
 }
+Future<void> _signInAnonymously() async {
+    try {
+      final AuthResult result = await FirebaseAuth.instance.signInAnonymously();
+      FirebaseUser user = result.user;
+      FirebaseFunctions.currentUID = user.uid;
+
+      await FirebaseFunctions.refreshFirebaseUserData();
+      await FirebaseFunctions.refreshFirebaseRoomData();
+    } catch (e) {
+      print(e);
+    }
+  }
+
+void pushToHomeScreen(BuildContext context) {
+
+  Navigator.push(
+          context,
+          MaterialPageRoute(
+              builder: (context) => MapRender()));
+}
+
 
 class MyApp extends StatelessWidget {
   @override
@@ -25,10 +56,12 @@ class MyApp extends StatelessWidget {
     ]);
     return MaterialApp(
       title: 'Retrieve Text Input',
-      home: Page1(),
+      home: FirebaseFunctions.currentUserData["roomCode"] != null ? MapRender() : Page1(),
     );
   }
 }
+
+
 
 /*
 // Define a custom Form widget.

@@ -5,9 +5,11 @@ import 'package:flutter/material.dart';
 import 'package:secure_random/secure_random.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:shared_preferences/shared_preferences.dart';
+import 'firebaseFunctions.dart';
 import 'page1.dart';
 import 'page3.dart';
 import 'page4.dart';
+import 'firebaseFunctions.dart';
 
 Future<void> saveRoomCodePreference(String roomCode) async {
   SharedPreferences roomCodePrefs = await SharedPreferences.getInstance();
@@ -45,11 +47,11 @@ class _Page2State extends State<Page2> {
     });
   }
 
-  createRoomCode() {
+  createRoomCode() async {
     // create unique roomCode
-    var roomCodeSecureRandom = SecureRandom();
-    String roomCode = roomCodeSecureRandom.nextString(
-        length: 5, charset: 'abcdefghijklmnopqrstuvwxyz');
+
+    String roomCode = await FirebaseFunctions.createFirebaseRoom(_name);
+
 
 //    // create unique documentId and then push to firebase as document
 //    // instead of using add?
@@ -59,7 +61,7 @@ class _Page2State extends State<Page2> {
 //        charset: 'abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ');
 
     // map userName and roomCode and send to fireBase database, create userId
-    String documentID = "ThisNeedsToBeUpdatedWithActualValue";
+
 
     /*Firestore.instance
         .collection("rooms")
@@ -89,15 +91,11 @@ class _Page2State extends State<Page2> {
 
     //databaseMethods.createMapRoom(roomCode, name);
     print("roomCode is: " + roomCode);
-    print("documentID is: " + documentID);
     saveRoomCodePreference(roomCode).then((_) {
       Navigator.push(
           context,
           MaterialPageRoute(
-              builder: (context) => MapRender(
-                    name: _name,
-                    roomCode: roomCode,
-                  )));
+              builder: (context) => MapRender()));
     });
 
 //    Navigator.pushReplacement(
