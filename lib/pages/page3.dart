@@ -76,15 +76,14 @@ final firebase = Firestore.instance;
 class MapRender extends StatefulWidget {
   final String roomCode;
   final String name;
-  final String userDocID;
-  final String roomDocID;
-
+  final String userDocID = FirebaseFunctions.currentUID;
+  final String roomDocID = FirebaseFunctions.currentUserData["roomCode"];
+//FirebaseFunctions.currentUserData[“roomCode”] 
+// FirebaseFunctions.currentUID
   MapRender(
       {Key key,
         @required this.roomCode,
-        @required this.name,
-        @required this.userDocID,
-        @required this.roomDocID})
+        @required this.name})
       : super(key: key);
 
   @override
@@ -143,11 +142,11 @@ class _MapRenderState extends State<MapRender> {
   }
 
   void initFunctionCaller() async {
-    await _initMarkers();
     await _getUserLocation();
-    _lastMapPosition = _center;
-//_getUserAddress();
     _onAddMarkerButtonPressed();
+    _lastMapPosition = _center;
+    await _initMarkers();
+//_getUserAddress();
     //print("Done initialising variabels for map");
     //print(_center);
   }
@@ -183,24 +182,29 @@ class _MapRenderState extends State<MapRender> {
 
   //This function will be used to initialise my markers, by accessing the user data from firebase
   Future <void> _initMarkers() async{
-    print("initMarkers called");
-    int i = 1;
+    //print("initMarkers called");
     firebase
         .collection("rooms")
         .document(widget.roomDocID)
         .collection("users")
         .snapshots()
-        .listen((snapshot) {
-      snapshot.documents.forEach((user) async{
+        .listen((snapshot) async {
+      //Adding a line that will clear the markers that is not the current user, to update in case a user leaves
+      setState(() {
+        _markers.removeWhere((element) => element.markerId.value != "User" && element.markerId.value != "Midpoint");
+      });
+      for (var user in snapshot.documents){
+        //print("Here. Number of markers = ${_markers.length}");
         //Id the user is not equal to the current user, then we need to add that users location to markers
         if (user.documentID != widget.userDocID) {
           await addOtherUserMarkers(user);
-          //print(i);
-          //i++;
         }
-      });
+      }
+      //print("Got to this point before markers were initialised");
+      //Here, I call the midpoint function, so that if another user changes their location, the midpoint changes
+      await findMidpoint(_markers);
     });
-    print("Markers = $_markers");
+    //print("Markers = $_markers");
   }
   //In this function, I iterate through every user in the document, and get there location and add it to markers
   //All other users will have their BitMapDescriptor as Magenta in color, so that we can differentiate from other users
@@ -227,6 +231,7 @@ class _MapRenderState extends State<MapRender> {
       infoWindow: InfoWindow(title: newUserName, snippet: ""),
       icon: BitmapDescriptor.defaultMarkerWithHue(BitmapDescriptor.hueMagenta),
     ));
+    //print("Finished adding users location");
   }
 
   void _onCameraMove(CameraPosition position) {
@@ -260,42 +265,49 @@ class _MapRenderState extends State<MapRender> {
     print("MidAddress updated to $midAddress");
   }
 
-  void findMidpoint(Set<Marker> locations) async {
+  //This function will be used to add the yelp markers
+  void addYelpMarkers(){
+    //First, remove all the current yelp markers
+    _markers.removeWhere((element) => element.markerId.value == 'Yelp');
+    //For every location we found, we need to add a marker
+    for (int i; i < resultCords.length; i++){
+      _markers.add(Marker(
+        markerId: MarkerId('Yelp'),
+        position: LatLng(resultCords[i].latitude, resultCords[i].longitude),
+        infoWindow: InfoWindow(title: names[i], snippet: locations[i]),
+        icon: BitmapDescriptor.defaultMarkerWithHue(BitmapDescriptor.hueCyan), //Setting midpoint marker to blue so it's identifiable
+      ));
+    }
+  }
+
+  Future<void> findMidpoint(Set<Marker> userPositions) async {
     double currentMidLat = 0;
     double currentMidLon = 0;
-
+    //Start off by removing the midpoint marker
+    setState(() {
+      _markers.removeWhere((marker) => marker.markerId.value == "Midpoint");
+    });
 //   var newLoc = locations[0];
-    Marker toRemove;
-    int i = 1;
-    for (var location in locations) {
-//Want to skip the midpoint so that it doesn't affect the position of the new midpoint.
-//If there is a Midpoint marker, I will store it in toRemove so I can remove it later
-      if (location.markerId.value == "Midpoint") {
+    for (var userPosition in userPositions) {
+//Want to skip the midpoint and remove it in case it is still there
+      if (userPosition.markerId.value == "Midpoint") {
+        _markers.removeWhere((marker) => marker.markerId.value == "Midpoint");
         continue;
       }
-      print("Marker $i = ${location.toString()}");
-      i++;
-      currentMidLat = (location.position.latitude + currentMidLat);
-      currentMidLon = (location.position.longitude + currentMidLon);
+      currentMidLat = (userPosition.position.latitude + currentMidLat);
+      currentMidLon = (userPosition.position.longitude + currentMidLon);
     }
-    setState(() {
-      print("toRemove = $toRemove");
-      _markers.removeWhere((marker) => marker.markerId.value == "Midpoint");
-      //print("Value removed = $removed");
-    });
-    print("Number of markers = ${locations.length})");
-    currentMidLat = currentMidLat / (locations.length);
-    currentMidLon = currentMidLon / (locations.length);
+    //print("Number of markers = ${userPositions.length})");
+    currentMidLat = currentMidLat / (userPositions.length);
+    currentMidLon = currentMidLon / (userPositions.length);
 
 
-     finalLat=currentMidLat;
-     finalLon=currentMidLon;
+    finalLat=currentMidLat;
+    finalLon=currentMidLon;
 
     print("Lat = $currentMidLat, and Long = $currentMidLon");
     await placefromLatLng(LatLng(currentMidLat, currentMidLon));
-//Over here I remove the current midpoint marker, so I can add it again later
     setState(() {
-//      _markers.remove(toRemove);
 //      currentMidLat = currentMidLat / (locations.length);
 //      currentMidLon = currentMidLon / (locations.length);
 //      placefromLatLng(LatLng(currentMidLat, currentMidLon));
@@ -307,7 +319,10 @@ class _MapRenderState extends State<MapRender> {
             .hueBlue), //Setting midpoint marker to blue so it's identifiable
       ));
     });
-    print("Midpoint address = " + midAddress);
+    //print("Midpoint address = " + midAddress);
+    //Now I find places around the midpoint, and display all the Yelp markers
+    //_findingPlaces();
+    //addYelpMarkers();
   }
 
   //Need to test updateUserLocation, as the userDocID currently is an invalid ID, so it doesn't work
@@ -325,9 +340,6 @@ class _MapRenderState extends State<MapRender> {
   //This function will change the marker of the current user, so that a user can only edit their own marker
   void _onAddMarkerButtonPressed() async {
     //Here I find if there is already a user marker. If there is, toRemove is set to that marker. Otherwise toRemove is set to NULL
-//    Marker toRemove = _markers.firstWhere(
-//        (marker) => marker.markerId.value == "User",
-//        orElse: () => null);
 //Getting the correct address in searchAddr. Using await to ensure we get the right address.
     await _getUserAddress();
     setState(() {
@@ -343,8 +355,8 @@ class _MapRenderState extends State<MapRender> {
       ));
     });
     //print("Markers length before midpoint = ${_markers.length}");
-    findMidpoint(_markers);
     updateUserLocation();
+    //findMidpoint(_markers);
   }
 
   void _searchandNavigate() {
