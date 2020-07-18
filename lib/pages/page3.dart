@@ -78,8 +78,7 @@ class MapRender extends StatefulWidget {
   final String name;
   final String userDocID = FirebaseFunctions.currentUID;
   final String roomDocID = FirebaseFunctions.currentUserData["roomCode"];
-
-//FirebaseFunctions.currentUserData[“roomCode”] 
+//FirebaseFunctions.currentUserData[“roomCode”]
 // FirebaseFunctions.currentUID
   MapRender({Key key,
     @required this.roomCode,
@@ -96,6 +95,7 @@ class _MapRenderState extends State<MapRender> {
 //Get the current position, and store it in the variable currPosition
 //Need to learn how to get return value from future class
   Position currPosition;
+  static List<String> nameList = []; 
 
 //const int longitude = currPosition.longitude;
 
@@ -187,6 +187,8 @@ class _MapRenderState extends State<MapRender> {
   //This function will be used to initialise my markers, by accessing the user data from firebase
   Future <void> _initMarkers() async {
     //print("initMarkers called");
+    List<String> userNames = [];
+    userNames.clear();
     firebase
         .collection("rooms")
         .document(widget.roomDocID)
@@ -202,10 +204,15 @@ class _MapRenderState extends State<MapRender> {
       for (var user in snapshot.documents) {
         //print("Here. Number of markers = ${_markers.length}");
         //Id the user is not equal to the current user, then we need to add that users location to markers
+        
+        String newUserName = user.data["userName"];
+        userNames.add(newUserName);
         if (user.documentID != widget.userDocID) {
           await addOtherUserMarkers(user);
         }
       }
+      nameList.clear();
+      nameList = userNames;
       //print("Got to this point before markers were initialised");
       //Here, I call the midpoint function, so that if another user changes their location, the midpoint changes
       await findMidpoint(_markers);
@@ -559,7 +566,7 @@ class _MapRenderState extends State<MapRender> {
                     padding: EdgeInsets.fromLTRB(30, 0, 0, 0),
                     child: ListTile(
                       title: Text(
-                        "${FirebaseFunctions.currentUserData["userName"]}" ??
+                        "${nameList.join("\n")}" ??
                             "Name is Null",
                         style: TextStyle(
                           fontSize: 20,
@@ -751,8 +758,8 @@ class _MapRenderState extends State<MapRender> {
                         onPressed: () {
                           FirebaseFunctions.removeCurrentUserFromRoom(
                               FirebaseFunctions.roomData["roomCode"]);
-                          // BUGG HERE for me 
-                          //Navigator.pop(context);
+                          Navigator.pushNamedAndRemoveUntil(context, '/page1', (route) => false);
+
                         },
                       ),
                     ),

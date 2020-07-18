@@ -20,9 +20,6 @@ void main() async {
   //runApp(MyApp());
   WidgetsFlutterBinding.ensureInitialized();
   await _signInAnonymously();
-  print("Hello");
-  print(FirebaseFunctions?.currentUID);
-  print(FirebaseFunctions.roomData);
   runApp(MyApp());
 }
 Future<void> _signInAnonymously() async {
@@ -39,7 +36,6 @@ Future<void> _signInAnonymously() async {
   }
 
 void pushToHomeScreen(BuildContext context) {
-
   Navigator.push(
           context,
           MaterialPageRoute(
@@ -54,9 +50,19 @@ class MyApp extends StatelessWidget {
       DeviceOrientation.portraitUp,
       DeviceOrientation.portraitDown,
     ]);
+
+    String initialRoute = '/page1';
+    if(FirebaseFunctions.currentUserData["roomCode"] != null) {
+      initialRoute = '/map';
+    }
     return MaterialApp(
       title: 'Retrieve Text Input',
-      home: FirebaseFunctions.currentUserData["roomCode"] != null ? MapRender() : Page1(),
+      home: Page1(),
+      routes: {
+        '/map' : (BuildContext context) => MapRender(),
+        '/page1' : (BuildContext context) => Page1()
+      },
+      initialRoute: initialRoute
     );
   }
 }

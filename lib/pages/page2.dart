@@ -51,8 +51,8 @@ class _Page2State extends State<Page2> {
     // create unique roomCode
 
     String roomCode = await FirebaseFunctions.createFirebaseRoom(_name);
-
-
+    roomCode = FirebaseFunctions.roomData["roomCode"];
+    
 //    // create unique documentId and then push to firebase as document
 //    // instead of using add?
 //    var documentIdSecureRandom = SecureRandom();

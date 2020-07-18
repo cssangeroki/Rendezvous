@@ -130,6 +130,7 @@ class _Page4State extends State<Page4> {
             bool isSuccess =
                 await FirebaseFunctions.addCurrentUserToRoom(this.roomCode);
             if (isSuccess) {
+              await FirebaseFunctions.refreshFirebaseUserData();
               await FirebaseFunctions.refreshFirebaseRoomData();
 //              sendToRoom();
               _sendDataToPage3(context);

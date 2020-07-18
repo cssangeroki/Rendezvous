@@ -1,5 +1,6 @@
 // page 1, this is start/home page
 
+import 'package:Rendezvous/pages/firebaseFunctions.dart';
 import 'package:flutter/material.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'page2.dart';
@@ -110,6 +111,7 @@ class _Page1State extends State<Page1> {
                         controller: userNameController,
                         onChanged: (text) {
                           userName = text;
+                          FirebaseFunctions.currentUserData["userName"] = text;
                         },
                         //controller: userNameController,
                         decoration:

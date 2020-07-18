@@ -118,11 +118,14 @@ class FirebaseFunctions {
         });
     }
 
+    FirebaseFunctions.currentUserData["userName"] = userName;
     FirebaseFunctions.roomData = {"roomCode":roomCode};
     // stores the room to database
-    Firestore.instance.collection("rooms").document(roomCode).setData({"roomCode":roomCode}).then((value) {
-          Firestore.instance.collection("users").document(FirebaseFunctions?.currentUID).updateData({"userName": userName, "roomCode":roomCode}).then((value) {
-              FirebaseFunctions.addCurrentUserToRoom(roomCode);
+    await Firestore.instance.collection("rooms").document(roomCode).setData({"roomCode":roomCode}).then((value) async {
+          
+          await Firestore.instance.collection("users").document(FirebaseFunctions?.currentUID).updateData({"userName": userName, "roomCode":roomCode}).then((value) async {
+              await FirebaseFunctions.addCurrentUserToRoom(roomCode);
+              return roomCode;
           }).catchError((e){
                 print(e.toString());
                 return null;
