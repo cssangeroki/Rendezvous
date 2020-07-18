@@ -430,6 +430,7 @@ class _MapRenderState extends State<MapRender> {
     BorderRadiusGeometry radius = BorderRadius.only(
         topLeft: Radius.circular(75.0), topRight: Radius.circular(75.0));
     return MaterialApp(
+      debugShowCheckedModeBanner: false,
       home: Scaffold(
         appBar: AppBar(
           title: Text('Maps'),
