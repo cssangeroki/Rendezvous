@@ -182,8 +182,6 @@ class _MapRenderState extends State<MapRender> {
   //This function will be used to initialise my markers, by accessing the user data from firebase
   Future<void> _initMarkers() async {
     //print("initMarkers called");
-    List<String> userNames = [];
-    userNames.clear();
     firebase
         .collection("rooms")
         .document(widget.roomDocID)
@@ -196,6 +194,9 @@ class _MapRenderState extends State<MapRender> {
             element.markerId.value != "User" &&
             element.markerId.value != "Midpoint");
       });
+
+      List<String> userNames = [];
+      userNames.clear();
       for (var user in snapshot.documents) {
         //print("Here. Number of markers = ${_markers.length}");
         //Id the user is not equal to the current user, then we need to add that users location to markers
