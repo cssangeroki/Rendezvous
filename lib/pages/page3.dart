@@ -172,7 +172,7 @@ class _MapRenderState extends State<MapRender> {
 
       setState(() {
         searchAddr =
-            "${place.name}, ${place.subLocality}, ${place.locality}, ${place.postalCode}, ${place.country}";
+            "${place.name}, ${place.thoroughfare}, ${place.locality}, ${place.postalCode}, ${place.country}";
       });
     } catch (e) {
       print(e);
@@ -225,11 +225,11 @@ class _MapRenderState extends State<MapRender> {
     if (newUserLoc == null) {
       return;
     }
-    var newUserinfo = await firebase
-        .collection("users")
-        .document(userLocations.documentID)
-        .get();
-    String newUserName = newUserinfo.data["userName"];
+//    var newUserinfo = await firebase
+//        .collection("users")
+//        .document(userLocations.documentID)
+//        .get();
+    String newUserName = userLocations.data["userName"];
     //if the user is already in our markers array, I will just update their position
     _markers.removeWhere(
         (marker) => marker.markerId.value == userLocations.documentID);
@@ -350,9 +350,10 @@ class _MapRenderState extends State<MapRender> {
   }
 
   //This function will change the marker of the current user, so that a user can only edit their own marker
-  void _onAddMarkerButtonPressed() async {
+  Future<void> _onAddMarkerButtonPressed() async {
     //Here I find if there is already a user marker. If there is, toRemove is set to that marker. Otherwise toRemove is set to NULL
 //Getting the correct address in searchAddr. Using await to ensure we get the right address.
+    print("Entered _onAddMarkerButtonPressed. Center = $_center");
     await _getUserAddress();
     setState(() {
       //First I remove the toRemove marker from _markers
@@ -374,18 +375,17 @@ class _MapRenderState extends State<MapRender> {
   void _searchandNavigate() async {
 //Get the placemark from the search address, and then store the center and userAddress
     await Geolocator().placemarkFromAddress(searchAddr).then((value) async {
+      //Set our _center location to the new position
+      _center = LatLng(value[0].position.latitude, value[0].position.longitude);
+//Set our _lastMapPosition also to the new position
+      _lastMapPosition = _center;
+      //Now I replace the users current position marker with the new marker
+      await _onAddMarkerButtonPressed();
 //With the placemark that will be stored in 'value', we move our camera to that position.
       mapController.animateCamera(CameraUpdate.newCameraPosition(CameraPosition(
           target:
               LatLng(value[0].position.latitude, value[0].position.longitude),
           zoom: 15.0)));
-//Set our _center location to the new position
-      _center = LatLng(value[0].position.latitude, value[0].position.longitude);
-//Set our _lastMapPosition also to the new position
-      _lastMapPosition = _center;
-//Then get the actual full address of that location, and finally call _onAddMarkerButtonPressed so that a marker is added at that location
-      //await _getUserAddress();
-      await _onAddMarkerButtonPressed();
     });
   }
 
