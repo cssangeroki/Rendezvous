@@ -27,7 +27,6 @@ double finalLon;
 double finalLat;
 // double finalRad;
 
-
 List resultCords = [];
 List names = [];
 List locations = [];
@@ -43,7 +42,7 @@ Future<Position> currentLocation() async {
 //First, I want to check if location services are available
 //Lines below are to check if location services are enabled
   GeolocationStatus geolocationStatus =
-  await Geolocator().checkGeolocationPermissionStatus();
+      await Geolocator().checkGeolocationPermissionStatus();
 //If we get access to the location services, we should get the current location, and return it
   if (geolocationStatus == GeolocationStatus.granted) {
     print("Using location services to find current location");
@@ -80,9 +79,7 @@ class MapRender extends StatefulWidget {
   final String roomDocID = FirebaseFunctions.currentUserData["roomCode"];
 //FirebaseFunctions.currentUserData[“roomCode”]
 // FirebaseFunctions.currentUID
-  MapRender({Key key,
-    @required this.roomCode,
-    @required this.name})
+  MapRender({Key key, @required this.roomCode, @required this.name})
       : super(key: key);
 
   @override
@@ -95,7 +92,7 @@ class _MapRenderState extends State<MapRender> {
 //Get the current position, and store it in the variable currPosition
 //Need to learn how to get return value from future class
   Position currPosition;
-  static List<String> nameList = []; 
+  static List<String> nameList = [];
 
 //const int longitude = currPosition.longitude;
 
@@ -153,7 +150,6 @@ class _MapRenderState extends State<MapRender> {
     //print(_center);
   }
 
-
 //Function used to get users original position
   Future<void> _getUserLocation() async {
     currPosition = await currentLocation();
@@ -176,8 +172,7 @@ class _MapRenderState extends State<MapRender> {
 
       setState(() {
         searchAddr =
-        "${place.name}, ${place.subLocality}, ${place.locality}, ${place
-            .postalCode}, ${place.country}";
+            "${place.name}, ${place.subLocality}, ${place.locality}, ${place.postalCode}, ${place.country}";
       });
     } catch (e) {
       print(e);
@@ -185,7 +180,7 @@ class _MapRenderState extends State<MapRender> {
   }
 
   //This function will be used to initialise my markers, by accessing the user data from firebase
-  Future <void> _initMarkers() async {
+  Future<void> _initMarkers() async {
     //print("initMarkers called");
     List<String> userNames = [];
     userNames.clear();
@@ -198,13 +193,13 @@ class _MapRenderState extends State<MapRender> {
       //Adding a line that will clear the markers that is not the current user, to update in case a user leaves
       setState(() {
         _markers.removeWhere((element) =>
-        element.markerId.value != "User" &&
+            element.markerId.value != "User" &&
             element.markerId.value != "Midpoint");
       });
       for (var user in snapshot.documents) {
         //print("Here. Number of markers = ${_markers.length}");
         //Id the user is not equal to the current user, then we need to add that users location to markers
-        
+
         String newUserName = user.data["userName"];
         userNames.add(newUserName);
         if (user.documentID != widget.userDocID) {
@@ -222,7 +217,7 @@ class _MapRenderState extends State<MapRender> {
 
   //In this function, I iterate through every user in the document, and get there location and add it to markers
   //All other users will have their BitMapDescriptor as Magenta in color, so that we can differentiate from other users
-  Future <void> addOtherUserMarkers(DocumentSnapshot userLocations) async {
+  Future<void> addOtherUserMarkers(DocumentSnapshot userLocations) async {
     //print("Users doc ID = " + userLocations.documentID);
     GeoPoint newUserLoc = userLocations.data["location"];
     //If for some reason the user doesn't have a location yet, simply return
@@ -235,8 +230,8 @@ class _MapRenderState extends State<MapRender> {
         .get();
     String newUserName = newUserinfo.data["userName"];
     //if the user is already in our markers array, I will just update their position
-    _markers.removeWhere((marker) =>
-    marker.markerId.value == userLocations.documentID);
+    _markers.removeWhere(
+        (marker) => marker.markerId.value == userLocations.documentID);
     _markers.add(Marker(
       markerId: MarkerId(userLocations.documentID),
       position: LatLng(newUserLoc.latitude, newUserLoc.longitude),
@@ -271,14 +266,13 @@ class _MapRenderState extends State<MapRender> {
     Placemark place = p[0];
     setState(() {
       midAddress =
-      "${place.name}, ${place.subLocality}, ${place.locality}, ${place
-          .postalCode}, ${place.country}";
+          "${place.name}, ${place.subLocality}, ${place.locality}, ${place.postalCode}, ${place.country}";
     });
     print("MidAddress updated to $midAddress");
   }
 
   //This function will be used to add the yelp markers
-  void addYelpMarkers(){
+  void addYelpMarkers() {
     print("Entered Yelp markers. resultCords = ${resultCords.length}");
     //First, remove all the current yelp markers
     //_markers.removeWhere((element) => element.markerId.value == 'Yelp');
@@ -319,7 +313,6 @@ class _MapRenderState extends State<MapRender> {
     currentMidLat = currentMidLat / (userPositions.length);
     currentMidLon = currentMidLon / (userPositions.length);
 
-
     finalLat = currentMidLat;
     finalLon = currentMidLon;
 
@@ -352,7 +345,7 @@ class _MapRenderState extends State<MapRender> {
         .collection("users")
         .document(widget.userDocID)
         .updateData(
-        {"location": GeoPoint(_center.latitude, _center.longitude)});
+            {"location": GeoPoint(_center.latitude, _center.longitude)});
   }
 
   //This function will change the marker of the current user, so that a user can only edit their own marker
@@ -377,13 +370,13 @@ class _MapRenderState extends State<MapRender> {
     //findMidpoint(_markers);
   }
 
-  void _searchandNavigate() async{
+  void _searchandNavigate() async {
 //Get the placemark from the search address, and then store the center and userAddress
-    await Geolocator().placemarkFromAddress(searchAddr).then((value) async{
+    await Geolocator().placemarkFromAddress(searchAddr).then((value) async {
 //With the placemark that will be stored in 'value', we move our camera to that position.
       mapController.animateCamera(CameraUpdate.newCameraPosition(CameraPosition(
           target:
-          LatLng(value[0].position.latitude, value[0].position.longitude),
+              LatLng(value[0].position.latitude, value[0].position.longitude),
           zoom: 15.0)));
 //Set our _center location to the new position
       _center = LatLng(value[0].position.latitude, value[0].position.longitude);
@@ -415,6 +408,7 @@ class _MapRenderState extends State<MapRender> {
     BorderRadiusGeometry radius = BorderRadius.only(
         topLeft: Radius.circular(75.0), topRight: Radius.circular(75.0));
     return MaterialApp(
+      debugShowCheckedModeBanner: false,
       home: Scaffold(
         appBar: AppBar(
           title: Text('Maps'),
@@ -443,88 +437,88 @@ class _MapRenderState extends State<MapRender> {
           minHeight: 100,
           body: _center == null
               ? Container(
-            child: Center(
-              child: Text(
-                'loading map..',
-                style: TextStyle(
-                    fontFamily: 'Avenir-Medium', color: Colors.grey[400]),
-              ),
-            ),
-          )
+                  child: Center(
+                    child: Text(
+                      'loading map..',
+                      style: TextStyle(
+                          fontFamily: 'Avenir-Medium', color: Colors.grey[400]),
+                    ),
+                  ),
+                )
               : Container(
-            child: Stack(
-              children: <Widget>[
-                GoogleMap(
-                  onMapCreated: _onMapCreated,
-                  initialCameraPosition: CameraPosition(
-                    target: _center,
-                    zoom: 11.0,
-                  ),
-                  markers: _markers,
+                  child: Stack(
+                    children: <Widget>[
+                      GoogleMap(
+                        onMapCreated: _onMapCreated,
+                        initialCameraPosition: CameraPosition(
+                          target: _center,
+                          zoom: 11.0,
+                        ),
+                        markers: _markers,
 //Adding the marker property to Google Maps Widget
-                  onCameraMove:
-                  _onCameraMove, //Moving the center each time we move on the map, by calling _onCameraMove
-                ),
-                Positioned(
-                  top: 30,
-                  right: 15,
-                  left: 15,
-                  child: Container(
-                    height: 50.0,
-                    width: double.infinity,
-                    decoration: BoxDecoration(
-                      borderRadius: BorderRadius.circular(5.0),
-                      color: Colors.white,
-                    ),
-                    child: TextField(
-                      decoration: InputDecoration(
-                          hintText: "Enter address...",
-                          border: InputBorder.none,
-                          contentPadding:
-                          EdgeInsets.only(left: 15.0, top: 15.0),
-                          suffixIcon: IconButton(
-                            icon: Icon(Icons.search),
-                            onPressed:  _searchandNavigate,
-                            iconSize: 30.0,
-                          )),
-                      onChanged: (val) {
-                        setState(() {
-                          searchAddr = val;
-                        });
-                      },
-                    ),
-                  ),
-                ),
-                Padding(
-                  padding:
-                  const EdgeInsets.fromLTRB(16.0, 100.0, 16.0, 16.0),
-                  child: Align(
-                    alignment: Alignment.topRight,
-                    child: Column(
-                      children: <Widget>[
-//Adding another floating button to mark locations
-                        FloatingActionButton(
-                          onPressed: _onAddMarkerButtonPressed,
-                          materialTapTargetSize:
-                          MaterialTapTargetSize.padded,
-                          backgroundColor: Colors.redAccent,
-                          child: const Icon(
-                            Icons.add_location,
-                            size: 36.0,
+                        onCameraMove:
+                            _onCameraMove, //Moving the center each time we move on the map, by calling _onCameraMove
+                      ),
+                      Positioned(
+                        top: 30,
+                        right: 15,
+                        left: 15,
+                        child: Container(
+                          height: 50.0,
+                          width: double.infinity,
+                          decoration: BoxDecoration(
+                            borderRadius: BorderRadius.circular(5.0),
+                            color: Colors.white,
                           ),
-                        )
-                      ],
-                    ),
+                          child: TextField(
+                            decoration: InputDecoration(
+                                hintText: "Enter address...",
+                                border: InputBorder.none,
+                                contentPadding:
+                                    EdgeInsets.only(left: 15.0, top: 15.0),
+                                suffixIcon: IconButton(
+                                  icon: Icon(Icons.search),
+                                  onPressed: _searchandNavigate,
+                                  iconSize: 30.0,
+                                )),
+                            onChanged: (val) {
+                              setState(() {
+                                searchAddr = val;
+                              });
+                            },
+                          ),
+                        ),
+                      ),
+                      Padding(
+                        padding:
+                            const EdgeInsets.fromLTRB(16.0, 100.0, 16.0, 16.0),
+                        child: Align(
+                          alignment: Alignment.topRight,
+                          child: Column(
+                            children: <Widget>[
+//Adding another floating button to mark locations
+                              FloatingActionButton(
+                                onPressed: _onAddMarkerButtonPressed,
+                                materialTapTargetSize:
+                                    MaterialTapTargetSize.padded,
+                                backgroundColor: Colors.redAccent,
+                                child: const Icon(
+                                  Icons.add_location,
+                                  size: 36.0,
+                                ),
+                              )
+                            ],
+                          ),
+                        ),
+                      ),
+                    ],
                   ),
                 ),
-              ],
-            ),
-          ),
         ),
         drawer: Theme(
           data: Theme.of(context).copyWith(
             canvasColor:
-            Colors.blue, //This will change the drawer background to blue.
+                Colors.blue, //This will change the drawer background to blue.
             //other styles
           ),
           child: Container(
@@ -566,8 +560,7 @@ class _MapRenderState extends State<MapRender> {
                     padding: EdgeInsets.fromLTRB(30, 0, 0, 0),
                     child: ListTile(
                       title: Text(
-                        "${nameList.join("\n")}" ??
-                            "Name is Null",
+                        "${nameList.join("\n")}" ?? "Name is Null",
                         style: TextStyle(
                           fontSize: 20,
                         ),
@@ -599,15 +592,15 @@ class _MapRenderState extends State<MapRender> {
                       decoration: InputDecoration(
                           focusedBorder: OutlineInputBorder(
                             borderSide:
-                            BorderSide(color: Colors.black, width: 1.5),
+                                BorderSide(color: Colors.black, width: 1.5),
                           ),
                           enabledBorder: OutlineInputBorder(
                             borderSide:
-                            BorderSide(color: Colors.black, width: 1.5),
+                                BorderSide(color: Colors.black, width: 1.5),
                           ),
                           hintText: "Enter category...",
                           contentPadding:
-                          EdgeInsets.only(left: 15.0, top: 15.0),
+                              EdgeInsets.only(left: 15.0, top: 15.0),
                           suffixIcon: IconButton(
                             icon: Icon(Icons.search),
                             onPressed: _findingPlaces,
@@ -640,10 +633,10 @@ class _MapRenderState extends State<MapRender> {
                       trackHeight: 4.0,
                       thumbColor: Colors.white,
                       thumbShape:
-                      RoundSliderThumbShape(enabledThumbRadius: 10.0),
+                          RoundSliderThumbShape(enabledThumbRadius: 10.0),
                       overlayColor: Colors.red.withAlpha(32),
                       overlayShape:
-                      RoundSliderOverlayShape(overlayRadius: 28.0),
+                          RoundSliderOverlayShape(overlayRadius: 28.0),
                     ),
                     child: Container(
                       margin: EdgeInsets.all(5),
@@ -686,10 +679,10 @@ class _MapRenderState extends State<MapRender> {
                         trackHeight: 4.0,
                         thumbColor: Colors.white,
                         thumbShape:
-                        RoundSliderThumbShape(enabledThumbRadius: 10.0),
+                            RoundSliderThumbShape(enabledThumbRadius: 10.0),
                         overlayColor: Colors.red.withAlpha(32),
                         overlayShape:
-                        RoundSliderOverlayShape(overlayRadius: 28.0),
+                            RoundSliderOverlayShape(overlayRadius: 28.0),
                       ),
                       child: Container(
                         margin: EdgeInsets.all(5),
@@ -758,8 +751,8 @@ class _MapRenderState extends State<MapRender> {
                         onPressed: () {
                           FirebaseFunctions.removeCurrentUserFromRoom(
                               FirebaseFunctions.roomData["roomCode"]);
-                          Navigator.pushNamedAndRemoveUntil(context, '/page1', (route) => false);
-
+                          Navigator.pushNamedAndRemoveUntil(
+                              context, '/page1', (route) => false);
                         },
                       ),
                     ),
@@ -790,10 +783,8 @@ void _findingPlaces() async {
   businesses = await BackendMethods.getLocations(
       finalLon, finalLat, "", finalRadMiles.toInt());
 
-
   //var buss = "";
   //buss = await BackendMethods.getLocations( -118.30198471, 34.16972651);
-
 
   //print(buss);
   var lat;
@@ -812,7 +803,6 @@ void _findingPlaces() async {
     var myLatlng = new LatLng(lat, lon);
     resultCords.add(myLatlng);
 
-
     name = place['name'];
     names.add(name);
 
@@ -822,16 +812,12 @@ void _findingPlaces() async {
     url = place['url'];
     urls.add(url);
 
-
     // print(names);
     // print(address);
 
-
     //names.add(name);
 
-
   }
-
 
   print(names);
   print("Locations: $resultCords");
