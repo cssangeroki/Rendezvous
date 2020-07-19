@@ -821,7 +821,7 @@ class _MapRenderState extends State<MapRender> {
 }
 
 //Function that will connect to yelp API
-void _findingPlaces() async {
+Future <void> _findingPlaces() async {
   print("Searching for your place");
   //finalRad.toInt()
   names.clear();
