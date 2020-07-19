@@ -414,29 +414,121 @@ class _MapRenderState extends State<MapRender> {
     });
   }
 
+  /*Widget _viewYelp() {
+    _updateYelpVenues();
+    if (_arrLength == null || _arrLength == 0) {
+      return Text("No Places Found");
+    }
+
+    //Using ListView.seperated instead of .builder to create a seperated list
+    return ListView.separated(
+      itemCount: _arrLength,
+      itemBuilder: (BuildContext context, int index) {
+        //return new Text(names[index]);
+        return new Container(
+          //padding: EdgeInsets.fromLTRB(0, 20, 0, 20),
+          child: Link(
+            url: urls[index],
+            child: Row(children: [
+              Container(
+                alignment: Alignment.centerLeft,
+                width: 100,
+                height: 100,
+                decoration: BoxDecoration(
+                    image: DecorationImage(
+                        image: NetworkImage(
+                            "'https:///flutter.github.io/assets-for-api-docs/assets/widgets/owl-2.jpg'"))),
+              ),
+              Text(
+                "${names[index]} \n (Click to open Yelp page)",
+                style: TextStyle(
+                  fontWeight: FontWeight.bold,
+                  fontSize: 15,
+                ),
+                //textAlign: TextAlign.right,
+              ),
+            ]),
+          ),
+        );
+      },
+      separatorBuilder: (BuildContext context, int index) => Divider(),
+      //);
+      // },
+    );
+  }*/
+
   Widget _viewYelp() {
     _updateYelpVenues();
     if (_arrLength == null || _arrLength == 0) {
       return Text("No Places Found");
     }
-    //Using ListView.seperated instead of .builder to create a seperated list
-    return ListView.separated(
+
+    return Card(
+      elevation: 4,
+      child: ListView.builder(
         itemCount: _arrLength,
         itemBuilder: (BuildContext context, int index) {
           //return new Text(names[index]);
           return new Container(
+            //padding: EdgeInsets.fromLTRB(0, 20, 0, 20),
             child: Link(
-              child: Text("${names[index]} (Click to open Yelp page)", style: TextStyle(fontWeight: FontWeight.bold),),
               url: urls[index],
+              child: Row(
+                children: <Widget>[
+                  Container(
+                    height: 110,
+                    width: 90,
+                    child: Image.network(
+                      'https://firebasestorage.googleapis.com/v0/b/rendezvous-b51b4.appspot.com/o/photo-1550747545-c896b5f89ff7.jpeg?alt=media&token=eb3eb883-86da-4b89-87e1-7490fd518910',
+                      fit: BoxFit.cover,
+                    ),
+                  ),
+                  SizedBox(
+                    width: 5.0,
+                  ),
+                  Flexible(
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: <Widget>[
+                        MergeSemantics(
+                          child: Row(
+                            children: <Widget>[
+                              Flexible(
+                                child: Text(
+                                  "${names[index]} ",
+                                  overflow: TextOverflow.ellipsis,
+                                  softWrap: true,
+                                  style: TextStyle(
+                                      fontWeight: FontWeight.bold,
+                                      fontSize: 15,
+                                      color: Theme.of(context).primaryColor),
+                                  textAlign: TextAlign.left,
+                                ),
+                                //textAlign: TextAlign.right,
+                              ),
+                            ],
+                          ),
+                        ),
+                        SizedBox(height: 5),
+                        Text(
+                          'Click to open Yelp page',
+                          maxLines: 1,
+                          style: TextStyle(
+                              fontSize: 12,
+                              fontWeight: FontWeight.w500,
+                              color: Colors.grey),
+                        ),
+                        SizedBox(height: 5),
+                      ],
+                    ),
+                  )
+                ],
+              ),
             ),
-            color: Colors.yellow[200],
-            padding: EdgeInsets.fromLTRB(0, 10, 0, 10),
           );
         },
-        separatorBuilder: (BuildContext context, int index) => Divider(),
-        //);
-        // },
-        );
+      ),
+    );
   }
 
   @override
