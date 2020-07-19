@@ -35,6 +35,7 @@ List resultCords = [];
 List names = [];
 List locations = [];
 List urls = [];
+List images = [];
 
 //Map rendering stuff
 //Check the below link for some explanation of how a lot of the methods work
@@ -831,6 +832,7 @@ void _findingPlaces() async {
   resultCords.clear();
   locations.clear();
   urls.clear();
+  images.clear();
 
   double finalRadMiles = finalRad * 1609.344;
 
@@ -848,6 +850,7 @@ void _findingPlaces() async {
   var name;
   var address;
   var url;
+  var image;
 
   for (var place in jsonDecode(businesses)) {
     lat = place['coordinates']['latitude'];
@@ -867,6 +870,12 @@ void _findingPlaces() async {
 
     url = place['url'];
     urls.add(url);
+
+    image=place['image_url'];
+    images.add(image);
+
+    // print("image_url");
+    // print(image);
 
     // print(names);
     // print(address);
