@@ -4,6 +4,7 @@ import 'package:flutter/material.dart';
 //import 'package:geoflutterfire/geoflutterfire.dart';
 import 'firebaseFunctions.dart';
 import 'dart:async';
+
 //import 'dart:io';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
 //import 'src/locations.dart' as locations;
@@ -20,6 +21,7 @@ import 'package:sliding_up_panel/sliding_up_panel.dart';
 
 import '../backendFunctions.dart';
 import 'dart:convert';
+import 'package:link/link.dart';
 
 //lib/backendFunctions.dart
 
@@ -35,7 +37,6 @@ List urls = [];
 //Map rendering stuff
 //Check the below link for some explanation of how a lot of the methods work
 //https://medium.com/@rajesh.muthyala/flutter-with-google-maps-and-google-place-85ccee3f0371
-//Note: This does not work on android for some reason. I was not able to find out why, but the source of the problem had something to do with starting at the user's location.
 //Going to create a function that gets the users current location, or last known location.
 //The function will return a Position variable
 Future<Position> currentLocation() async {
@@ -77,6 +78,7 @@ class MapRender extends StatefulWidget {
   final String name;
   final String userDocID = FirebaseFunctions.currentUID;
   final String roomDocID = FirebaseFunctions.currentUserData["roomCode"];
+
 //FirebaseFunctions.currentUserData[“roomCode”]
 // FirebaseFunctions.currentUID
   MapRender({Key key, @required this.roomCode, @required this.name})
@@ -405,6 +407,7 @@ class _MapRenderState extends State<MapRender> {
   }
 */
   var _arrLength;
+
   void _updateYelpVenues() {
     setState(() {
       _arrLength = names.length;
@@ -416,12 +419,22 @@ class _MapRenderState extends State<MapRender> {
     if (_arrLength == null || _arrLength == 0) {
       return Text("No Places Found");
     }
-
-    return ListView.builder(
+    //Using ListView.seperated instead of .builder to create a seperated list
+    return ListView.separated(
         itemCount: _arrLength,
         itemBuilder: (BuildContext context, int index) {
-          return new Text(names[index]);
-        } //);
+          //return new Text(names[index]);
+          return new Container(
+            child: Link(
+              child: Text("${names[index]} (Click to open Yelp page)", style: TextStyle(fontWeight: FontWeight.bold),),
+              url: urls[index],
+            ),
+            color: Colors.yellow[200],
+            padding: EdgeInsets.fromLTRB(0, 10, 0, 10),
+          );
+        },
+        separatorBuilder: (BuildContext context, int index) => Divider(),
+        //);
         // },
         );
   }
@@ -814,6 +827,7 @@ void _findingPlaces() async {
   names.clear();
   resultCords.clear();
   locations.clear();
+  urls.clear();
 
   double finalRadMiles = finalRad * 1609.344;
 
