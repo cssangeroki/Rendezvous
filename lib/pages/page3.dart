@@ -482,7 +482,10 @@ class _MapRenderState extends State<MapRender> {
                     height: 110,
                     width: 90,
                     child: Image.network(
-                      'https://firebasestorage.googleapis.com/v0/b/rendezvous-b51b4.appspot.com/o/photo-1550747545-c896b5f89ff7.jpeg?alt=media&token=eb3eb883-86da-4b89-87e1-7490fd518910',
+                      images[index] == null
+                          ? 'https://firebasestorage.googleapis.com/v0/b/rendezvous-b51b4.appspot.com/o/photo-1550747545-c896b5f89ff7.jpeg?alt=media&token=eb3eb883-86da-4b89-87e1-7490fd518910'
+                          : '${images[index]}',
+                      // 'https://firebasestorage.googleapis.com/v0/b/rendezvous-b51b4.appspot.com/o/photo-1550747545-c896b5f89ff7.jpeg?alt=media&token=eb3eb883-86da-4b89-87e1-7490fd518910',
                       fit: BoxFit.cover,
                     ),
                   ),
@@ -754,7 +757,7 @@ class _MapRenderState extends State<MapRender> {
                       onChanged: (val) {
                         setState(() {
                           category = val;
-                          finalCatagory=category;
+                          finalCatagory = category;
                         });
                       },
                     ),
@@ -963,7 +966,7 @@ void _findingPlaces() async {
     url = place['url'];
     urls.add(url);
 
-    image=place['image_url'];
+    image = place['image_url'];
     images.add(image);
 
     // print("image_url");
