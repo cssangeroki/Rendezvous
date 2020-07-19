@@ -27,6 +27,8 @@ import 'package:link/link.dart';
 
 double finalLon;
 double finalLat;
+
+String finalCatagory;
 // double finalRad;
 
 List resultCords = [];
@@ -659,6 +661,7 @@ class _MapRenderState extends State<MapRender> {
                       onChanged: (val) {
                         setState(() {
                           category = val;
+                          finalCatagory=category;
                         });
                       },
                     ),
@@ -834,7 +837,7 @@ void _findingPlaces() async {
   var businesses = "";
 
   businesses = await BackendMethods.getLocations(
-      finalLon, finalLat, "", finalRadMiles.toInt());
+      finalLon, finalLat, finalCatagory, finalRadMiles.toInt());
 
   //var buss = "";
   //buss = await BackendMethods.getLocations( -118.30198471, 34.16972651);
