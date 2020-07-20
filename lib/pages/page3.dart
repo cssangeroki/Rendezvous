@@ -12,7 +12,7 @@ import 'package:google_maps_flutter/google_maps_flutter.dart';
 import 'package:geolocator/geolocator.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 
-import 'firebaseFunctions.dart';
+//import 'firebaseFunctions.dart';
 import 'page1.dart';
 import 'page2.dart';
 //import 'page4.dart';
@@ -158,11 +158,11 @@ class _MapRenderState extends State<MapRender> {
 //Function used to get users original position
   Future<void> _getUserLocation() async {
     currPosition = await currentLocation();
-    print("Current Position = " + currPosition.toString());
+    //print("Current Position = " + currPosition.toString());
     setState(() {
       _center = LatLng(currPosition.latitude, currPosition.longitude);
     });
-    print("Center = " + _center.toString());
+    //print("Center = " + _center.toString());
     bool pushedLocation = await FirebaseFunctions.pushUserLocation(
         currPosition.latitude, currPosition.longitude);
   }
@@ -278,15 +278,18 @@ class _MapRenderState extends State<MapRender> {
   }
 
   //This function will be used to add the yelp markers
-  void addYelpMarkers() {
+  void addYelpMarkers(){
     print("Entered Yelp markers. resultCords = ${resultCords.length}");
     //First, remove all the current yelp markers
-    //_markers.removeWhere((element) => element.markerId.value == 'Yelp');
+    setState((){
+     _markers.removeWhere((element) => (element.infoWindow.snippet != '' && element.infoWindow.snippet != "Midpoint"));
+    });
+    print("Removed yelp markers. resultCords = ${resultCords.length}");
     //For every location we found, we need to add a marker
     setState(() {
       for (int i = 0; i < resultCords.length; i++) {
         _markers.add(Marker(
-          markerId: MarkerId(names[i]),
+          markerId: MarkerId(resultCords[i].toString()),
           position: LatLng(resultCords[i].latitude, resultCords[i].longitude),
           infoWindow: InfoWindow(title: names[i], snippet: locations[i]),
           icon: BitmapDescriptor.defaultMarkerWithHue(BitmapDescriptor
@@ -299,6 +302,7 @@ class _MapRenderState extends State<MapRender> {
   }
 
   Future<void> findMidpoint(Set<Marker> userPositions) async {
+    print("Entered findMidpoint");
     double currentMidLat = 0;
     double currentMidLon = 0;
     //Start off by removing the midpoint marker
@@ -409,6 +413,12 @@ class _MapRenderState extends State<MapRender> {
     });
   }
 */
+
+  //This functions is used when we search a category for yelp
+  void _searchingYelpCateogry() async{
+    await _findingPlaces();
+    addYelpMarkers();
+  }
   var _arrLength;
 
   void _updateYelpVenues() {
@@ -751,7 +761,7 @@ class _MapRenderState extends State<MapRender> {
                               EdgeInsets.only(left: 15.0, top: 15.0),
                           suffixIcon: IconButton(
                             icon: Icon(Icons.search),
-                            onPressed: _findingPlaces,
+                            onPressed: _searchingYelpCateogry,
                             iconSize: 20.0,
                           )),
                       onChanged: (val) {
@@ -845,17 +855,18 @@ class _MapRenderState extends State<MapRender> {
                                 */
                         child: Slider(
                           value: midSliderVal,
-                          onChanged: (double val) {
+                          onChanged: (double val){
                             //We need to connect the yelp API here
-                            setState(() {
+                            setState((){
                               midSliderVal = val;
-
+                            });
+                          },
+                          onChangeEnd: (double val) async{
+                            setState(() {
                               //can I do this
                               finalRad = midSliderVal;
-
-                              _findingPlaces();
-                              addYelpMarkers();
                             });
+                            await _searchingYelpCateogry();
                             _updateYelpVenues();
                           },
                           min: 1,
