@@ -147,11 +147,10 @@ class _MapRenderState extends State<MapRender> {
 
   void initFunctionCaller() async {
     await _getUserLocation();
-    _onAddMarkerButtonPressed();
+    await _onAddMarkerButtonPressed();
     _lastMapPosition = _center;
     await _initMarkers();
-//_getUserAddress();
-    //print("Done initialising variabels for map");
+    print("Done initialising variabels for map");
     //print(_center);
   }
 
@@ -186,13 +185,14 @@ class _MapRenderState extends State<MapRender> {
 
   //This function will be used to initialise my markers, by accessing the user data from firebase
   Future<void> _initMarkers() async {
-    //print("initMarkers called");
+    print("initMarkers called");
     firebase
         .collection("rooms")
         .document(widget.roomDocID)
         .collection("users")
         .snapshots()
         .listen((snapshot) async {
+      print("Listening");
       //Adding a line that will clear the markers that is not the current user, to update in case a user leaves
       setState(() {
         _markers.removeWhere((element) =>
@@ -224,16 +224,12 @@ class _MapRenderState extends State<MapRender> {
   //In this function, I iterate through every user in the document, and get there location and add it to markers
   //All other users will have their BitMapDescriptor as Magenta in color, so that we can differentiate from other users
   Future<void> addOtherUserMarkers(DocumentSnapshot userLocations) async {
-    //print("Users doc ID = " + userLocations.documentID);
+    print("Users doc ID = " + userLocations.documentID);
     GeoPoint newUserLoc = userLocations.data["location"];
     //If for some reason the user doesn't have a location yet, simply return
     if (newUserLoc == null) {
       return;
     }
-//    var newUserinfo = await firebase
-//        .collection("users")
-//        .document(userLocations.documentID)
-//        .get();
     String newUserName = userLocations.data["userName"];
     //if the user is already in our markers array, I will just update their position
     _markers.removeWhere(
@@ -357,6 +353,7 @@ class _MapRenderState extends State<MapRender> {
         .document(widget.userDocID)
         .updateData(
             {"location": GeoPoint(_center.latitude, _center.longitude)});
+    print("Updated users location");
   }
 
   //This function will change the marker of the current user, so that a user can only edit their own marker
@@ -419,6 +416,7 @@ class _MapRenderState extends State<MapRender> {
   void _searchingYelpCateogry() async {
     await _findingPlaces();
     addYelpMarkers();
+    _updateYelpVenues();
   }
 
   var _arrLength;
