@@ -278,11 +278,12 @@ class _MapRenderState extends State<MapRender> {
   }
 
   //This function will be used to add the yelp markers
-  void addYelpMarkers(){
+  void addYelpMarkers() {
     print("Entered Yelp markers. resultCords = ${resultCords.length}");
     //First, remove all the current yelp markers
-    setState((){
-     _markers.removeWhere((element) => (element.infoWindow.snippet != '' && element.infoWindow.snippet != "Midpoint"));
+    setState(() {
+      _markers.removeWhere((element) => (element.infoWindow.snippet != '' &&
+          element.infoWindow.snippet != "Midpoint"));
     });
     print("Removed yelp markers. resultCords = ${resultCords.length}");
     //For every location we found, we need to add a marker
@@ -415,10 +416,11 @@ class _MapRenderState extends State<MapRender> {
 */
 
   //This functions is used when we search a category for yelp
-  void _searchingYelpCateogry() async{
+  void _searchingYelpCateogry() async {
     await _findingPlaces();
     addYelpMarkers();
   }
+
   var _arrLength;
 
   void _updateYelpVenues() {
@@ -476,73 +478,107 @@ class _MapRenderState extends State<MapRender> {
       return Text("No Places Found");
     }
 
-    return Card(
-      elevation: 4,
-      child: ListView.builder(
-        itemCount: _arrLength,
-        itemBuilder: (BuildContext context, int index) {
-          //return new Text(names[index]);
-          return new Container(
-            //padding: EdgeInsets.fromLTRB(0, 20, 0, 20),
-            child: Link(
-              url: urls[index],
-              child: Row(
-                children: <Widget>[
-                  Container(
-                    height: 110,
-                    width: 90,
-                    child: Image.network(
-                      images[index] == null
-                          ? 'https://firebasestorage.googleapis.com/v0/b/rendezvous-b51b4.appspot.com/o/photo-1550747545-c896b5f89ff7.jpeg?alt=media&token=eb3eb883-86da-4b89-87e1-7490fd518910'
-                          : '${images[index]}',
-                      // 'https://firebasestorage.googleapis.com/v0/b/rendezvous-b51b4.appspot.com/o/photo-1550747545-c896b5f89ff7.jpeg?alt=media&token=eb3eb883-86da-4b89-87e1-7490fd518910',
-                      fit: BoxFit.cover,
-                    ),
+    return Container(
+      margin: EdgeInsets.fromLTRB(7, 0, 7, 0),
+      child: Container(
+        child: ListView.builder(
+          itemCount: _arrLength,
+          itemBuilder: (BuildContext context, int index) {
+            //return new Text(names[index]);
+            return new Container(
+              margin: EdgeInsets.fromLTRB(15, 10, 15, 10),
+              decoration: BoxDecoration(
+                color: Colors.white,
+                border: Border.all(color: Colors.black38),
+                borderRadius: BorderRadius.only(
+                    topLeft: Radius.circular(10),
+                    topRight: Radius.circular(10),
+                    bottomLeft: Radius.circular(10),
+                    bottomRight: Radius.circular(10)),
+                boxShadow: [
+                  BoxShadow(
+                    color: Colors.grey.withOpacity(0.3),
+                    spreadRadius: 0.5,
+                    blurRadius: 6,
+                    offset: Offset(8, 5), // changes position of shadow
                   ),
-                  SizedBox(
-                    width: 5.0,
-                  ),
-                  Flexible(
-                    child: Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: <Widget>[
-                        MergeSemantics(
-                          child: Row(
-                            children: <Widget>[
-                              Flexible(
-                                child: Text(
-                                  "${names[index]} ",
-                                  overflow: TextOverflow.ellipsis,
-                                  softWrap: true,
-                                  style: TextStyle(
-                                      fontWeight: FontWeight.bold,
-                                      fontSize: 15,
-                                      color: Theme.of(context).primaryColor),
-                                  textAlign: TextAlign.left,
-                                ),
-                                //textAlign: TextAlign.right,
-                              ),
-                            ],
-                          ),
-                        ),
-                        SizedBox(height: 5),
-                        Text(
-                          'Click to open Yelp page',
-                          maxLines: 1,
-                          style: TextStyle(
-                              fontSize: 12,
-                              fontWeight: FontWeight.w500,
-                              color: Colors.grey),
-                        ),
-                        SizedBox(height: 5),
-                      ],
-                    ),
-                  )
                 ],
               ),
-            ),
-          );
-        },
+              child: Container(
+                //padding: EdgeInsets.fromLTRB(10, 0, 10, 0),
+
+                child: Link(
+                  url: urls[index],
+                  child: Row(
+                    children: <Widget>[
+                      Container(
+                        margin: EdgeInsets.fromLTRB(8, 8, 8, 8),
+                        height: 90,
+                        width: 90,
+                        child: ClipRRect(
+                          borderRadius: BorderRadius.all(Radius.circular(10)),
+                          child: Image.network(
+                            images[index] == null
+                                ? 'https://firebasestorage.googleapis.com/v0/b/rendezvous-b51b4.appspot.com/o/photo-1550747545-c896b5f89ff7.jpeg?alt=media&token=eb3eb883-86da-4b89-87e1-7490fd518910'
+                                : '${images[index]}',
+                            // 'https://firebasestorage.googleapis.com/v0/b/rendezvous-b51b4.appspot.com/o/photo-1550747545-c896b5f89ff7.jpeg?alt=media&token=eb3eb883-86da-4b89-87e1-7490fd518910',
+                            fit: BoxFit.cover,
+                          ),
+                        ),
+                      ),
+                      SizedBox(
+                        width: 5.0,
+                      ),
+                      Flexible(
+                        child: Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: <Widget>[
+                            MergeSemantics(
+                              child: Row(
+                                children: <Widget>[
+                                  Flexible(
+                                    child: Container(
+                                      padding: EdgeInsets.fromLTRB(0, 0, 0, 0),
+                                      child: Text(
+                                        "${names[index]} ",
+                                        overflow: TextOverflow.ellipsis,
+                                        softWrap: true,
+                                        style: TextStyle(
+                                            fontWeight: FontWeight.bold,
+                                            fontSize: 15,
+                                            color:
+                                                Theme.of(context).primaryColor),
+                                        textAlign: TextAlign.left,
+                                      ),
+                                    ),
+                                    //textAlign: TextAlign.right,
+                                  ),
+                                ],
+                              ),
+                            ),
+                            SizedBox(height: 5),
+                            Container(
+                              padding: EdgeInsets.fromLTRB(0, 0, 0, 0),
+                              child: Text(
+                                'Click to open Yelp page',
+                                maxLines: 1,
+                                style: TextStyle(
+                                    fontSize: 12,
+                                    fontWeight: FontWeight.w500,
+                                    color: Colors.grey),
+                              ),
+                            ),
+                            SizedBox(height: 5),
+                          ],
+                        ),
+                      )
+                    ],
+                  ),
+                ),
+              ),
+            );
+          },
+        ),
       ),
     );
   }
@@ -566,20 +602,7 @@ class _MapRenderState extends State<MapRender> {
 // yelp info will display here
               child: Container(
                   padding: EdgeInsets.fromLTRB(0, 80, 0, 0),
-                  child:
-                      /*ValueListenableBuilder(
-                  valueListenable: _arrLength,
-                  builder: (BuildContext context, int value, _) {
-                    return */
-                      _viewYelp())
-              /* ListView.builder(
-                        itemCount: _arrLength,
-                        itemBuilder: (BuildContext context, int index) {
-                          return new Text(names[index]);
-                        } //);
-                        // },
-                        )),*/
-              ),
+                  child: _viewYelp())),
           collapsed: Container(
             decoration: BoxDecoration(
               color: Colors.white,
@@ -855,13 +878,13 @@ class _MapRenderState extends State<MapRender> {
                                 */
                         child: Slider(
                           value: midSliderVal,
-                          onChanged: (double val){
+                          onChanged: (double val) {
                             //We need to connect the yelp API here
-                            setState((){
+                            setState(() {
                               midSliderVal = val;
                             });
                           },
-                          onChangeEnd: (double val) async{
+                          onChangeEnd: (double val) async {
                             setState(() {
                               //can I do this
                               finalRad = midSliderVal;
@@ -931,7 +954,7 @@ class _MapRenderState extends State<MapRender> {
 }
 
 //Function that will connect to yelp API
-Future <void> _findingPlaces() async {
+Future<void> _findingPlaces() async {
   print("Searching for your place");
   //finalRad.toInt()
   names.clear();
