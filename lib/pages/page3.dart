@@ -91,6 +91,7 @@ class _MapRenderState extends State<MapRender> {
 //Need to learn how to get return value from future class
   Position currPosition;
   static List<String> nameList = [];
+  static StreamSubscription<QuerySnapshot> memberListener;
 
 //const int longitude = currPosition.longitude;
 
@@ -161,13 +162,13 @@ class _MapRenderState extends State<MapRender> {
   //This function will be used to initialise my markers, by accessing the user data from firebase
   Future<void> _initMarkers() async {
     print("initMarkers called");
-    firebase
+    memberListener = 
+        firebase
         .collection("rooms")
         .document(widget.roomDocID)
         .collection("users")
         .snapshots()
         .listen((snapshot) async {
-      print("Listening");
       //Adding a line that will clear the markers that is not the current user, to update in case a user leaves
       setState(() {
         _markers.removeWhere((element) =>
@@ -943,9 +944,19 @@ class _MapRenderState extends State<MapRender> {
                         child: Text("Leave Room",
                             style: new TextStyle(
                                 fontSize: 20.0, color: Colors.black)),
-                        onPressed: () {
-                          FirebaseFunctions.removeCurrentUserFromRoom(
-                              FirebaseFunctions.roomData["roomCode"]);
+                        onPressed: () async {
+                          String roomCodeString = FirebaseFunctions.roomData["roomCode"];
+                          
+
+                          await Firestore.instance.collection("rooms").document(roomCodeString).collection("users").getDocuments().then((data) {
+                              print("I'm running");
+                              print(data.documents.length);
+                              memberListener.cancel();
+                              FirebaseFunctions.removeCurrentUserFromRoom(
+                              roomCodeString, data.documents.length);
+                          });
+
+
                           Navigator.pushNamedAndRemoveUntil(
                               context, '/page1', (route) => false);
                         },
