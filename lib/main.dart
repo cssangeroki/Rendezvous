@@ -54,6 +54,13 @@ class MyApp extends StatelessWidget {
     }
     return MaterialApp(
         title: 'Retrieve Text Input',
+        theme: ThemeData(
+          textTheme: Theme.of(context).textTheme.apply(
+                fontFamily: 'Goldplay',
+                fontSizeFactor: 1.1,
+                fontSizeDelta: 2.0,
+              ),
+        ),
         debugShowCheckedModeBanner: false,
         home: Page1(),
         routes: {

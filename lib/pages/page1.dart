@@ -81,55 +81,73 @@ class _Page1State extends State<Page1> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+      backgroundColor: Color(0xffd4f9ff),
       appBar: AppBar(
-        title: Text('Rendezvous (Home Page)'),
+        brightness: Brightness.light,
+        iconTheme: IconThemeData(
+          color: Colors.black, //change your color here
+        ),
+        title: Text(
+          'Rendezvous (Home Page)',
+          style: TextStyle(color: Colors.black, fontFamily: 'Goldplay'),
+        ),
+        backgroundColor: Color(0xffcaf7dc),
       ),
       body //: isLoading
 //          ? Container(child: Center(child: CircularProgressIndicator()))
           : SafeArea(
         child: SingleChildScrollView(
-          child: Column(children: <Widget>[
-            Image(
-              image: AssetImage('images/Rendezvous_logo.png'),
-            ),
-            Container(
-              padding: EdgeInsets.fromLTRB(20.0, 20.0, 20.0, 0),
-              child: Text(
-                "Enter a display name:",
-                style: TextStyle(
-                  fontSize: 30.0,
+          child: Container(
+            child: Column(children: <Widget>[
+              Container(
+                padding: EdgeInsets.fromLTRB(0, 50, 0, 30),
+                child: Image(
+                  image: AssetImage('images/Rendezvous_logo.png'),
                 ),
               ),
-            ),
-            Container(
-              margin: EdgeInsets.fromLTRB(0, 20.0, 0, 0),
-              width: 300.0,
-              child: Form(
-                key: formKey,
-                child: TextFormField(
-                  validator: (val) {
-                    return val.isEmpty ? "Please Enter a Name" : null;
-                  },
-                  controller: userNameController,
-                  onChanged: (text) {
-                    userName = text;
-                    FirebaseFunctions.currentUserData["userName"] = text;
-                  },
-                  decoration: InputDecoration(hintText: 'Enter text here'),
+              Container(
+                padding: EdgeInsets.fromLTRB(20.0, 20.0, 20.0, 0),
+                child: Text(
+                  "Enter a display name:",
+                  style: TextStyle(
+                    fontSize: 30.0,
+                  ),
                 ),
               ),
-            ),
-          ]),
+              Container(
+                margin: EdgeInsets.fromLTRB(0, 20.0, 0, 0),
+                width: 300.0,
+                child: Form(
+                  key: formKey,
+                  child: TextFormField(
+                    validator: (val) {
+                      return val.isEmpty ? "Please Enter a Name" : null;
+                    },
+                    controller: userNameController,
+                    onChanged: (text) {
+                      userName = text;
+                      FirebaseFunctions.currentUserData["userName"] = text;
+                    },
+                    decoration: InputDecoration(hintText: 'Enter text here'),
+                  ),
+                ),
+              ),
+            ]),
+          ),
         ),
       ),
       floatingActionButton: FloatingActionButton(
         heroTag: "btn1",
+        backgroundColor: Color(0xffffccbb),
         // When the user presses the button, show an alert dialog containing
         // the text that the user has entered into the text field.
         onPressed: () {
           _signMeUp();
         },
-        child: Text('Go'), // to show Go text in button
+        child: Text(
+          'Go',
+          style: TextStyle(color: Colors.black),
+        ), // to show Go text in button
       ),
     );
   }

@@ -59,16 +59,28 @@ class _Page4State extends State<Page4> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+      backgroundColor: Color(0xffd4f9ff),
       appBar: AppBar(
-        title: Text('Rendezvous Page 4'),
+        backgroundColor: Color(0xffcaf7dc),
+        brightness: Brightness.light,
+        iconTheme: IconThemeData(
+          color: Colors.black, //change your color here
+        ),
+        title: Text(
+          'Rendezvous page 4',
+          style: TextStyle(color: Colors.black, fontFamily: 'Goldplay'),
+        ),
       ),
       body: isLoading
           ? Container(child: Center(child: CircularProgressIndicator()))
           : SafeArea(
               child: SingleChildScrollView(
                 child: Column(children: <Widget>[
-                  Image(
-                    image: AssetImage('images/Rendezvous_logo.png'),
+                  Container(
+                    padding: EdgeInsets.fromLTRB(0, 50, 0, 30),
+                    child: Image(
+                      image: AssetImage('images/Rendezvous_logo.png'),
+                    ),
                   ),
                   Container(
                     child: Text(

@@ -472,8 +472,26 @@ class _MapRenderState extends State<MapRender> {
 
   Widget _viewYelp() {
     _updateYelpVenues();
-    if (_arrLength == null || _arrLength == 0) {
-      return Text("No Places Found");
+    if (_arrLength == null) {
+      return Text(
+        "Loading Places",
+        style: TextStyle(
+            color: Colors.black, fontFamily: 'Goldplay', fontSize: 30),
+      );
+    }
+
+    if (_arrLength == 0) {
+      return Container(
+        height: 500,
+        width: 500,
+        color: Color(0xffd8eefe),
+        child: Text(
+          "No Places Found.",
+          style: TextStyle(
+              color: Colors.black, fontFamily: 'Goldplay', fontSize: 30),
+        ),
+        alignment: Alignment.center,
+      );
     }
 
     return Container(
@@ -583,33 +601,52 @@ class _MapRenderState extends State<MapRender> {
 
   @override
   Widget build(BuildContext context) {
-    BorderRadiusGeometry radius = BorderRadius.only(
-        topLeft: Radius.circular(75.0), topRight: Radius.circular(75.0));
     return MaterialApp(
       debugShowCheckedModeBanner: false,
       home: Scaffold(
         appBar: AppBar(
-          title: Text('Maps'),
-          backgroundColor: Colors.lightBlue,
+          brightness: Brightness.light,
+          iconTheme: IconThemeData(
+            color: Colors.black, //change your color here
+          ),
+          title: Text(
+            'Maps',
+            style: TextStyle(color: Colors.black, fontFamily: 'Goldplay'),
+          ),
+          backgroundColor: Color(0xffcaf7dc),
         ),
         body: SlidingUpPanel(
 //maxHeight: 600,
+
           backdropEnabled: true,
-          borderRadius: radius,
+          borderRadius: BorderRadius.only(
+            topLeft: Radius.circular(75.0),
+            topRight: Radius.circular(75.0),
+          ),
           panel: Center(
 // yelp info will display here
-              child: Container(
-                  padding: EdgeInsets.fromLTRB(0, 80, 0, 0),
-                  child: _viewYelp())),
+            child: Container(
+                decoration: BoxDecoration(
+                  color: Color(0xffd8eefe),
+                  borderRadius: BorderRadius.only(
+                    topLeft: Radius.circular(75.0),
+                    topRight: Radius.circular(75.0),
+                  ),
+                ),
+                padding: EdgeInsets.fromLTRB(0, 80, 0, 0),
+                child: _viewYelp()),
+          ),
           collapsed: Container(
             decoration: BoxDecoration(
-              color: Colors.white,
-              borderRadius: radius,
+              color: Color(0xffd8eefe),
+              borderRadius: BorderRadius.only(
+                  topLeft: Radius.circular(75.0),
+                  topRight: Radius.circular(75.0)),
             ),
             child: Center(
               child: Text(
                 'Swipe up for menu',
-                style: TextStyle(fontSize: 20),
+                style: TextStyle(fontSize: 20, fontFamily: 'Goldplay'),
               ),
             ),
           ),
@@ -696,8 +733,8 @@ class _MapRenderState extends State<MapRender> {
         ),
         drawer: Theme(
           data: Theme.of(context).copyWith(
-            canvasColor:
-                Colors.blue, //This will change the drawer background to blue.
+            canvasColor: Color(
+                0xffffccbb), //This will change the drawer background to blue.
             //other styles
           ),
           child: Container(
@@ -794,6 +831,7 @@ class _MapRenderState extends State<MapRender> {
                     ),
                   ),
                   //Below are the sliders
+                  /*
                   Container(
                     child: ListTile(
                       title: Text(
@@ -841,6 +879,7 @@ class _MapRenderState extends State<MapRender> {
                       ),
                     ),
                   ),
+                  */
                   Container(
                     child: ListTile(
                       title: Text(
@@ -855,7 +894,7 @@ class _MapRenderState extends State<MapRender> {
                   SliderTheme(
                       data: SliderTheme.of(context).copyWith(
                         activeTrackColor: Colors.red[500],
-                        inactiveTrackColor: Colors.red[100],
+                        inactiveTrackColor: Colors.white,
                         trackShape: RectangularSliderTrackShape(),
                         trackHeight: 4.0,
                         thumbColor: Colors.white,

@@ -52,7 +52,7 @@ class _Page2State extends State<Page2> {
 
     String roomCode = await FirebaseFunctions.createFirebaseRoom(_name);
     roomCode = FirebaseFunctions.roomData["roomCode"];
-    
+
 //    // create unique documentId and then push to firebase as document
 //    // instead of using add?
 //    var documentIdSecureRandom = SecureRandom();
@@ -61,7 +61,6 @@ class _Page2State extends State<Page2> {
 //        charset: 'abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ');
 
     // map userName and roomCode and send to fireBase database, create userId
-
 
     /*Firestore.instance
         .collection("rooms")
@@ -93,9 +92,7 @@ class _Page2State extends State<Page2> {
     print("roomCode is: " + roomCode);
     saveRoomCodePreference(roomCode).then((_) {
       Navigator.push(
-          context,
-          MaterialPageRoute(
-              builder: (context) => MapRender()));
+          context, MaterialPageRoute(builder: (context) => MapRender()));
     });
 
 //    Navigator.pushReplacement(
@@ -109,14 +106,26 @@ class _Page2State extends State<Page2> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+      backgroundColor: Color(0xffd4f9ff),
       appBar: AppBar(
-        title: Text('Rendezvous page 2'),
+        backgroundColor: Color(0xffcaf7dc),
+        brightness: Brightness.light,
+        iconTheme: IconThemeData(
+          color: Colors.black, //change your color here
+        ),
+        title: Text(
+          'Rendezvous page 2',
+          style: TextStyle(color: Colors.black, fontFamily: 'Goldplay'),
+        ),
       ),
       body: SafeArea(
         child: SingleChildScrollView(
           child: Column(children: <Widget>[
-            Image(
-              image: AssetImage('images/Rendezvous_logo.png'),
+            Container(
+              padding: EdgeInsets.fromLTRB(0, 50, 0, 30),
+              child: Image(
+                image: AssetImage('images/Rendezvous_logo.png'),
+              ),
             ),
             Container(
               padding: EdgeInsets.all(10.0),
@@ -135,7 +144,7 @@ class _Page2State extends State<Page2> {
                 minWidth: 200.0,
                 height: 30.0,
                 padding: EdgeInsets.all(10.0),
-                buttonColor: Colors.white,
+                buttonColor: Color(0xffcaf7dc),
                 child: RaisedButton(
                   child: Text("Create a Room",
                       style:
@@ -152,8 +161,8 @@ class _Page2State extends State<Page2> {
               minWidth: 200.0,
               height: 30.0,
               padding: EdgeInsets.all(10.0),
-              buttonColor: Colors.white,
-              hoverColor: Colors.grey,
+              buttonColor: Color(0xffcaf7dc),
+              hoverColor: Color(0xffffccbb),
               child: RaisedButton(
                 child: Text("Join a Room",
                     style: new TextStyle(fontSize: 20.0, color: Colors.black)),
