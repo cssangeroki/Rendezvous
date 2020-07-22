@@ -13,8 +13,6 @@ import 'package:geolocator/geolocator.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 
 //import 'firebaseFunctions.dart';
-import 'page1.dart';
-import 'page2.dart';
 //import 'page4.dart';
 
 import 'package:sliding_up_panel/sliding_up_panel.dart';
@@ -71,22 +69,17 @@ String category;
 double midSliderVal = 5;
 double finalRad = midSliderVal;
 
-double userSliderVal = 25;
+double userSliderVal = 5;
 
 //Here I'm creating a reference to our firebase
 final firebase = Firestore.instance;
 
 class MapRender extends StatefulWidget {
-  final String roomCode;
-  final String name;
   final String userDocID = FirebaseFunctions.currentUID;
   final String roomDocID = FirebaseFunctions.currentUserData["roomCode"];
 
 //FirebaseFunctions.currentUserData[“roomCode”]
 // FirebaseFunctions.currentUID
-  MapRender({Key key, @required this.roomCode, @required this.name})
-      : super(key: key);
-
   @override
   _MapRenderState createState() => _MapRenderState();
 }
@@ -123,26 +116,8 @@ class _MapRenderState extends State<MapRender> {
   void initState() {
     super.initState();
     initFunctionCaller();
-    getRoomCodePreference().then(_updateRoomCode); // initialize stored roomCode
-    getNamePreference().then(_updateName);
 
     //I also want to update the users location in the database
-  }
-
-  String _roomCode = "";
-
-  void _updateRoomCode(String roomCode) {
-    setState(() {
-      this._roomCode = roomCode;
-    });
-  }
-
-  String _name = "";
-
-  void _updateName(String name) {
-    setState(() {
-      this._name = name;
-    });
   }
 
   void initFunctionCaller() async {
@@ -162,7 +137,7 @@ class _MapRenderState extends State<MapRender> {
       _center = LatLng(currPosition.latitude, currPosition.longitude);
     });
     //print("Center = " + _center.toString());
-    bool pushedLocation = await FirebaseFunctions.pushUserLocation(
+    await FirebaseFunctions.pushUserLocation(
         currPosition.latitude, currPosition.longitude);
   }
 
@@ -413,7 +388,7 @@ class _MapRenderState extends State<MapRender> {
 */
 
   //This functions is used when we search a category for yelp
-  void _searchingYelpCateogry() async {
+  void _searchingYelpCategory() async {
     await _findingPlaces();
     addYelpMarkers();
     _updateYelpVenues();
@@ -819,7 +794,7 @@ class _MapRenderState extends State<MapRender> {
                               EdgeInsets.only(left: 15.0, top: 15.0),
                           suffixIcon: IconButton(
                             icon: Icon(Icons.search),
-                            onPressed: _searchingYelpCateogry,
+                            onPressed: _searchingYelpCategory,
                             iconSize: 20.0,
                           )),
                       onChanged: (val) {
@@ -883,7 +858,7 @@ class _MapRenderState extends State<MapRender> {
                   Container(
                     child: ListTile(
                       title: Text(
-                        'Range from midpoint: ${midSliderVal} mi',
+                        'Range from midpoint: $midSliderVal mi',
                         style: TextStyle(
                           fontSize: 18,
                         ),
@@ -896,7 +871,7 @@ class _MapRenderState extends State<MapRender> {
                         activeTrackColor: Colors.red[500],
                         inactiveTrackColor: Colors.white,
                         trackShape: RectangularSliderTrackShape(),
-                        trackHeight: 4.0,
+                        trackHeight: 5.0,
                         thumbColor: Colors.white,
                         thumbShape:
                             RoundSliderThumbShape(enabledThumbRadius: 10.0),
@@ -905,7 +880,6 @@ class _MapRenderState extends State<MapRender> {
                             RoundSliderOverlayShape(overlayRadius: 28.0),
                       ),
                       child: Container(
-                        margin: EdgeInsets.all(5),
                         /*decoration: BoxDecoration(
                             border: Border.all(
                               color: Colors.black,
@@ -926,8 +900,7 @@ class _MapRenderState extends State<MapRender> {
                               //can I do this
                               finalRad = midSliderVal;
                             });
-                            await _searchingYelpCateogry();
-                            _updateYelpVenues();
+                            _searchingYelpCategory();
                           },
                           min: 1,
                           max: 25,

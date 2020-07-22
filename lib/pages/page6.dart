@@ -1,8 +1,6 @@
 //map 8-6
 import 'package:flutter/material.dart';
 
-import 'page1.dart';
-
 class Page6 extends StatelessWidget {
   @override
   Widget build(BuildContext context) {

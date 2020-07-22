@@ -1,18 +1,13 @@
 // 8-4, the enter code page
 
 import 'package:flutter/material.dart';
-import 'package:cloud_firestore/cloud_firestore.dart';
 
-import 'firebaseFunctions.dart';
-import 'firebaseFunctions.dart';
 import 'firebaseFunctions.dart';
 import 'page3.dart';
-import 'page5.dart';
 
 class Page4 extends StatefulWidget {
-  String roomCode;
-  Page4({Key key, @required this.roomCode, @required this.name})
-      : super(key: key);
+  final String roomCode;
+  Page4({Key key, this.roomCode, this.name}) : super(key: key);
   String name;
 
   @override
@@ -44,15 +39,10 @@ class _Page4State extends State<Page4> {
   }*/
 
   void _sendDataToPage3(BuildContext context) {
-    String userName = name;
-    String chatRoomCode = roomCode;
     Navigator.pushReplacement(
         context,
         MaterialPageRoute(
-          builder: (context) => MapRender(
-            name: userName,
-            roomCode: chatRoomCode,
-          ),
+          builder: (context) => MapRender(),
         ));
   }
 
@@ -111,7 +101,7 @@ class _Page4State extends State<Page4> {
                           return null;
                         },
                         onChanged: (text) {
-                          String msg = null;
+                          String msg;
                           if (text == "") {
                             msg = "Enter a valid code";
                           }
