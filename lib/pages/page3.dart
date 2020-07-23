@@ -899,7 +899,7 @@ class _MapRenderState extends State<MapRender> {
                           onChangeEnd: (double val) async {
                             setState(() {
                               //can I do this
-                              finalRad = midSliderVal;
+                              finalRad = val;
                             });
                             _searchingYelpCategory();
                           },
@@ -983,15 +983,13 @@ Future<void> _findingPlaces() async {
   locations.clear();
   urls.clear();
   images.clear();
-
+  //var buss = "";
   double finalRadMiles = finalRad * 1609.344;
 
   var businesses = "";
 
   businesses = await BackendMethods.getLocations(
       finalLon, finalLat, finalCatagory, finalRadMiles.toInt());
-
-  //var buss = "";
   //buss = await BackendMethods.getLocations( -118.30198471, 34.16972651);
 
   //print(buss);
