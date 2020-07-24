@@ -36,26 +36,6 @@ class _Page1State extends State<Page1> {
   final userNameController = TextEditingController();
   String userName;
 
-//  TextEditingController userNameTextEditingController =
-//      new TextEditingController();
-
-//  signMeUp() {
-//    if (formKey.currentState.validate()) {
-//      setState(() {
-//        isLoading = true;
-//      });
-  // this can be used for future login with firebase
-//      Map<String, String> userInfoMap = {
-//        "name": userNameTextEditingController.text,
-//        "email": userNameTextEditingController.text
-//      };
-
-  //databaseMethods.uploadUserInfo(userInfoMap);
-  //_sendDataToPage2(context);
-//      _saveName();
-//    }
-//  }
-
   // checks if name is valid then saves name and sends to page2
   void _signMeUp() {
     if (formKey.currentState.validate()) {
@@ -66,17 +46,6 @@ class _Page1State extends State<Page1> {
       });
     }
   }
-
-  /*void _sendDataToPage2(BuildContext context) {
-    String personName = userName;
-    Navigator.pushReplacement(
-        context,
-        MaterialPageRoute(
-          builder: (context) => Page2(
-            name: personName,
-          ),
-        ));
-  }*/
 
   @override
   Widget build(BuildContext context) {

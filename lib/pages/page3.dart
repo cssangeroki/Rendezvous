@@ -880,13 +880,6 @@ class _MapRenderState extends State<MapRender> {
                             RoundSliderOverlayShape(overlayRadius: 28.0),
                       ),
                       child: Container(
-                        /*decoration: BoxDecoration(
-                            border: Border.all(
-                              color: Colors.black,
-                            ),
-                            borderRadius:
-                                BorderRadius.all(Radius.circular(20))),
-                                */
                         child: Slider(
                           value: midSliderVal,
                           onChanged: (double val) {
@@ -995,9 +988,6 @@ Future<void> _findingPlaces() async {
     lat = place['coordinates']['latitude'];
     lon = place['coordinates']['longitude'];
 
-    //  print(lat);
-    //  print(lon);
-
     var myLatlng = new LatLng(lat, lon);
     resultCords.add(myLatlng);
 
@@ -1012,15 +1002,6 @@ Future<void> _findingPlaces() async {
 
     image = place['image_url'];
     images.add(image);
-
-    // print("image_url");
-    // print(image);
-
-    // print(names);
-    // print(address);
-
-    //names.add(name);
-
   }
 
   print(names);
