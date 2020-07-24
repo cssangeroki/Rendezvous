@@ -109,21 +109,33 @@ class FirebaseFunctions {
     return true;
   }
 
-  static removeCurrentUserFromRoom(String roomCode) async {
+  static deleteRoom(String roomCode) async {
     Firestore.instance
+            .collection("rooms")
+            .document(roomCode).delete();
+    
+  }
+  static removeCurrentUserFromRoom(String roomCode, int membersLength) async {
+
+    await Firestore.instance
         .collection("users")
         .document(FirebaseFunctions.currentUID)
-        .updateData({"roomCode": null}).then((result) {
-      Firestore.instance
-          .collection("rooms")
-          .document(roomCode)
-          .collection("users")
-          .document(FirebaseFunctions?.currentUID)
-          .delete()
-          .then((value) {
-        FirebaseFunctions.roomData = {"roomCode": null};
-        FirebaseFunctions.currentUserData = {"roomCode": null};
-      });
+        .updateData({"roomCode": null}).then((result) async {
+        await Firestore.instance
+            .collection("rooms")
+            .document(roomCode)
+            .collection("users")
+            .document(FirebaseFunctions?.currentUID)
+            .delete()
+            .then((value) {
+          FirebaseFunctions.roomData = {"roomCode": null};
+          FirebaseFunctions.currentUserData = {"roomCode": null};
+        });
+        if(membersLength == 1) {
+            print("This is the length of members");
+            print(membersLength);
+        await deleteRoom(roomCode);
+      }
     });
   }
 
