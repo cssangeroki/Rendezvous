@@ -20,7 +20,7 @@ class BackendMethods {
       bodyJSON['radius'] = radius;
     }
 
-    bodyJSON['sort_by'] = 'best_match';
+    bodyJSON['sort_by'] = 'distance';
 
     bodyJSON['limit'] = 25;
     //  bodyJSON['limit'] = 5;
@@ -32,22 +32,7 @@ class BackendMethods {
         body: jsonEncode(bodyJSON));
     print("check statement 1");
     if (res.statusCode == 200) {
-      // Map result = jsonDecode(res.body);
-
-      // for (var place in result['businesses']) {
-
-      //print(['name']);
-      // print(place['address1']);
-      // print(place['city']);
-
-      // }
-
-      // print("printing res.body");
-      //print((res.body));
       print("check statement 2");
-      // Map<String, dynamic> businesses = json.decode(res.body) as Map<String, dynamic>;
-      //print(businesses);
-      // return businesses;
 
       return res.body;
     } else {

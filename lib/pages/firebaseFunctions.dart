@@ -10,10 +10,6 @@ class FirebaseFunctions {
   static Map<String, dynamic> roomData = {"roomCode": null};
 
   static refreshFirebaseRoomData() async {
-    // StreamSubscription<QuerySnapshot> realtimeListener;
-    // realtimeListener = Firestore.instance.collection("rooms").document(currentUserData["roomData"]).collection("users").where(true).snapshots().listen((event) {
-    //    realtimeListener.cancel();
-    // });
     if (FirebaseFunctions.currentUserData["roomCode"] != null) {
       await Firestore.instance
           .collection("rooms")
