@@ -35,10 +35,22 @@ List locations = [];
 List urls = [];
 List images = [];
 
+//A string that will store the category searched for on the Yelp search
+String category;
+
+//Below are variables we will use for the sliders
+double midSliderVal = 5;
+double finalRad = midSliderVal;
+
+double userSliderVal = 5;
+
+//Here I'm creating a reference to our firebase
+final firebase = Firestore.instance;
+
 //Map rendering stuff
 //Check the below link for some explanation of how a lot of the methods work
 //https://medium.com/@rajesh.muthyala/flutter-with-google-maps-and-google-place-85ccee3f0371
-//Going to create a function that gets the users current location, or last known location.
+//Below is a function that gets the users current location, or last known location.
 //The function will return a Position variable
 Future<Position> currentLocation() async {
 //First, I want to check if location services are available
@@ -61,18 +73,6 @@ Future<Position> currentLocation() async {
     return position;
   }
 }
-
-//A string that will store the category searched for on the Yelp search
-String category;
-
-//Below are variables we will use for the sliders
-double midSliderVal = 5;
-double finalRad = midSliderVal;
-
-double userSliderVal = 5;
-
-//Here I'm creating a reference to our firebase
-final firebase = Firestore.instance;
 
 class MapRender extends StatefulWidget {
   final String userDocID = FirebaseFunctions.currentUID;
@@ -133,10 +133,11 @@ class _MapRenderState extends State<MapRender> {
 //Function used to get users original position
   Future<void> _getUserLocation() async {
     currPosition = await currentLocation();
-    //print("Current Position = " + currPosition.toString());
+    print("Current Position = " + currPosition.toString());
     setState(() {
       _center = LatLng(currPosition.latitude, currPosition.longitude);
     });
+    _lastMapPosition = _center;
     //print("Center = " + _center.toString());
     await FirebaseFunctions.pushUserLocation(
         currPosition.latitude, currPosition.longitude);
@@ -152,7 +153,7 @@ class _MapRenderState extends State<MapRender> {
 
       setState(() {
         searchAddr =
-            "${place.name}, ${place.thoroughfare}, ${place.locality}, ${place.postalCode}, ${place.country}";
+        "${place.name}, ${place.subLocality}, ${place.locality}, ${place.postalCode}, ${place.country}";
       });
     } catch (e) {
       print(e);
@@ -185,6 +186,7 @@ class _MapRenderState extends State<MapRender> {
         String newUserName = user.data["userName"];
         userNames.add(newUserName);
         if (user.documentID != widget.userDocID) {
+          print("Found other users");
           await addOtherUserMarkers(user);
         }
       }
@@ -229,7 +231,7 @@ class _MapRenderState extends State<MapRender> {
     mapController = controller;
     print("Done creating Map!");
     _lastMapPosition = _center;
-    _onAddMarkerButtonPressed();
+    //_onAddMarkerButtonPressed();
 //We wait to receive the users current position
 //The initial position of the map should now be set to the users initial position
 //_center = LatLng(currPosition.latitude, currPosition.longitude);
@@ -351,7 +353,9 @@ class _MapRenderState extends State<MapRender> {
       ));
     });
     //print("Markers length before midpoint = ${_markers.length}");
+    print("Users Marker location before firebase update = ${_markers.where((element) => element.markerId.value == "User")}");
     updateUserLocation();
+    print("Users Marker location after firebase update = ${_markers.where((element) => element.markerId.value == "User")}");
     //findMidpoint(_markers);
   }
 
