@@ -29,16 +29,6 @@ class _Page4State extends State<Page4> {
 
   final codeController = TextEditingController();
 
-  /*sendToRoom() {
-    if (formKey.currentState.validate()) {
-      setState(() {
-        isLoading = true;
-      });
-
-      _sendDataToPage3(context);
-    }
-  }*/
-
   void _sendDataToPage3(BuildContext context) {
     Navigator.pushReplacement(
         context,
