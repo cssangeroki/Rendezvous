@@ -3,6 +3,7 @@
 import 'package:Rendezvous/pages/firebaseFunctions.dart';
 import 'package:flutter/material.dart';
 import 'package:shared_preferences/shared_preferences.dart';
+import '../appBar.dart';
 import 'page2.dart';
 
 Future<void> saveNamePreference(String userName) async {
@@ -51,20 +52,8 @@ class _Page1State extends State<Page1> {
   Widget build(BuildContext context) {
     return Scaffold(
       backgroundColor: Color(0xffd4f9ff),
-      appBar: AppBar(
-        brightness: Brightness.light,
-        iconTheme: IconThemeData(
-          color: Colors.black, //change your color here
-        ),
-        title: Text(
-          'Rendezvous (Home Page)',
-          style: TextStyle(color: Colors.black, fontFamily: 'Goldplay'),
-        ),
-        backgroundColor: Color(0xffcaf7dc),
-      ),
-      body //: isLoading
-//          ? Container(child: Center(child: CircularProgressIndicator()))
-          : SafeArea(
+      appBar: appBarMain(context),
+      body: SafeArea(
         child: SingleChildScrollView(
           child: Container(
             child: Column(children: <Widget>[

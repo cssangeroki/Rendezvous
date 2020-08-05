@@ -2,6 +2,7 @@ import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 
 //import 'package:geoflutterfire/geoflutterfire.dart';
+import '../appBar.dart';
 import 'firebaseFunctions.dart';
 import 'dart:async';
 
@@ -153,7 +154,7 @@ class _MapRenderState extends State<MapRender> {
 
       setState(() {
         searchAddr =
-        "${place.name}, ${place.subLocality}, ${place.locality}, ${place.postalCode}, ${place.country}";
+            "${place.name}, ${place.subLocality}, ${place.locality}, ${place.postalCode}, ${place.country}";
       });
     } catch (e) {
       print(e);
@@ -163,8 +164,7 @@ class _MapRenderState extends State<MapRender> {
   //This function will be used to initialise my markers, by accessing the user data from firebase
   Future<void> _initMarkers() async {
     print("initMarkers called");
-    memberListener = 
-        firebase
+    memberListener = firebase
         .collection("rooms")
         .document(widget.roomDocID)
         .collection("users")
@@ -353,9 +353,11 @@ class _MapRenderState extends State<MapRender> {
       ));
     });
     //print("Markers length before midpoint = ${_markers.length}");
-    print("Users Marker location before firebase update = ${_markers.where((element) => element.markerId.value == "User")}");
+    print(
+        "Users Marker location before firebase update = ${_markers.where((element) => element.markerId.value == "User")}");
     updateUserLocation();
-    print("Users Marker location after firebase update = ${_markers.where((element) => element.markerId.value == "User")}");
+    print(
+        "Users Marker location after firebase update = ${_markers.where((element) => element.markerId.value == "User")}");
     //findMidpoint(_markers);
   }
 
@@ -584,17 +586,7 @@ class _MapRenderState extends State<MapRender> {
     return MaterialApp(
       debugShowCheckedModeBanner: false,
       home: Scaffold(
-        appBar: AppBar(
-          brightness: Brightness.light,
-          iconTheme: IconThemeData(
-            color: Colors.black, //change your color here
-          ),
-          title: Text(
-            'Maps',
-            style: TextStyle(color: Colors.black, fontFamily: 'Goldplay'),
-          ),
-          backgroundColor: Color(0xffcaf7dc),
-        ),
+        appBar: appBarMain(context),
         body: SlidingUpPanel(
 //maxHeight: 600,
 
@@ -942,17 +934,21 @@ class _MapRenderState extends State<MapRender> {
                             style: new TextStyle(
                                 fontSize: 20.0, color: Colors.black)),
                         onPressed: () async {
-                          String roomCodeString = FirebaseFunctions.roomData["roomCode"];
-                          
+                          String roomCodeString =
+                              FirebaseFunctions.roomData["roomCode"];
 
-                          await Firestore.instance.collection("rooms").document(roomCodeString).collection("users").getDocuments().then((data) {
-                              print("I'm running");
-                              print(data.documents.length);
-                              memberListener.cancel();
-                              FirebaseFunctions.removeCurrentUserFromRoom(
-                              roomCodeString, data.documents.length);
+                          await Firestore.instance
+                              .collection("rooms")
+                              .document(roomCodeString)
+                              .collection("users")
+                              .getDocuments()
+                              .then((data) {
+                            print("I'm running");
+                            print(data.documents.length);
+                            memberListener.cancel();
+                            FirebaseFunctions.removeCurrentUserFromRoom(
+                                roomCodeString, data.documents.length);
                           });
-
 
                           Navigator.pushNamedAndRemoveUntil(
                               context, '/page1', (route) => false);

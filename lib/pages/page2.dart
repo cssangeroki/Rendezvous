@@ -3,6 +3,7 @@
 import 'package:flutter/material.dart';
 
 import 'package:shared_preferences/shared_preferences.dart';
+import '../appBar.dart';
 import 'firebaseFunctions.dart';
 import 'page1.dart';
 import 'page3.dart';
@@ -68,17 +69,7 @@ class _Page2State extends State<Page2> {
   Widget build(BuildContext context) {
     return Scaffold(
       backgroundColor: Color(0xffd4f9ff),
-      appBar: AppBar(
-        backgroundColor: Color(0xffcaf7dc),
-        brightness: Brightness.light,
-        iconTheme: IconThemeData(
-          color: Colors.black, //change your color here
-        ),
-        title: Text(
-          'Rendezvous page 2',
-          style: TextStyle(color: Colors.black, fontFamily: 'Goldplay'),
-        ),
-      ),
+      appBar: appBarMain(context),
       body: SafeArea(
         child: SingleChildScrollView(
           child: Column(children: <Widget>[
