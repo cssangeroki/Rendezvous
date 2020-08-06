@@ -1,8 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'pages/firebaseFunctions.dart';
-import 'pages/page1.dart';
-import 'pages/page3.dart';
+import 'pages/insertNamePage.dart';
+import 'pages/mapRenderPage.dart';
 
 import 'package:firebase_auth/firebase_auth.dart';
 

@@ -409,49 +409,6 @@ class _MapRenderState extends State<MapRender> {
     });
   }
 
-  /*Widget _viewYelp() {
-    _updateYelpVenues();
-    if (_arrLength == null || _arrLength == 0) {
-      return Text("No Places Found");
-    }
-
-    //Using ListView.seperated instead of .builder to create a seperated list
-    return ListView.separated(
-      itemCount: _arrLength,
-      itemBuilder: (BuildContext context, int index) {
-        //return new Text(names[index]);
-        return new Container(
-          //padding: EdgeInsets.fromLTRB(0, 20, 0, 20),
-          child: Link(
-            url: urls[index],
-            child: Row(children: [
-              Container(
-                alignment: Alignment.centerLeft,
-                width: 100,
-                height: 100,
-                decoration: BoxDecoration(
-                    image: DecorationImage(
-                        image: NetworkImage(
-                            "'https:///flutter.github.io/assets-for-api-docs/assets/widgets/owl-2.jpg'"))),
-              ),
-              Text(
-                "${names[index]} \n (Click to open Yelp page)",
-                style: TextStyle(
-                  fontWeight: FontWeight.bold,
-                  fontSize: 15,
-                ),
-                //textAlign: TextAlign.right,
-              ),
-            ]),
-          ),
-        );
-      },
-      separatorBuilder: (BuildContext context, int index) => Divider(),
-      //);
-      // },
-    );
-  }*/
-
   Widget _viewYelp() {
     _updateYelpVenues();
     if (_arrLength == null) {
@@ -581,230 +538,200 @@ class _MapRenderState extends State<MapRender> {
     );
   }
 
-  @override
-  Widget build(BuildContext context) {
-    return MaterialApp(
-      debugShowCheckedModeBanner: false,
-      home: Scaffold(
-        appBar: appBarMain(context),
-        body: SlidingUpPanel(
-//maxHeight: 600,
-
-          backdropEnabled: true,
-          borderRadius: BorderRadius.only(
-            topLeft: Radius.circular(75.0),
-            topRight: Radius.circular(75.0),
-          ),
-          panel: Center(
-// yelp info will display here
-            child: Container(
-                decoration: BoxDecoration(
-                  color: Color(0xffd8eefe),
-                  borderRadius: BorderRadius.only(
-                    topLeft: Radius.circular(75.0),
-                    topRight: Radius.circular(75.0),
-                  ),
-                ),
-                padding: EdgeInsets.fromLTRB(0, 80, 0, 0),
-                child: _viewYelp()),
-          ),
-          collapsed: Container(
+  Widget _slideUpPanel() {
+    return SlidingUpPanel(
+      //maxHeight: 600,
+      backdropEnabled: true,
+      borderRadius: BorderRadius.only(
+        topLeft: Radius.circular(75.0),
+        topRight: Radius.circular(75.0),
+      ),
+      panel: Center(
+        child: Container(
             decoration: BoxDecoration(
               color: Color(0xffd8eefe),
               borderRadius: BorderRadius.only(
-                  topLeft: Radius.circular(75.0),
-                  topRight: Radius.circular(75.0)),
-            ),
-            child: Center(
-              child: Text(
-                'Swipe up for menu',
-                style: TextStyle(fontSize: 20, fontFamily: 'Goldplay'),
+                topLeft: Radius.circular(75.0),
+                topRight: Radius.circular(75.0),
               ),
             ),
+            padding: EdgeInsets.fromLTRB(0, 80, 0, 0),
+            child: _viewYelp()),
+      ),
+      collapsed: Container(
+        decoration: BoxDecoration(
+          color: Color(0xffd8eefe),
+          borderRadius: BorderRadius.only(
+              topLeft: Radius.circular(75.0), topRight: Radius.circular(75.0)),
+        ),
+        child: Center(
+          child: Text(
+            'Swipe up for menu',
+            style: TextStyle(fontSize: 20, fontFamily: 'Goldplay'),
           ),
-          minHeight: 100,
-          body: _center == null
-              ? Container(
-                  child: Center(
-                    child: Text(
-                      'loading map..',
-                      style: TextStyle(
-                          fontFamily: 'Avenir-Medium', color: Colors.grey[400]),
+        ),
+      ),
+      minHeight: 100,
+      body: _center == null
+          ? Container(
+              child: Center(
+                child: Text(
+                  'loading map..',
+                  style: TextStyle(
+                      fontFamily: 'Avenir-Medium', color: Colors.grey[400]),
+                ),
+              ),
+            )
+          : Container(
+              child: Stack(
+                children: <Widget>[
+                  GoogleMap(
+                    onMapCreated: _onMapCreated,
+                    initialCameraPosition: CameraPosition(
+                      target: _center,
+                      zoom: 11.0,
+                    ),
+                    markers: _markers,
+//Adding the marker property to Google Maps Widget
+                    onCameraMove:
+                        _onCameraMove, //Moving the center each time we move on the map, by calling _onCameraMove
+                  ),
+                  Positioned(
+                    top: 30,
+                    right: 15,
+                    left: 15,
+                    child: Container(
+                      height: 50.0,
+                      width: double.infinity,
+                      decoration: BoxDecoration(
+                        borderRadius: BorderRadius.circular(5.0),
+                        color: Colors.white,
+                      ),
+                      child: TextField(
+                        decoration: InputDecoration(
+                            hintText: "Enter address...",
+                            border: InputBorder.none,
+                            contentPadding:
+                                EdgeInsets.only(left: 15.0, top: 15.0),
+                            suffixIcon: IconButton(
+                              icon: Icon(Icons.search),
+                              onPressed: _searchandNavigate,
+                              iconSize: 30.0,
+                            )),
+                        onChanged: (val) {
+                          setState(() {
+                            searchAddr = val;
+                          });
+                        },
+                      ),
                     ),
                   ),
-                )
-              : Container(
-                  child: Stack(
-                    children: <Widget>[
-                      GoogleMap(
-                        onMapCreated: _onMapCreated,
-                        initialCameraPosition: CameraPosition(
-                          target: _center,
-                          zoom: 11.0,
-                        ),
-                        markers: _markers,
-//Adding the marker property to Google Maps Widget
-                        onCameraMove:
-                            _onCameraMove, //Moving the center each time we move on the map, by calling _onCameraMove
+                  Padding(
+                    padding: const EdgeInsets.fromLTRB(16.0, 100.0, 16.0, 16.0),
+                    child: Align(
+                      alignment: Alignment.topRight,
+                      child: Column(
+                        children: <Widget>[
+                          FloatingActionButton(
+                            onPressed: _onAddMarkerButtonPressed,
+                            materialTapTargetSize: MaterialTapTargetSize.padded,
+                            backgroundColor: Colors.redAccent,
+                            child: const Icon(
+                              Icons.add_location,
+                              size: 36.0,
+                            ),
+                          )
+                        ],
                       ),
-                      Positioned(
-                        top: 30,
-                        right: 15,
-                        left: 15,
-                        child: Container(
-                          height: 50.0,
-                          width: double.infinity,
-                          decoration: BoxDecoration(
-                            borderRadius: BorderRadius.circular(5.0),
-                            color: Colors.white,
-                          ),
-                          child: TextField(
-                            decoration: InputDecoration(
-                                hintText: "Enter address...",
-                                border: InputBorder.none,
-                                contentPadding:
-                                    EdgeInsets.only(left: 15.0, top: 15.0),
-                                suffixIcon: IconButton(
-                                  icon: Icon(Icons.search),
-                                  onPressed: _searchandNavigate,
-                                  iconSize: 30.0,
-                                )),
-                            onChanged: (val) {
-                              setState(() {
-                                searchAddr = val;
-                              });
-                            },
-                          ),
-                        ),
-                      ),
-                      Padding(
-                        padding:
-                            const EdgeInsets.fromLTRB(16.0, 100.0, 16.0, 16.0),
-                        child: Align(
-                          alignment: Alignment.topRight,
-                          child: Column(
-                            children: <Widget>[
-//Adding another floating button to mark locations
-                              FloatingActionButton(
-                                onPressed: _onAddMarkerButtonPressed,
-                                materialTapTargetSize:
-                                    MaterialTapTargetSize.padded,
-                                backgroundColor: Colors.redAccent,
-                                child: const Icon(
-                                  Icons.add_location,
-                                  size: 36.0,
-                                ),
-                              )
-                            ],
-                          ),
-                        ),
-                      ),
-                    ],
+                    ),
                   ),
-                ),
-        ),
-        drawer: Theme(
-          data: Theme.of(context).copyWith(
-            canvasColor: Color(
-                0xffffccbb), //This will change the drawer background to blue.
-            //other styles
-          ),
-          child: Container(
-            width: 350,
-            child: Drawer(
+                ],
+              ),
+            ),
+    );
+  }
+
+  Widget _viewDrawer() {
+    return Theme(
+      data: Theme.of(context).copyWith(
+        canvasColor:
+            Color(0xffffccbb), //This will change the drawer background to blue.
+        //other styles
+      ),
+      child: Container(
+        width: 350,
+        child: Drawer(
 // Add a ListView to the drawer. This ensures the user can scroll
 // through the options in the drawer if there isn't enough vertical
 // space to fit everything.
-              child: ListView(
+          child: ListView(
 // Important: Remove any padding from the ListView.
 //padding: EdgeInsets.only(),
-                children: <Widget>[
-                  Container(
-                    height: 80.0,
-                    margin: EdgeInsets.all(0),
-                    child: DrawerHeader(
-                      child: Container(
-                        child: Text(
-                          'Settings',
-                          style: TextStyle(
-                            fontSize: 30,
-                          ),
-                        ),
+            children: <Widget>[
+              Container(
+                height: 80.0,
+                margin: EdgeInsets.all(0),
+                child: DrawerHeader(
+                  child: Container(
+                    child: Text(
+                      'Settings',
+                      style: TextStyle(
+                        fontSize: 30,
                       ),
                     ),
                   ),
-                  Container(
-                    child: ListTile(
-                      title: Text(
-                        'People in this room:',
-                        style: TextStyle(
-                          fontSize: 20,
-                        ),
-                      ),
-                      onTap: null,
+                ),
+              ),
+              Container(
+                child: ListTile(
+                  title: Text(
+                    'People in this room:',
+                    style: TextStyle(
+                      fontSize: 20,
                     ),
                   ),
-                  Container(
-                    padding: EdgeInsets.fromLTRB(30, 0, 0, 0),
-                    child: ListTile(
-                      title: Text(
-                        "${nameList.join("\n")}" ?? "Name is Null",
-                        style: TextStyle(
-                          fontSize: 20,
-                        ),
-                      ),
-                      onTap: null,
+                  onTap: null,
+                ),
+              ),
+              Container(
+                padding: EdgeInsets.fromLTRB(30, 0, 0, 0),
+                child: ListTile(
+                  title: Text(
+                    "${nameList.join("\n")}" ?? "Name is Null",
+                    style: TextStyle(
+                      fontSize: 20,
                     ),
                   ),
-                  Container(
-                    child: ListTile(
-                      title: Text(
-                        'Searching for:',
-                        style: TextStyle(
-                          fontSize: 20,
-                        ),
-                      ),
-                      onTap: null,
+                  onTap: null,
+                ),
+              ),
+              Container(
+                child: ListTile(
+                  title: Text(
+                    'Searching for:',
+                    style: TextStyle(
+                      fontSize: 20,
                     ),
                   ),
-                  //Search bar
+                  onTap: null,
+                ),
+              ),
+              //Search bar
+              _categoryBar(),
 
-                  Container(
-                    margin: EdgeInsets.all(15),
-                    width: double.infinity,
-                    decoration: BoxDecoration(
-                      borderRadius: BorderRadius.circular(10.0),
-                      color: Colors.white,
-                    ),
-                    child: TextField(
-                      decoration: InputDecoration(
-                          focusedBorder: OutlineInputBorder(
-                            borderSide:
-                                BorderSide(color: Colors.black, width: 1.5),
-                          ),
-                          enabledBorder: OutlineInputBorder(
-                            borderSide:
-                                BorderSide(color: Colors.black, width: 1.5),
-                          ),
-                          hintText: "Enter category...",
-                          contentPadding:
-                              EdgeInsets.only(left: 15.0, top: 15.0),
-                          suffixIcon: IconButton(
-                            icon: Icon(Icons.search),
-                            onPressed: _searchingYelpCategory,
-                            iconSize: 20.0,
-                          )),
-                      onChanged: (val) {
-                        setState(() {
-                          category = val;
-                          finalCatagory = category;
-                        });
-                      },
+              Container(
+                child: ListTile(
+                  title: Text(
+                    'Range from midpoint: $midSliderVal mi',
+                    style: TextStyle(
+                      fontSize: 18,
                     ),
                   ),
-                  //Below are the sliders
-                  /*
-                  Container(
+                  onTap: null,
+                ),
+              ),
+              _midpointSlider(),
+              /*Container(
                     child: ListTile(
                       title: Text(
                         'Range from your location: ${userSliderVal} mi',
@@ -814,153 +741,187 @@ class _MapRenderState extends State<MapRender> {
                       ),
                       onTap: null,
                     ),
-                  ),
-                  SliderTheme(
-                    data: SliderTheme.of(context).copyWith(
-                      activeTrackColor: Colors.red[500],
-                      inactiveTrackColor: Colors.red[100],
-                      trackShape: RectangularSliderTrackShape(),
-                      trackHeight: 4.0,
-                      thumbColor: Colors.white,
-                      thumbShape:
-                          RoundSliderThumbShape(enabledThumbRadius: 10.0),
-                      overlayColor: Colors.red.withAlpha(32),
-                      overlayShape:
-                          RoundSliderOverlayShape(overlayRadius: 28.0),
+                  ),*/
+              Container(
+                child: ListTile(
+                  title: Text(
+                    'Your Code:',
+                    style: TextStyle(
+                      fontSize: 20,
                     ),
-                    child: Container(
-                      margin: EdgeInsets.all(5),
-                      /*
+                  ),
+                  onTap: null,
+                ),
+              ),
+              Container(
+                padding: EdgeInsets.fromLTRB(0, 0, 0, 0),
+                child: ListTile(
+                  title: Text(
+                    "${FirebaseFunctions.roomData["roomCode"]}" ??
+                        "roomCode is Null",
+                    style: TextStyle(
+                      fontSize: 35,
+                    ),
+                  ),
+                  onTap: null,
+                ),
+              ),
+              Container(
+                  padding: EdgeInsets.fromLTRB(20.0, 20.0, 20.0, 15.0),
+                  width: 50,
+                  child: _leaveRoomButton()),
+            ],
+          ),
+        ),
+      ),
+    );
+  }
+
+  Widget _categoryBar() {
+    return Container(
+      margin: EdgeInsets.all(15),
+      width: double.infinity,
+      decoration: BoxDecoration(
+        borderRadius: BorderRadius.circular(10.0),
+        color: Colors.white,
+      ),
+      child: TextField(
+        decoration: InputDecoration(
+            focusedBorder: OutlineInputBorder(
+              borderSide: BorderSide(color: Colors.black, width: 1.5),
+            ),
+            enabledBorder: OutlineInputBorder(
+              borderSide: BorderSide(color: Colors.black, width: 1.5),
+            ),
+            hintText: "Enter category...",
+            contentPadding: EdgeInsets.only(left: 15.0, top: 15.0),
+            suffixIcon: IconButton(
+              icon: Icon(Icons.search),
+              onPressed: _searchingYelpCategory,
+              iconSize: 20.0,
+            )),
+        onChanged: (val) {
+          setState(() {
+            category = val;
+            finalCatagory = category;
+          });
+        },
+      ),
+    );
+  }
+
+  Widget _midpointSlider() {
+    return SliderTheme(
+        data: SliderTheme.of(context).copyWith(
+          activeTrackColor: Colors.red[500],
+          inactiveTrackColor: Colors.white,
+          trackShape: RectangularSliderTrackShape(),
+          trackHeight: 5.0,
+          thumbColor: Colors.white,
+          thumbShape: RoundSliderThumbShape(enabledThumbRadius: 10.0),
+          overlayColor: Colors.red.withAlpha(32),
+          overlayShape: RoundSliderOverlayShape(overlayRadius: 28.0),
+        ),
+        child: Container(
+          child: Slider(
+            value: midSliderVal,
+            onChanged: (double val) {
+              //We need to connect the yelp API here
+              setState(() {
+                midSliderVal = val;
+              });
+            },
+            onChangeEnd: (double val) async {
+              setState(() {
+                //can I do this
+                finalRad = val;
+              });
+              _searchingYelpCategory();
+            },
+            min: 1,
+            max: 25,
+            divisions: 24,
+          ),
+        ));
+  }
+/*
+  Widget _userSlider() {
+    return SliderTheme(
+      data: SliderTheme.of(context).copyWith(
+        activeTrackColor: Colors.red[500],
+        inactiveTrackColor: Colors.red[100],
+        trackShape: RectangularSliderTrackShape(),
+        trackHeight: 4.0,
+        thumbColor: Colors.white,
+        thumbShape: RoundSliderThumbShape(enabledThumbRadius: 10.0),
+        overlayColor: Colors.red.withAlpha(32),
+        overlayShape: RoundSliderOverlayShape(overlayRadius: 28.0),
+      ),
+      child: Container(
+        margin: EdgeInsets.all(5),
+        /*
                       decoration: BoxDecoration(
                           border: Border.all(
                             color: Colors.black,
                           ),
                           borderRadius: BorderRadius.all(Radius.circular(20))), */
-                      child: Slider(
-                        value: userSliderVal,
-                        onChanged: (double val) {
-                          //We need to connect the yelp API here
+        child: Slider(
+          value: userSliderVal,
+          onChanged: (double val) {
+            //We need to connect the yelp API here
 
-                          setState(() {
-                            userSliderVal = val;
-                          });
-                        },
-                        min: 1,
-                        max: 25,
-                        divisions: 24,
-                      ),
-                    ),
-                  ),
-                  */
-                  Container(
-                    child: ListTile(
-                      title: Text(
-                        'Range from midpoint: $midSliderVal mi',
-                        style: TextStyle(
-                          fontSize: 18,
-                        ),
-                      ),
-                      onTap: null,
-                    ),
-                  ),
-                  SliderTheme(
-                      data: SliderTheme.of(context).copyWith(
-                        activeTrackColor: Colors.red[500],
-                        inactiveTrackColor: Colors.white,
-                        trackShape: RectangularSliderTrackShape(),
-                        trackHeight: 5.0,
-                        thumbColor: Colors.white,
-                        thumbShape:
-                            RoundSliderThumbShape(enabledThumbRadius: 10.0),
-                        overlayColor: Colors.red.withAlpha(32),
-                        overlayShape:
-                            RoundSliderOverlayShape(overlayRadius: 28.0),
-                      ),
-                      child: Container(
-                        child: Slider(
-                          value: midSliderVal,
-                          onChanged: (double val) {
-                            //We need to connect the yelp API here
-                            setState(() {
-                              midSliderVal = val;
-                            });
-                          },
-                          onChangeEnd: (double val) async {
-                            setState(() {
-                              //can I do this
-                              finalRad = val;
-                            });
-                            _searchingYelpCategory();
-                          },
-                          min: 1,
-                          max: 25,
-                          divisions: 24,
-                        ),
-                      )),
-                  Container(
-                    child: ListTile(
-                      title: Text(
-                        'Your Code:',
-                        style: TextStyle(
-                          fontSize: 20,
-                        ),
-                      ),
-                      onTap: null,
-                    ),
-                  ),
-                  Container(
-                    padding: EdgeInsets.fromLTRB(0, 0, 0, 0),
-                    child: ListTile(
-                      title: Text(
-                        "${FirebaseFunctions.roomData["roomCode"]}" ??
-                            "roomCode is Null",
-                        style: TextStyle(
-                          fontSize: 35,
-                        ),
-                      ),
-                      onTap: null,
-                    ),
-                  ),
-                  Container(
-                    padding: EdgeInsets.fromLTRB(20.0, 20.0, 20.0, 15.0),
-                    width: 50,
-                    child: ButtonTheme(
-                      minWidth: double.infinity,
-                      height: 60.0,
-                      padding: EdgeInsets.all(10.0),
-                      buttonColor: Colors.white,
-                      child: RaisedButton(
-                        child: Text("Leave Room",
-                            style: new TextStyle(
-                                fontSize: 20.0, color: Colors.black)),
-                        onPressed: () async {
-                          String roomCodeString =
-                              FirebaseFunctions.roomData["roomCode"];
-
-                          await Firestore.instance
-                              .collection("rooms")
-                              .document(roomCodeString)
-                              .collection("users")
-                              .getDocuments()
-                              .then((data) {
-                            print("I'm running");
-                            print(data.documents.length);
-                            memberListener.cancel();
-                            FirebaseFunctions.removeCurrentUserFromRoom(
-                                roomCodeString, data.documents.length);
-                          });
-
-                          Navigator.pushNamedAndRemoveUntil(
-                              context, '/page1', (route) => false);
-                        },
-                      ),
-                    ),
-                  ),
-                ],
-              ),
-            ),
-          ),
+            setState(() {
+              userSliderVal = val;
+            });
+          },
+          min: 1,
+          max: 25,
+          divisions: 24,
         ),
+      ),
+    );
+  }*/
+
+  Widget _leaveRoomButton() {
+    return ButtonTheme(
+      minWidth: double.infinity,
+      height: 60.0,
+      padding: EdgeInsets.all(10.0),
+      buttonColor: Colors.white,
+      child: RaisedButton(
+        child: Text("Leave Room",
+            style: new TextStyle(fontSize: 20.0, color: Colors.black)),
+        onPressed: () async {
+          String roomCodeString = FirebaseFunctions.roomData["roomCode"];
+
+          await Firestore.instance
+              .collection("rooms")
+              .document(roomCodeString)
+              .collection("users")
+              .getDocuments()
+              .then((data) {
+            print("I'm running");
+            print(data.documents.length);
+            memberListener.cancel();
+            FirebaseFunctions.removeCurrentUserFromRoom(
+                roomCodeString, data.documents.length);
+          });
+
+          Navigator.pushNamedAndRemoveUntil(
+              context, '/page1', (route) => false);
+        },
+      ),
+    );
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return MaterialApp(
+      debugShowCheckedModeBanner: false,
+      home: Scaffold(
+        appBar: appBarMain(context),
+        body: _slideUpPanel(),
+        drawer: _viewDrawer(),
       ),
     );
 //);

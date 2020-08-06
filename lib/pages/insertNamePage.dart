@@ -4,7 +4,7 @@ import 'package:Rendezvous/pages/firebaseFunctions.dart';
 import 'package:flutter/material.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import '../appBar.dart';
-import 'page2.dart';
+import 'createOrJoinPage.dart';
 
 Future<void> saveNamePreference(String userName) async {
   SharedPreferences userNamePrefs = await SharedPreferences.getInstance();

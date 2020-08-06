@@ -4,7 +4,7 @@ import 'package:flutter/material.dart';
 
 import '../appBar.dart';
 import 'firebaseFunctions.dart';
-import 'page3.dart';
+import 'mapRenderPage.dart';
 
 class Page4 extends StatefulWidget {
   final String roomCode;

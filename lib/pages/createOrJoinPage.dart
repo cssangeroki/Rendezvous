@@ -5,9 +5,9 @@ import 'package:flutter/material.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import '../appBar.dart';
 import 'firebaseFunctions.dart';
-import 'page1.dart';
-import 'page3.dart';
-import 'page4.dart';
+import 'insertNamePage.dart';
+import 'mapRenderPage.dart';
+import 'enterCodePage.dart';
 
 Future<void> saveRoomCodePreference(String roomCode) async {
   SharedPreferences roomCodePrefs = await SharedPreferences.getInstance();
