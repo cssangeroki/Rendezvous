@@ -2,47 +2,15 @@
 
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
-
-//import 'package:geoflutterfire/geoflutterfire.dart';
 import 'pages/firebaseFunctions.dart';
 import 'dart:async';
-
-//import 'dart:io';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
-//import 'src/locations.dart' as locations;
 
 import 'package:geolocator/geolocator.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 
-//import 'firebaseFunctions.dart';
-//import 'page4.dart';
-
-//import "pages/page3.dart";
-//import 'package:sliding_up_panel/sliding_up_panel.dart';
-
-import 'backendFunctions.dart';
-import 'dart:convert';
-import 'package:link/link.dart';
-
-double finalLon;
-double finalLat;
-
-String finalCatagory;
-// double finalRad;
-
-List resultCords = [];
-List names = [];
-List locations = [];
-List urls = [];
-List images = [];
-//A string that will store the category searched for on the Yelp search
-String category;
-
-//Below are variables we will use for the sliders
-double midSliderVal = 5;
-double finalRad = midSliderVal;
-
-double userSliderVal = 5;
+import "globalVar.dart";
+import "findYelpPlaces.dart";
 
 //Here I'm creating a reference to our firebase
 final firebase = Firestore.instance;
@@ -79,48 +47,7 @@ Future<Position> currentLocation() async {
   }
 }
 
-//Function that will connect to yelp API
-Future<void> _findingPlaces() async {
-  print("Searching for your place");
-  names.clear();
-  resultCords.clear();
-  locations.clear();
-  urls.clear();
-  images.clear();
-  double finalRadMiles = finalRad * 1609.344;
-  var businesses = "";
-  businesses = await BackendMethods.getLocations(
-      finalLon, finalLat, finalCatagory, finalRadMiles.toInt());
-  var lat;
-  var lon;
-  var name;
-  var address;
-  var url;
-  var image;
-  for (var place in jsonDecode(businesses)) {
-    lat = place['coordinates']['latitude'];
-    lon = place['coordinates']['longitude'];
-    var myLatlng = new LatLng(lat, lon);
-    resultCords.add(myLatlng);
-
-    name = place['name'];
-    names.add(name);
-
-    address = place['location'];
-    locations.add(address);
-
-    url = place['url'];
-    urls.add(url);
-
-    image = place['image_url'];
-    images.add(image);
-  }
-  print(names);
-  print("Locations: $resultCords");
-  print("testing if I got a response:");
-}
-
-/*class GoogleMaps extends StatefulWidget {
+class GoogleMaps extends StatefulWidget {
   final String userDocID = FirebaseFunctions.currentUID;
   final String roomDocID = FirebaseFunctions.currentUserData["roomCode"];
 
@@ -128,9 +55,9 @@ Future<void> _findingPlaces() async {
 // FirebaseFunctions.currentUID
   @override
   _GoogleMapsState createState() => _GoogleMapsState();
-}*/
+}
 
-class _GoogleMaps {
+class _GoogleMapsState extends State<GoogleMaps> {
   final String userDocID = FirebaseFunctions.currentUID;
   final String roomDocID = FirebaseFunctions.currentUserData["roomCode"];
   GoogleMapController mapController;
@@ -138,7 +65,8 @@ class _GoogleMaps {
 //Creating a variable currPosition that will be used to store the users current position
   Position currPosition;
   static List<String> nameList = [];
-  static StreamSubscription<QuerySnapshot> memberListener;
+
+  //static StreamSubscription<QuerySnapshot> memberListener;
 
 //Initializing center of map
   static LatLng _center;
@@ -158,9 +86,10 @@ class _GoogleMaps {
 //Marker _markers;
 //Function initState initialises the state of variables
 //It returns a reference to the listener, so that we may turn off the listener at a later time
-  StreamSubscription<QuerySnapshot> initState() {
-     initFunctionCaller();
-     return memberListener;
+  @override
+  void initState() {
+    super.initState();
+    initFunctionCaller();
   }
 
   void initFunctionCaller() async {
@@ -186,8 +115,10 @@ class _GoogleMaps {
 
       Placemark place = p[0];
 
-      searchAddr =
-          "${place.name}, ${place.subLocality}, ${place.locality}, ${place.postalCode}, ${place.country}";
+      setState(() {
+        searchAddr =
+        "${place.name}, ${place.subLocality}, ${place.locality}, ${place.postalCode}, ${place.country}";
+      });
     } catch (e) {
       print(e);
     }
@@ -196,7 +127,7 @@ class _GoogleMaps {
   //This function will be used to initialise my markers, by accessing the user data from firebase
   Future<void> _initMarkers() async {
     //print("initMarkers called");
-    memberListener = firebase
+    Global.memberListener = firebase
         .collection("rooms")
         .document(roomDocID)
         .collection("users")
@@ -212,9 +143,11 @@ class _GoogleMaps {
   //This function clears all other markers other than the current users and the midpoint
   void clearOtherUserUserMarkers() {
     //Adding a line that will clear the markers that is not the current user, to update in case a user leaves
-    _markers.removeWhere((element) =>
-        element.markerId.value != "User" &&
-        element.markerId.value != "Midpoint");
+    setState(() {
+      _markers.removeWhere((element) =>
+      element.markerId.value != "User" &&
+          element.markerId.value != "Midpoint");
+    });
   }
 
   //This function will be used to clear the markers, and call addOtherUserMarkers. Is there to enforce more modularity
@@ -244,15 +177,17 @@ class _GoogleMaps {
       return;
     }
     String newUserName = userLocations.data["userName"];
-    //if the user is already in our markers array, I will just update their position
-    _markers.removeWhere(
-        (marker) => marker.markerId.value == userLocations.documentID);
-    _markers.add(Marker(
-      markerId: MarkerId(userLocations.documentID),
-      position: LatLng(newUserLoc.latitude, newUserLoc.longitude),
-      infoWindow: InfoWindow(title: newUserName, snippet: ""),
-      icon: BitmapDescriptor.defaultMarkerWithHue(BitmapDescriptor.hueMagenta),
-    ));
+    setState(() {
+      //if the user is already in our markers array, I will just update their position
+      _markers.removeWhere(
+              (marker) => marker.markerId.value == userLocations.documentID);
+      _markers.add(Marker(
+        markerId: MarkerId(userLocations.documentID),
+        position: LatLng(newUserLoc.latitude, newUserLoc.longitude),
+        infoWindow: InfoWindow(title: newUserName, snippet: ""),
+        icon: BitmapDescriptor.defaultMarkerWithHue(BitmapDescriptor.hueMagenta),
+      ));
+    });
     //print("Finished adding users location");
   }
 
@@ -275,28 +210,34 @@ class _GoogleMaps {
         .placemarkFromCoordinates(mid.latitude, mid.longitude);
 
     Placemark place = p[0];
-    midAddress =
-        "${place.name}, ${place.subLocality}, ${place.locality}, ${place.postalCode}, ${place.country}";
+    setState(() {
+      midAddress =
+      "${place.name}, ${place.subLocality}, ${place.locality}, ${place.postalCode}, ${place.country}";
+    });
     print("MidAddress updated to $midAddress");
   }
 
   //This function will be used to add the yelp markers
   void addYelpMarkers() {
-    print("Entered Yelp markers. resultCords = ${resultCords.length}");
+    print("Entered Yelp markers. resultCords = ${Global.resultCords.length}");
     //First, remove all the current yelp markers
     _markers.removeWhere((element) => (element.infoWindow.snippet != '' &&
         element.infoWindow.snippet != "Midpoint"));
-    print("Removed yelp markers. resultCords = ${resultCords.length}");
+    print("Removed yelp markers. resultCords = ${Global.resultCords.length}");
     //For every location we found, we need to add a marker
-    for (int i = 0; i < resultCords.length; i++) {
-      _markers.add(Marker(
-        markerId: MarkerId(resultCords[i].toString()),
-        position: LatLng(resultCords[i].latitude, resultCords[i].longitude),
-        infoWindow: InfoWindow(title: names[i], snippet: locations[i]),
-        icon: BitmapDescriptor.defaultMarkerWithHue(BitmapDescriptor
-            .hueGreen), //Setting midpoint marker to blue so it's identifiable
-      ));
-    }
+    setState(() {
+      for (int i = 0; i < Global.resultCords.length; i++) {
+        _markers.add(Marker(
+          markerId: MarkerId(Global.resultCords[i].toString()),
+          position: LatLng(
+              Global.resultCords[i].latitude, Global.resultCords[i].longitude),
+          infoWindow:
+          InfoWindow(title: Global.names[i], snippet: Global.locations[i]),
+          icon: BitmapDescriptor.defaultMarkerWithHue(BitmapDescriptor
+              .hueGreen), //Setting midpoint marker to blue so it's identifiable
+        ));
+      }
+    });
     print(_markers.length);
     print(_markers);
   }
@@ -306,7 +247,9 @@ class _GoogleMaps {
     double currentMidLat = 0;
     double currentMidLon = 0;
     //Start off by removing the midpoint marker
-    _markers.removeWhere((marker) => marker.markerId.value == "Midpoint");
+    setState(() {
+      _markers.removeWhere((marker) => marker.markerId.value == "Midpoint");
+    });
 //   var newLoc = locations[0];
     for (var userPosition in userPositions) {
 //Want to skip the midpoint and remove it in case it is still there
@@ -321,23 +264,25 @@ class _GoogleMaps {
     currentMidLat = currentMidLat / (userPositions.length);
     currentMidLon = currentMidLon / (userPositions.length);
 
-    finalLat = currentMidLat;
-    finalLon = currentMidLon;
+    Global.finalLat = currentMidLat;
+    Global.finalLon = currentMidLon;
 
     print("Lat = $currentMidLat, and Long = $currentMidLon");
     await placefromLatLng(LatLng(currentMidLat, currentMidLon));
 //      currentMidLat = currentMidLat / (locations.length);
 //      currentMidLon = currentMidLon / (locations.length);
 //      placefromLatLng(LatLng(currentMidLat, currentMidLon));
-    _markers.add(Marker(
-      markerId: MarkerId('Midpoint'),
-      position: LatLng(currentMidLat, currentMidLon),
-      infoWindow: InfoWindow(title: midAddress, snippet: 'Midpoint'),
-      icon: BitmapDescriptor.defaultMarkerWithHue(BitmapDescriptor
-          .hueBlue), //Setting midpoint marker to blue so it's identifiable
-    ));
+    setState(() {
+      _markers.add(Marker(
+        markerId: MarkerId('Midpoint'),
+        position: LatLng(currentMidLat, currentMidLon),
+        infoWindow: InfoWindow(title: midAddress, snippet: 'Midpoint'),
+        icon: BitmapDescriptor.defaultMarkerWithHue(BitmapDescriptor
+            .hueBlue), //Setting midpoint marker to blue so it's identifiable
+      ));
+    });
     //Now I find places around the midpoint, and display all the Yelp markers
-    await _findingPlaces();
+    await YelpPlaces.findingPlaces();
     addYelpMarkers();
   }
 
@@ -361,15 +306,17 @@ class _GoogleMaps {
     print("Entered _onAddMarkerButtonPressed. Center = $_center");
     await _getUserAddress();
     //First I remove the toRemove marker from _markers
-    _markers.removeWhere((marker) => marker.markerId.value == "User");
-    //Then I add the Users new location
-    _markers.add(Marker(
-      markerId: MarkerId("User"),
-      position: _lastMapPosition,
-      infoWindow: InfoWindow(title: searchAddr, snippet: ''),
+    setState(() {
+      _markers.removeWhere((marker) => marker.markerId.value == "User");
+      //Then I add the Users new location
+      _markers.add(Marker(
+        markerId: MarkerId("User"),
+        position: _lastMapPosition,
+        infoWindow: InfoWindow(title: searchAddr, snippet: ''),
 //infoWindow: InfoWindow(),
-      icon: BitmapDescriptor.defaultMarker,
-    ));
+        icon: BitmapDescriptor.defaultMarker,
+      ));
+    });
     //print("Markers length before midpoint = ${_markers.length}");
     print(
         "Users Marker location before firebase update = ${_markers.where((element) => element.markerId.value == "User")}");
@@ -402,84 +349,83 @@ class _GoogleMaps {
    */
 
   //Here, we add the widget that will be built. This widget will be used to display the google maps, as well as the locations
-  Widget googleMapsDisplay(){
-    if (_center == null){
-      return Container(
-        child: Center(
-          child: Text(
-            'loading map..',
-            style: TextStyle(
-                fontFamily: 'Avenir-Medium', color: Colors.grey[400]),
-          ),
-        ),
-      );
-    }
-    else{
-      return Container(
-        child: Stack(
-          children: <Widget>[
-            GoogleMap(
-              onMapCreated: _onMapCreated,
-              initialCameraPosition: CameraPosition(
-                target: _center,
-                zoom: 11.0,
+
+  @override
+  Widget build(BuildContext context) {
+    return _center == null
+        ? Container(
+            child: Center(
+              child: Text(
+                'loading map..',
+                style: TextStyle(
+                    fontFamily: 'Avenir-Medium', color: Colors.grey[400]),
               ),
-              markers: _markers,
+            ),
+          )
+        : Container(
+            child: Stack(
+              children: <Widget>[
+                GoogleMap(
+                  onMapCreated: _onMapCreated,
+                  initialCameraPosition: CameraPosition(
+                    target: _center,
+                    zoom: 11.0,
+                  ),
+                  markers: _markers,
 //Adding the marker property to Google Maps Widget
-              onCameraMove:
-              _onCameraMove, //Moving the center each time we move on the map, by calling _onCameraMove
-            ),
-            Positioned(
-              top: 30,
-              right: 15,
-              left: 15,
-              child: Container(
-                height: 50.0,
-                width: double.infinity,
-                decoration: BoxDecoration(
-                  borderRadius: BorderRadius.circular(5.0),
-                  color: Colors.white,
+                  onCameraMove:
+                      _onCameraMove, //Moving the center each time we move on the map, by calling _onCameraMove
                 ),
-                child: TextField(
-                  decoration: InputDecoration(
-                      hintText: "Enter address...",
-                      border: InputBorder.none,
-                      contentPadding:
-                      EdgeInsets.only(left: 15.0, top: 15.0),
-                      suffixIcon: IconButton(
-                        icon: Icon(Icons.search),
-                        onPressed: _searchandNavigate,
-                        iconSize: 30.0,
-                      )),
-                  onChanged: (val) {
-                    searchAddr = val;
-                  },
+                Positioned(
+                  top: 30,
+                  right: 15,
+                  left: 15,
+                  child: Container(
+                    height: 50.0,
+                    width: double.infinity,
+                    decoration: BoxDecoration(
+                      borderRadius: BorderRadius.circular(5.0),
+                      color: Colors.white,
+                    ),
+                    child: TextField(
+                      decoration: InputDecoration(
+                          hintText: "Enter address...",
+                          border: InputBorder.none,
+                          contentPadding:
+                              EdgeInsets.only(left: 15.0, top: 15.0),
+                          suffixIcon: IconButton(
+                            icon: Icon(Icons.search),
+                            onPressed: _searchandNavigate,
+                            iconSize: 30.0,
+                          )),
+                      onChanged: (val) {
+                        searchAddr = val;
+                      },
+                    ),
+                  ),
                 ),
-              ),
-            ),
-            Padding(
-              padding: const EdgeInsets.fromLTRB(16.0, 100.0, 16.0, 16.0),
-              child: Align(
-                alignment: Alignment.topRight,
-                child: Column(
-                  children: <Widget>[
+                Padding(
+                  padding: const EdgeInsets.fromLTRB(16.0, 100.0, 16.0, 16.0),
+                  child: Align(
+                    alignment: Alignment.topRight,
+                    child: Column(
+                      children: <Widget>[
 //Adding another floating button to mark locations
-                    FloatingActionButton(
-                      onPressed: _onAddMarkerButtonPressed,
-                      materialTapTargetSize: MaterialTapTargetSize.padded,
-                      backgroundColor: Colors.redAccent,
-                      child: const Icon(
-                        Icons.add_location,
-                        size: 36.0,
-                      ),
-                    )
-                  ],
+                        FloatingActionButton(
+                          onPressed: _onAddMarkerButtonPressed,
+                          materialTapTargetSize: MaterialTapTargetSize.padded,
+                          backgroundColor: Colors.redAccent,
+                          child: const Icon(
+                            Icons.add_location,
+                            size: 36.0,
+                          ),
+                        )
+                      ],
+                    ),
+                  ),
                 ),
-              ),
+              ],
             ),
-          ],
-        ),
-      );
-    }
+          );
   }
 } //End of _GoogleMaps class

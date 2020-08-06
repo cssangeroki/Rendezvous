@@ -21,30 +21,17 @@ import 'package:sliding_up_panel/sliding_up_panel.dart';
 import '../backendFunctions.dart';
 import 'dart:convert';
 import 'package:link/link.dart';
-
+import "../googleMaps.dart";
+import "../globalVar.dart";
+import "../findYelpPlaces.dart";
 //lib/backendFunctions.dart
 
-double finalLon;
-double finalLat;
-
-String finalCatagory;
-// double finalRad;
-
-List resultCords = [];
-List names = [];
-List locations = [];
-List urls = [];
-List images = [];
-
-//A string that will store the category searched for on the Yelp search
-String category;
 
 //Below are variables we will use for the sliders
 double midSliderVal = 5;
-double finalRad = midSliderVal;
-
 double userSliderVal = 5;
 
+String category;
 //Here I'm creating a reference to our firebase
 final firebase = Firestore.instance;
 
@@ -86,7 +73,13 @@ class MapRender extends StatefulWidget {
 }
 
 class _MapRenderState extends State<MapRender> {
-  GoogleMapController mapController;
+  @override
+  void initState() {
+    // TODO: implement initState
+    super.initState();
+    Global.finalRad = midSliderVal;
+  }
+  /*GoogleMapController mapController;
 
 //Get the current position, and store it in the variable currPosition
 //Need to learn how to get return value from future class
@@ -377,7 +370,7 @@ class _MapRenderState extends State<MapRender> {
           zoom: 15.0)));
     });
   }
-
+*/
   /* String _roomCode = "";
 
   void _updateRoomCode(String roomCode) {
@@ -396,8 +389,8 @@ class _MapRenderState extends State<MapRender> {
 
   //This functions is used when we search a category for yelp
   void _searchingYelpCategory() async {
-    await _findingPlaces();
-    addYelpMarkers();
+    await YelpPlaces.findingPlaces();
+    GoogleMaps().createState().addYelpMarkers();
     _updateYelpVenues();
   }
 
@@ -405,7 +398,7 @@ class _MapRenderState extends State<MapRender> {
 
   void _updateYelpVenues() {
     setState(() {
-      _arrLength = names.length;
+      _arrLength = Global.names.length;
     });
   }
 
@@ -463,7 +456,7 @@ class _MapRenderState extends State<MapRender> {
                 //padding: EdgeInsets.fromLTRB(10, 0, 10, 0),
 
                 child: Link(
-                  url: urls[index],
+                  url: Global.urls[index],
                   child: Row(
                     children: <Widget>[
                       Container(
@@ -473,9 +466,9 @@ class _MapRenderState extends State<MapRender> {
                         child: ClipRRect(
                           borderRadius: BorderRadius.all(Radius.circular(10)),
                           child: Image.network(
-                            images[index] == null
+                            Global.images[index] == null
                                 ? 'https://firebasestorage.googleapis.com/v0/b/rendezvous-b51b4.appspot.com/o/photo-1550747545-c896b5f89ff7.jpeg?alt=media&token=eb3eb883-86da-4b89-87e1-7490fd518910'
-                                : '${images[index]}',
+                                : '${Global.images[index]}',
                             // 'https://firebasestorage.googleapis.com/v0/b/rendezvous-b51b4.appspot.com/o/photo-1550747545-c896b5f89ff7.jpeg?alt=media&token=eb3eb883-86da-4b89-87e1-7490fd518910',
                             fit: BoxFit.cover,
                           ),
@@ -495,7 +488,7 @@ class _MapRenderState extends State<MapRender> {
                                     child: Container(
                                       padding: EdgeInsets.fromLTRB(0, 0, 0, 0),
                                       child: Text(
-                                        "${names[index]} ",
+                                        "${Global.names[index]} ",
                                         overflow: TextOverflow.ellipsis,
                                         softWrap: true,
                                         style: TextStyle(
@@ -572,7 +565,7 @@ class _MapRenderState extends State<MapRender> {
         ),
       ),
       minHeight: 100,
-      body: _center == null
+      body: GoogleMaps()/*_center == null
           ? Container(
               child: Center(
                 child: Text(
@@ -647,7 +640,7 @@ class _MapRenderState extends State<MapRender> {
                   ),
                 ],
               ),
-            ),
+            )*/,
     );
   }
 
@@ -697,7 +690,7 @@ class _MapRenderState extends State<MapRender> {
                 padding: EdgeInsets.fromLTRB(30, 0, 0, 0),
                 child: ListTile(
                   title: Text(
-                    "${nameList.join("\n")}" ?? "Name is Null",
+                    "${Global.nameList.join("\n")}" ?? "Name is Null",
                     style: TextStyle(
                       fontSize: 20,
                     ),
@@ -803,7 +796,7 @@ class _MapRenderState extends State<MapRender> {
         onChanged: (val) {
           setState(() {
             category = val;
-            finalCatagory = category;
+            Global.finalCategory = category;
           });
         },
       ),
@@ -834,7 +827,7 @@ class _MapRenderState extends State<MapRender> {
             onChangeEnd: (double val) async {
               setState(() {
                 //can I do this
-                finalRad = val;
+                Global.finalRad = val;
               });
               _searchingYelpCategory();
             },
@@ -902,7 +895,7 @@ class _MapRenderState extends State<MapRender> {
               .then((data) {
             print("I'm running");
             print(data.documents.length);
-            memberListener.cancel();
+            Global.memberListener.cancel();
             FirebaseFunctions.removeCurrentUserFromRoom(
                 roomCodeString, data.documents.length);
           });
@@ -929,7 +922,7 @@ class _MapRenderState extends State<MapRender> {
 }
 
 //Function that will connect to yelp API
-Future<void> _findingPlaces() async {
+/*Future<void> _findingPlaces() async {
   print("Searching for your place");
   //finalRad.toInt()
   names.clear();
@@ -978,4 +971,4 @@ Future<void> _findingPlaces() async {
   print("Locations: $resultCords");
   print("testing if I got a response:");
   //print(businesses==null);
-}
+}*/
