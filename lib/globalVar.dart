@@ -1,6 +1,7 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'dart:async';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
+import 'package:flutter/foundation.dart';
 
 class Global{
   static StreamSubscription<QuerySnapshot> memberListener;
@@ -17,4 +18,8 @@ class Global{
   static var arrLength;
 
   static List<String> nameList = [];
+
+  static ValueNotifier findYPCalled = ValueNotifier(false);
+
+  static ValueNotifier mapRPfindYPListener = ValueNotifier(false);
 }

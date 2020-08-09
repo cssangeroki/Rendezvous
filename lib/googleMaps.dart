@@ -48,23 +48,32 @@ Future<Position> currentLocation() async {
 }
 
 class GoogleMaps extends StatefulWidget {
-  final String userDocID = FirebaseFunctions.currentUID;
-  final String roomDocID = FirebaseFunctions.currentUserData["roomCode"];
+  //const GoogleMaps ({Key key}) : super(key: key);
+  //GlobalKey<_GoogleMapsState> myKey = GlobalKey();
+  //final _GoogleMapsState mapsState = new _GoogleMapsState();
+//  static of(BuildContext context, {bool root = false}) => root
+//      ? context.findRootAncestorStateOfType<_GoogleMapsState>()
+//      : context.findAncestorStateOfType<_GoogleMapsState>();
 
-//FirebaseFunctions.currentUserData[“roomCode”]
-// FirebaseFunctions.currentUID
   @override
-  _GoogleMapsState createState() => _GoogleMapsState();
+  _GoogleMapsState createState() => _GoogleMapsState();//mapsState;
+
+//  void addYelpMarkers(){
+//    mapsState.addYelpMarkers();
+//  }
 }
 
 class _GoogleMapsState extends State<GoogleMaps> {
+  //Creating a global key to access class state outside of the class
+  //GlobalKey<_GoogleMapsState> _myKey = GlobalKey();
+
   final String userDocID = FirebaseFunctions.currentUID;
   final String roomDocID = FirebaseFunctions.currentUserData["roomCode"];
   GoogleMapController mapController;
 
 //Creating a variable currPosition that will be used to store the users current position
   Position currPosition;
-  static List<String> nameList = [];
+  //static List<String> nameList = [];
 
   //static StreamSubscription<QuerySnapshot> memberListener;
 
@@ -92,11 +101,23 @@ class _GoogleMapsState extends State<GoogleMaps> {
     initFunctionCaller();
   }
 
-  void initFunctionCaller() async {
+   void initFunctionCaller() async {
+    addYelpMarkersWhenFindYPCalled();
     await _getUserLocation();
     _lastMapPosition = _center;
     await _onAddMarkerButtonPressed();
     await _initMarkers();
+  }
+
+  //This functions will listen to when the function addYelpMarkers is called outside and will add the yelpMarkers to the widget
+  void addYelpMarkersWhenFindYPCalled(){
+    Global.findYPCalled.addListener(() {
+      setState(() {
+        print("entered YP listener");
+        addYelpMarkers();
+      });
+    });
+    //Global.findYPCalled.value = false;
   }
 
 //Function used to get users original position
@@ -133,7 +154,7 @@ class _GoogleMapsState extends State<GoogleMaps> {
         .collection("users")
         .snapshots()
         .listen((snapshot) async {
-      clearOtherUserUserMarkers();
+      clearOtherUserMarkers();
       await callAddOtherUserMarkers(snapshot);
       await findMidpoint(_markers);
     });
@@ -141,7 +162,7 @@ class _GoogleMapsState extends State<GoogleMaps> {
   }
 
   //This function clears all other markers other than the current users and the midpoint
-  void clearOtherUserUserMarkers() {
+  void clearOtherUserMarkers() {
     //Adding a line that will clear the markers that is not the current user, to update in case a user leaves
     setState(() {
       _markers.removeWhere((element) =>
@@ -163,8 +184,8 @@ class _GoogleMapsState extends State<GoogleMaps> {
         print("Found other users");
         await addOtherUserMarkers(user);
       }
-      changeNames(userNames, nameList);
     }
+    changeNames(userNames, Global.nameList);
   }
 
   //In this function, I iterate through every user in the document, and get there location and add it to markers
@@ -282,7 +303,10 @@ class _GoogleMapsState extends State<GoogleMaps> {
       ));
     });
     //Now I find places around the midpoint, and display all the Yelp markers
+    Global.resultCords.clear();
     await YelpPlaces.findingPlaces();
+    Global.mapRPfindYPListener.notifyListeners();
+    Global.mapRPfindYPListener.value = true;
     addYelpMarkers();
   }
 
