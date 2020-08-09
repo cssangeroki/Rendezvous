@@ -22,4 +22,6 @@ class Global{
   static ValueNotifier findYPCalled = ValueNotifier(false);
 
   static ValueNotifier mapRPfindYPListener = ValueNotifier(false);
+
+  static ValueNotifier mapRPnameListListener = ValueNotifier(false);
 }

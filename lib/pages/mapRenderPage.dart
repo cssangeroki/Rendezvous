@@ -35,12 +35,14 @@ class MapRender extends StatefulWidget {
 }
 
 class _MapRenderState extends State<MapRender> {
-  //GoogleMaps userMap = new GoogleMaps();
+  List <String> nameList = Global.nameList;
+
   @override
   void initState() {
     super.initState();
     Global.finalRad = midSliderVal;
     newPlacesListener();
+    nameListListener();
   }
 
   //This function will be used to set a listener for whenever findingYelpPlaces is called in other widgets
@@ -51,7 +53,15 @@ class _MapRenderState extends State<MapRender> {
     Global.mapRPfindYPListener.value = false;
   }
 
-
+  //This function just lets the app reset to show the users names whenever the users change
+  void nameListListener(){
+    Global.mapRPnameListListener.addListener(() {
+      setState(() {
+        nameList = Global.nameList;
+      });
+    });
+    Global.mapRPnameListListener.value = false;
+  }
   //This functions is used when we search a category for yelp
   void _searchingYelpCategory() async {
     print("Entered searchingYelpCategory");
@@ -286,7 +296,7 @@ class _MapRenderState extends State<MapRender> {
                 padding: EdgeInsets.fromLTRB(30, 0, 0, 0),
                 child: ListTile(
                   title: Text(
-                    "${Global.nameList.join("\n")}" ?? "Name is Null",
+                    "${nameList.join("\n")}" ?? "Name is Null",
                     style: TextStyle(
                       fontSize: 20,
                     ),

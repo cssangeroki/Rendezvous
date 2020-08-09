@@ -43,9 +43,9 @@ class YelpPlaces {
       image = place['image_url'];
       Global.images.add(image);
     }
-    print(Global.names);
-    print("Locations: ${Global.resultCords}");
-    print("testing if I got a response:");
+    //print(Global.names);
+    //print("Locations: ${Global.resultCords}");
+    //print("testing if I got a response:");
   }
 
   static void updateYelpVenues() {

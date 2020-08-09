@@ -15,13 +15,6 @@ import "findYelpPlaces.dart";
 //Here I'm creating a reference to our firebase
 final firebase = Firestore.instance;
 
-//This function will be used to copy the user names from userNames to namesList
-void changeNames(List<String> userNames, List<String> namesList) {
-  //First clear namesList, in case it already has data
-  namesList.clear();
-  //Then simply set namesList to be equal to userNames.
-  namesList = userNames;
-}
 
 //Below is a function that gets the users current location, or last known location.
 //The function will return a Position variable
@@ -174,7 +167,7 @@ class _GoogleMapsState extends State<GoogleMaps> {
   //This function will be used to clear the markers, and call addOtherUserMarkers. Is there to enforce more modularity
   Future<void> callAddOtherUserMarkers(QuerySnapshot snapshot) async {
     List<String> userNames = [];
-    userNames.clear();
+    //userNames.clear();
     for (var user in snapshot.documents) {
       //print("Here. Number of markers = ${_markers.length}");
       String newUserName = user.data["userName"];
@@ -186,8 +179,18 @@ class _GoogleMapsState extends State<GoogleMaps> {
       }
     }
     changeNames(userNames, Global.nameList);
+    print("nameList is ${Global.nameList}");
+    Global.mapRPnameListListener.notifyListeners();
+    Global.mapRPnameListListener.value = true;
   }
 
+  //This function will be used to copy the user names from userNames to namesList
+  void changeNames(List<String> userNames, List<String> namesList) {
+    //First clear namesList, in case it already has data
+    namesList.clear();
+    //Then simply add all names in userNames to namesList
+    namesList.addAll(userNames);
+  }
   //In this function, I iterate through every user in the document, and get there location and add it to markers
   //All other users will have their BitMapDescriptor as Magenta in color, so that we can differentiate from other users
   Future<void> addOtherUserMarkers(DocumentSnapshot userLocations) async {
@@ -244,7 +247,6 @@ class _GoogleMapsState extends State<GoogleMaps> {
     //First, remove all the current yelp markers
     _markers.removeWhere((element) => (element.infoWindow.snippet != '' &&
         element.infoWindow.snippet != "Midpoint"));
-    print("Removed yelp markers. resultCords = ${Global.resultCords.length}");
     //For every location we found, we need to add a marker
     setState(() {
       for (int i = 0; i < Global.resultCords.length; i++) {
@@ -327,7 +329,7 @@ class _GoogleMapsState extends State<GoogleMaps> {
   Future<void> _onAddMarkerButtonPressed() async {
     //Here I find if there is already a user marker. If there is, toRemove is set to that marker. Otherwise toRemove is set to NULL
 //Getting the correct address in searchAddr. Using await to ensure we get the right address.
-    print("Entered _onAddMarkerButtonPressed. Center = $_center");
+    //print("Entered _onAddMarkerButtonPressed. Center = $_center");
     await _getUserAddress();
     //First I remove the toRemove marker from _markers
     setState(() {
@@ -341,13 +343,7 @@ class _GoogleMapsState extends State<GoogleMaps> {
         icon: BitmapDescriptor.defaultMarker,
       ));
     });
-    //print("Markers length before midpoint = ${_markers.length}");
-    print(
-        "Users Marker location before firebase update = ${_markers.where((element) => element.markerId.value == "User")}");
-    updateUserLocation();
-    print(
-        "Users Marker location after firebase update = ${_markers.where((element) => element.markerId.value == "User")}");
-    //findMidpoint(_markers);
+     updateUserLocation();
   }
 
   void _searchandNavigate() async {
