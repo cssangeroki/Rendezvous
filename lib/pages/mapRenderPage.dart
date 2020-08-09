@@ -28,8 +28,6 @@ final firebase = Firestore.instance;
 class MapRender extends StatefulWidget {
   final String userDocID = FirebaseFunctions.currentUID;
   final String roomDocID = FirebaseFunctions.currentUserData["roomCode"];
-//FirebaseFunctions.currentUserData[“roomCode”]
-// FirebaseFunctions.currentUID
   @override
   _MapRenderState createState() => _MapRenderState();
 }
@@ -49,8 +47,8 @@ class _MapRenderState extends State<MapRender> {
   void newPlacesListener(){
     Global.mapRPfindYPListener.addListener(() {
       _updateYelpVenues();
+      Global.mapRPfindYPListener.value = false;
     });
-    Global.mapRPfindYPListener.value = false;
   }
 
   //This function just lets the app reset to show the users names whenever the users change
@@ -59,8 +57,8 @@ class _MapRenderState extends State<MapRender> {
       setState(() {
         nameList = Global.nameList;
       });
+      Global.mapRPnameListListener.value = false;
     });
-    Global.mapRPnameListListener.value = false;
   }
   //This functions is used when we search a category for yelp
   void _searchingYelpCategory() async {
@@ -69,8 +67,6 @@ class _MapRenderState extends State<MapRender> {
     print("Returned from findingPlaces");
     Global.findYPCalled.notifyListeners();
     Global.findYPCalled.value = true;
-    //userMap.addYelpMarkers();
-    //GoogleMaps.of(context).addYelpMarkers();
     _updateYelpVenues();
   }
 
@@ -491,6 +487,14 @@ class _MapRenderState extends State<MapRender> {
         child: Text("Leave Room",
             style: new TextStyle(fontSize: 20.0, color: Colors.black)),
         onPressed: () async {
+          //Adding some code to turn off all listeners
+          Global.mapRPnameListListener.removeListener((){});
+          Global.mapRPnameListListener.dispose();
+          Global.mapRPfindYPListener.removeListener(() { });
+          Global.mapRPnameListListener.dispose();
+          Global.findYPCalled.removeListener(() {});
+          Global.findYPCalled.dispose();
+
           String roomCodeString = FirebaseFunctions.roomData["roomCode"];
 
           await Firestore.instance
@@ -527,54 +531,3 @@ class _MapRenderState extends State<MapRender> {
   }
 }
 
-//Function that will connect to yelp API
-/*Future<void> _findingPlaces() async {
-  print("Searching for your place");
-  //finalRad.toInt()
-  names.clear();
-  resultCords.clear();
-  locations.clear();
-  urls.clear();
-  images.clear();
-  //var buss = "";
-  double finalRadMiles = finalRad * 1609.344;
-
-  var businesses = "";
-
-  businesses = await BackendMethods.getLocations(
-      finalLon, finalLat, finalCatagory, finalRadMiles.toInt());
-  //buss = await BackendMethods.getLocations( -118.30198471, 34.16972651);
-
-  //print(buss);
-  var lat;
-  var lon;
-  var name;
-  var address;
-  var url;
-  var image;
-
-  for (var place in jsonDecode(businesses)) {
-    lat = place['coordinates']['latitude'];
-    lon = place['coordinates']['longitude'];
-
-    var myLatlng = new LatLng(lat, lon);
-    resultCords.add(myLatlng);
-
-    name = place['name'];
-    names.add(name);
-
-    address = place['location'];
-    locations.add(address);
-
-    url = place['url'];
-    urls.add(url);
-
-    image = place['image_url'];
-    images.add(image);
-  }
-
-  print(names);
-  print("Locations: $resultCords");
-  print("testing if I got a response:");
-  //print(businesses==null);
-}*/
