@@ -15,6 +15,7 @@ class YelpPlaces {
     Global.locations.clear();
     Global.urls.clear();
     Global.images.clear();
+    Global.ratings.clear();
     double finalRadMiles = Global.finalRad * 1609.344;
     var businesses = "";
     businesses = await BackendMethods.getLocations(
@@ -25,6 +26,9 @@ class YelpPlaces {
     var address;
     var url;
     var image;
+    var rating;
+    var open;
+
     for (var place in jsonDecode(businesses)) {
       lat = place['coordinates']['latitude'];
       lon = place['coordinates']['longitude'];
@@ -42,10 +46,20 @@ class YelpPlaces {
 
       image = place['image_url'];
       Global.images.add(image);
+
+      rating = place['rating'];
+      Global.ratings.add(rating);
+
+
+
+      open = place['isOpen'];
+      Global.isOpen.add(open);
+
+
     }
-    //print(Global.names);
-    //print("Locations: ${Global.resultCords}");
-    //print("testing if I got a response:");
+    print(Global.ratings);
+    // print("Locations: ${Global.resultCords}");
+    // print("testing if I got a response:");
   }
 
   static void updateYelpVenues() {

@@ -6,7 +6,7 @@ class BackendMethods {
 
   //              returns the businesses
   static getLocations(double longitude, double latitude,
-      [String term, int radius]) async {
+      [String term, int radius, int time]) async {
     print("Start getting data");
 
     var bodyJSON = <String, dynamic>{
@@ -18,6 +18,10 @@ class BackendMethods {
     }
     if (radius != null) {
       bodyJSON['radius'] = radius;
+    }
+
+    if (time!=null){
+      bodyJSON['open_at']= time;
     }
 
     bodyJSON['sort_by'] = 'distance';
@@ -33,6 +37,9 @@ class BackendMethods {
     print("check statement 1");
     if (res.statusCode == 200) {
       print("check statement 2");
+
+
+      print(res.body);
 
       return res.body;
     } else {

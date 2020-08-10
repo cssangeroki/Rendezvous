@@ -10,6 +10,8 @@ class Global{
   static List<String> locations = [];
   static List urls = [];
   static List images = [];
+  static List ratings =[];
+  static List isOpen=[];
   static double finalLon;
   static double finalLat;
   static String finalCategory;
