@@ -16,6 +16,7 @@ class Global{
   static double finalLat;
   static String finalCategory;
   static double finalRad;
+  static double finalTime;
 
   static var arrLength;
 
