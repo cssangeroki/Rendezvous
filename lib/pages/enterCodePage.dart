@@ -40,7 +40,6 @@ class _Page4State extends State<Page4> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: Color(0xffd4f9ff),
       appBar: appBarMain(context),
       body: isLoading
           ? Container(child: Center(child: CircularProgressIndicator()))
@@ -56,9 +55,7 @@ class _Page4State extends State<Page4> {
                   Container(
                     child: Text(
                       "Enter Code Below:",
-                      style: new TextStyle(
-                        fontSize: 25.0,
-                      ),
+                      style: buttonTextSize25(),
                     ),
                     padding: EdgeInsets.all(25.0),
                   ),

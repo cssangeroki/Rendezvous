@@ -68,7 +68,6 @@ class _Page2State extends State<Page2> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: Color(0xffd4f9ff),
       appBar: appBarMain(context),
       body: SafeArea(
         child: SingleChildScrollView(
@@ -83,10 +82,7 @@ class _Page2State extends State<Page2> {
               padding: EdgeInsets.all(10.0),
               child: Text(
                 "Hello, $_name:" ?? "Name is Null",
-                style: new TextStyle(
-                  fontSize: 30.0,
-                  color: Colors.black,
-                ),
+                style: buttonTextSize30(),
               ),
               margin: EdgeInsets.fromLTRB(0, 10.0, 0, 0),
             ),
@@ -98,13 +94,9 @@ class _Page2State extends State<Page2> {
                 padding: EdgeInsets.all(10.0),
                 buttonColor: Color(0xffcaf7dc),
                 child: RaisedButton(
-                  child: Text("Create a Room",
-                      style:
-                          new TextStyle(fontSize: 20.0, color: Colors.black)),
+                  child: Text("Create a Room", style: buttonTextSize20()),
                   onPressed: () {
                     createRoomCode();
-//                    Navigator.push(context,
-//                        MaterialPageRoute(builder: (context) => MapRender()));
                   },
                 ),
               ),
@@ -116,8 +108,7 @@ class _Page2State extends State<Page2> {
               buttonColor: Color(0xffcaf7dc),
               hoverColor: Color(0xffffccbb),
               child: RaisedButton(
-                child: Text("Join a Room",
-                    style: new TextStyle(fontSize: 20.0, color: Colors.black)),
+                child: Text("Join a Room", style: buttonTextSize20()),
                 onPressed: () {
                   Navigator.push(context,
                       MaterialPageRoute(builder: (context) => Page4()));

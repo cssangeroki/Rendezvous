@@ -51,7 +51,7 @@ class _Page1State extends State<Page1> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: Color(0xffd4f9ff),
+//      backgroundColor: Color(0xffd4f9ff),
       appBar: appBarMain(context),
       body: SafeArea(
         child: SingleChildScrollView(
@@ -67,9 +67,7 @@ class _Page1State extends State<Page1> {
                 padding: EdgeInsets.fromLTRB(20.0, 20.0, 20.0, 0),
                 child: Text(
                   "Enter a display name:",
-                  style: TextStyle(
-                    fontSize: 30.0,
-                  ),
+                  style: buttonTextSize30(),
                 ),
               ),
               Container(
