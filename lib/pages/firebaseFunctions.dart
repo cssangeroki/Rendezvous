@@ -5,7 +5,8 @@ class FirebaseFunctions {
   static String currentUID;
   static Map<String, dynamic> currentUserData = {
     "roomCode": null,
-    "userName": null
+    "userName": null,
+    "host": null
   };
   static Map<String, dynamic> roomData = {"roomCode": null};
 
@@ -110,30 +111,27 @@ class FirebaseFunctions {
   }
 
   static deleteRoom(String roomCode) async {
-    Firestore.instance
-            .collection("rooms")
-            .document(roomCode).delete();
-    
+    Firestore.instance.collection("rooms").document(roomCode).delete();
   }
-  static removeCurrentUserFromRoom(String roomCode, int membersLength) async {
 
+  static removeCurrentUserFromRoom(String roomCode, int membersLength) async {
     await Firestore.instance
         .collection("users")
         .document(FirebaseFunctions.currentUID)
         .updateData({"roomCode": null}).then((result) async {
-        await Firestore.instance
-            .collection("rooms")
-            .document(roomCode)
-            .collection("users")
-            .document(FirebaseFunctions?.currentUID)
-            .delete()
-            .then((value) {
-          FirebaseFunctions.roomData = {"roomCode": null};
-          FirebaseFunctions.currentUserData = {"roomCode": null};
-        });
-        if(membersLength == 1) {
-            print("This is the length of members");
-            print(membersLength);
+      await Firestore.instance
+          .collection("rooms")
+          .document(roomCode)
+          .collection("users")
+          .document(FirebaseFunctions?.currentUID)
+          .delete()
+          .then((value) {
+        FirebaseFunctions.roomData = {"roomCode": null};
+        FirebaseFunctions.currentUserData = {"roomCode": null};
+      });
+      if (membersLength == 1) {
+        print("This is the length of members");
+        print(membersLength);
         await deleteRoom(roomCode);
       }
     });
@@ -161,11 +159,13 @@ class FirebaseFunctions {
 
     FirebaseFunctions.currentUserData["userName"] = userName;
     FirebaseFunctions.roomData = {"roomCode": roomCode};
+    //Setting the host variable for the current user to true
+    FirebaseFunctions.currentUserData["host"] = userName;
     // stores the room to database
     await Firestore.instance
         .collection("rooms")
         .document(roomCode)
-        .setData({"roomCode": roomCode}).then((value) async {
+        .setData({"roomCode": roomCode, "host": userName}).then((value) async {
       await Firestore.instance
           .collection("users")
           .document(FirebaseFunctions?.currentUID)

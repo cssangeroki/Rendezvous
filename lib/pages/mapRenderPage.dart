@@ -303,6 +303,29 @@ class _MapRenderState extends State<MapRender> {
               Container(
                 child: ListTile(
                   title: Text(
+                    'Host:',
+                    style: TextStyle(
+                      fontSize: 20,
+                    ),
+                  ),
+                  onTap: null,
+                ),
+              ),
+              Container(
+                padding: EdgeInsets.fromLTRB(30, 0, 0, 0),
+                child: ListTile(
+                  title: Text(
+                    "${FirebaseFunctions.currentUserData["host"]}",
+                    style: TextStyle(
+                      fontSize: 20,
+                    ),
+                  ),
+                  onTap: null,
+                ),
+              ),
+              Container(
+                child: ListTile(
+                  title: Text(
                     'Searching for:',
                     style: TextStyle(
                       fontSize: 20,
@@ -491,7 +514,7 @@ class _MapRenderState extends State<MapRender> {
           Global.mapRPnameListListener.removeListener((){});
           Global.mapRPnameListListener.dispose();
           Global.mapRPfindYPListener.removeListener(() { });
-          Global.mapRPnameListListener.dispose();
+          Global.mapRPfindYPListener.dispose();
           Global.findYPCalled.removeListener(() {});
           Global.findYPCalled.dispose();
 
