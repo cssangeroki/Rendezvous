@@ -512,11 +512,11 @@ class _MapRenderState extends State<MapRender> {
         onPressed: () async {
           //Adding some code to turn off all listeners
           Global.mapRPnameListListener.removeListener((){});
-          Global.mapRPnameListListener.dispose();
-          Global.mapRPfindYPListener.removeListener(() { });
-          Global.mapRPfindYPListener.dispose();
+          //Global.mapRPnameListListener.dispose();
+          Global.mapRPfindYPListener.removeListener((){});
+          //Global.mapRPfindYPListener.dispose();
           Global.findYPCalled.removeListener(() {});
-          Global.findYPCalled.dispose();
+          //Global.findYPCalled.dispose();
 
           String roomCodeString = FirebaseFunctions.roomData["roomCode"];
 
