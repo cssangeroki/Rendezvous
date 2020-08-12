@@ -45,6 +45,7 @@ class MyApp extends StatelessWidget {
     return MaterialApp(
         title: 'Retrieve Text Input',
         theme: ThemeData(
+          scaffoldBackgroundColor: Color(0xffd4f9ff),
           textTheme: Theme.of(context).textTheme.apply(
                 fontFamily: 'Goldplay',
                 fontSizeFactor: 1.1,
