@@ -6,9 +6,13 @@ class FirebaseFunctions {
   static Map<String, dynamic> currentUserData = {
     "roomCode": null,
     "userName": null,
-    "host": null
   };
-  static Map<String, dynamic> roomData = {"roomCode": null};
+  static Map<String, dynamic> roomData = {
+    "roomCode": null,
+    "host": null,
+    "Final Location": null,
+    "Final Location Address": null
+  };
 
   static refreshFirebaseRoomData() async {
     if (FirebaseFunctions.currentUserData["roomCode"] != null) {
@@ -17,7 +21,12 @@ class FirebaseFunctions {
           .document(currentUserData["roomCode"])
           .get()
           .then((snapshot) {
-        FirebaseFunctions.roomData = snapshot.data;
+        FirebaseFunctions.roomData["roomCode"] = snapshot.data["roomCode"];
+        FirebaseFunctions.roomData["host"] = snapshot.data["host"];
+        FirebaseFunctions.roomData["Final Location"] =
+            snapshot.data["Final Location"];
+        FirebaseFunctions.roomData["Final Location Address"] =
+            snapshot.data["Final Location Address"];
       });
     }
   }
@@ -95,9 +104,19 @@ class FirebaseFunctions {
         .setData({
       "userID": FirebaseFunctions?.currentUID,
       "userName": FirebaseFunctions.currentUserData["userName"]
-    }).then((value) {
+    }).then((value) async {
       FirebaseFunctions.currentUserData["roomCode"] = roomCode;
-      Firestore.instance
+      //this line gets the host when the user joins the room
+      await Firestore.instance
+          .collection("rooms")
+          .document(roomCode)
+          .get()
+          .then((value) {
+        roomData["host"] = value.data["host"];
+        roomData["Final Location"] = value.data["Final Location"];
+        roomData["Final Location Address"] = value.data["Final Location Address"];
+      });
+      await Firestore.instance
           .collection("users")
           .document(FirebaseFunctions?.currentUID)
           .updateData({"roomCode": roomCode}).then((result) {
@@ -111,7 +130,7 @@ class FirebaseFunctions {
   }
 
   static deleteRoom(String roomCode) async {
-    Firestore.instance.collection("rooms").document(roomCode).delete();
+    await Firestore.instance.collection("rooms").document(roomCode).delete();
   }
 
   static removeCurrentUserFromRoom(String roomCode, int membersLength) async {
@@ -133,8 +152,29 @@ class FirebaseFunctions {
         print("This is the length of members");
         print(membersLength);
         await deleteRoom(roomCode);
+        return;
       }
+      //If there is more than 1 person in the room, we will change the host to the next user in the room
+      changeHost();
     });
+  }
+
+  //This function changes the host of the room for when someone leaves the room
+  static changeHost() async {
+    await Firestore.instance
+        .collection("rooms")
+        .document(roomData["roomCode"])
+        .collection("users")
+        .getDocuments()
+        .then((value) {
+      var userDocs = value.documents;
+      roomData["host"] = userDocs[0].data["userName"];
+    });
+    //Might have to change this line in case a different host shows up for everyone
+    await Firestore.instance
+        .collection("rooms")
+        .document(roomData["roomCode"])
+        .updateData({"host": roomData["host"]});
   }
 
   static createFirebaseRoom(String userName) async {
@@ -160,7 +200,7 @@ class FirebaseFunctions {
     FirebaseFunctions.currentUserData["userName"] = userName;
     FirebaseFunctions.roomData = {"roomCode": roomCode};
     //Setting the host variable for the current user to true
-    FirebaseFunctions.currentUserData["host"] = userName;
+    FirebaseFunctions.roomData["host"] = userName;
     // stores the room to database
     await Firestore.instance
         .collection("rooms")
@@ -178,5 +218,20 @@ class FirebaseFunctions {
         return null;
       });
     });
+  }
+
+  //Creating a function that will set the final position
+  static void setFinalPosition(
+      String finalLocName, String finalLocAddress) async {
+    //In this function, I want to push the finalLocName and finalLocAddress to firebase
+    await Firestore.instance
+        .collection("rooms")
+        .document(FirebaseFunctions.roomData["roomCode"])
+        .updateData({
+      "Final Location": finalLocName,
+      "Final Location Address": finalLocAddress
+    });
+    FirebaseFunctions.roomData["Final Location"] = finalLocName;
+    FirebaseFunctions.roomData["Final Location Address"] = finalLocAddress;
   }
 }

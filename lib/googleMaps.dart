@@ -15,7 +15,6 @@ import "findYelpPlaces.dart";
 //Here I'm creating a reference to our firebase
 final firebase = Firestore.instance;
 
-
 //Below is a function that gets the users current location, or last known location.
 //The function will return a Position variable
 Future<Position> currentLocation() async {
@@ -49,7 +48,7 @@ class GoogleMaps extends StatefulWidget {
 //      : context.findAncestorStateOfType<_GoogleMapsState>();
 
   @override
-  _GoogleMapsState createState() => _GoogleMapsState();//mapsState;
+  _GoogleMapsState createState() => _GoogleMapsState(); //mapsState;
 
 //  void addYelpMarkers(){
 //    mapsState.addYelpMarkers();
@@ -66,6 +65,7 @@ class _GoogleMapsState extends State<GoogleMaps> {
 
 //Creating a variable currPosition that will be used to store the users current position
   Position currPosition;
+
   //static List<String> nameList = [];
 
   //static StreamSubscription<QuerySnapshot> memberListener;
@@ -85,6 +85,11 @@ class _GoogleMapsState extends State<GoogleMaps> {
 //Going to create a string which will store the midpoint address
   String midAddress;
 
+  //Creating a variable that will trigger the confirm location dialog box
+  bool confirmDialogTrigger = false;
+  String finalLocName;
+  String finalLocAddress;
+
 //Marker _markers;
 //Function initState initialises the state of variables
 //It returns a reference to the listener, so that we may turn off the listener at a later time
@@ -94,7 +99,7 @@ class _GoogleMapsState extends State<GoogleMaps> {
     initFunctionCaller();
   }
 
-   void initFunctionCaller() async {
+  void initFunctionCaller() async {
     addYelpMarkersWhenFindYPCalled();
     await _getUserLocation();
     _lastMapPosition = _center;
@@ -103,7 +108,7 @@ class _GoogleMapsState extends State<GoogleMaps> {
   }
 
   //This functions will listen to when the function addYelpMarkers is called outside and will add the yelpMarkers to the widget
-  void addYelpMarkersWhenFindYPCalled(){
+  void addYelpMarkersWhenFindYPCalled() {
     Global.findYPCalled.addListener(() {
       setState(() {
         print("entered YP listener");
@@ -131,7 +136,7 @@ class _GoogleMapsState extends State<GoogleMaps> {
 
       setState(() {
         searchAddr =
-        "${place.name}, ${place.subLocality}, ${place.locality}, ${place.postalCode}, ${place.country}";
+            "${place.name}, ${place.subLocality}, ${place.locality}, ${place.postalCode}, ${place.country}";
       });
     } catch (e) {
       print(e);
@@ -159,7 +164,7 @@ class _GoogleMapsState extends State<GoogleMaps> {
     //Adding a line that will clear the markers that is not the current user, to update in case a user leaves
     setState(() {
       _markers.removeWhere((element) =>
-      element.markerId.value != "User" &&
+          element.markerId.value != "User" &&
           element.markerId.value != "Midpoint");
     });
   }
@@ -191,6 +196,7 @@ class _GoogleMapsState extends State<GoogleMaps> {
     //Then simply add all names in userNames to namesList
     namesList.addAll(userNames);
   }
+
   //In this function, I iterate through every user in the document, and get there location and add it to markers
   //All other users will have their BitMapDescriptor as Magenta in color, so that we can differentiate from other users
   Future<void> addOtherUserMarkers(DocumentSnapshot userLocations) async {
@@ -204,13 +210,18 @@ class _GoogleMapsState extends State<GoogleMaps> {
     setState(() {
       //if the user is already in our markers array, I will just update their position
       _markers.removeWhere(
-              (marker) => marker.markerId.value == userLocations.documentID);
+          (marker) => marker.markerId.value == userLocations.documentID);
       _markers.add(Marker(
-        markerId: MarkerId(userLocations.documentID),
-        position: LatLng(newUserLoc.latitude, newUserLoc.longitude),
-        infoWindow: InfoWindow(title: newUserName, snippet: ""),
-        icon: BitmapDescriptor.defaultMarkerWithHue(BitmapDescriptor.hueMagenta),
-      ));
+          markerId: MarkerId(userLocations.documentID),
+          position: LatLng(newUserLoc.latitude, newUserLoc.longitude),
+          infoWindow: InfoWindow(title: newUserName, snippet: ""),
+          icon: BitmapDescriptor.defaultMarkerWithHue(
+              BitmapDescriptor.hueMagenta),
+          onTap: () {
+            setState(() {
+              confirmDialogTrigger = false;
+            });
+          }));
     });
     //print("Finished adding users location");
   }
@@ -236,7 +247,7 @@ class _GoogleMapsState extends State<GoogleMaps> {
     Placemark place = p[0];
     setState(() {
       midAddress =
-      "${place.name}, ${place.subLocality}, ${place.locality}, ${place.postalCode}, ${place.country}";
+          "${place.name}, ${place.subLocality}, ${place.locality}, ${place.postalCode}, ${place.country}";
     });
     print("MidAddress updated to $midAddress");
   }
@@ -245,8 +256,8 @@ class _GoogleMapsState extends State<GoogleMaps> {
   void addYelpMarkers() {
     print("Entered Yelp markers. resultCords = ${Global.resultCords.length}");
     //First, remove all the current yelp markers
-    _markers.removeWhere((element) => (element.infoWindow.snippet != '' &&
-        element.infoWindow.snippet != "Midpoint"));
+    _markers.removeWhere((element) => (element.infoWindow.snippet != 'Your Location' &&
+        element.infoWindow.snippet != "Midpoint" && element.infoWindow.snippet != ''));
     //For every location we found, we need to add a marker
     setState(() {
       for (int i = 0; i < Global.resultCords.length; i++) {
@@ -255,9 +266,18 @@ class _GoogleMapsState extends State<GoogleMaps> {
           position: LatLng(
               Global.resultCords[i].latitude, Global.resultCords[i].longitude),
           infoWindow:
-          InfoWindow(title: Global.names[i], snippet: Global.locations[i]),
-          icon: BitmapDescriptor.defaultMarkerWithHue(BitmapDescriptor
-              .hueGreen), //Setting midpoint marker to blue so it's identifiable
+              InfoWindow(title: Global.names[i], snippet: Global.locations[i]),
+          icon:
+              BitmapDescriptor.defaultMarkerWithHue(BitmapDescriptor.hueGreen),
+          //Setting midpoint marker to blue so it's identifiable
+          onTap: () {
+            setState(() {
+              confirmDialogTrigger = true;
+              finalLocName = Global.names[i];
+              finalLocAddress = Global.locations[i];
+              //confirmFinalPosition();
+            });
+          }, //Want to add a stateless widget here,
         ));
       }
     });
@@ -297,12 +317,19 @@ class _GoogleMapsState extends State<GoogleMaps> {
 //      placefromLatLng(LatLng(currentMidLat, currentMidLon));
     setState(() {
       _markers.add(Marker(
-        markerId: MarkerId('Midpoint'),
-        position: LatLng(currentMidLat, currentMidLon),
-        infoWindow: InfoWindow(title: midAddress, snippet: 'Midpoint'),
-        icon: BitmapDescriptor.defaultMarkerWithHue(BitmapDescriptor
-            .hueBlue), //Setting midpoint marker to blue so it's identifiable
-      ));
+          markerId: MarkerId('Midpoint'),
+          position: LatLng(currentMidLat, currentMidLon),
+          infoWindow: InfoWindow(title: midAddress, snippet: 'Midpoint'),
+          icon: BitmapDescriptor.defaultMarkerWithHue(BitmapDescriptor.hueBlue),
+          onTap: () {
+            setState(() {
+              confirmDialogTrigger = true;
+              finalLocName = "Midpoint";
+              finalLocAddress = midAddress;
+              //confirmFinalPosition();
+            });
+          } //Setting midpoint marker to blue so it's identifiable
+          ));
     });
     //Now I find places around the midpoint, and display all the Yelp markers
     Global.resultCords.clear();
@@ -336,14 +363,18 @@ class _GoogleMapsState extends State<GoogleMaps> {
       _markers.removeWhere((marker) => marker.markerId.value == "User");
       //Then I add the Users new location
       _markers.add(Marker(
-        markerId: MarkerId("User"),
-        position: _lastMapPosition,
-        infoWindow: InfoWindow(title: searchAddr, snippet: ''),
+          markerId: MarkerId("User"),
+          position: _lastMapPosition,
+          infoWindow: InfoWindow(title: searchAddr, snippet: 'Your Location'),
 //infoWindow: InfoWindow(),
-        icon: BitmapDescriptor.defaultMarker,
-      ));
+          icon: BitmapDescriptor.defaultMarker,
+          onTap: () {
+            setState(() {
+              confirmDialogTrigger = false;
+            });
+          }));
     });
-     updateUserLocation();
+    updateUserLocation();
   }
 
   void _searchandNavigate() async {
@@ -361,6 +392,32 @@ class _GoogleMapsState extends State<GoogleMaps> {
               LatLng(value[0].position.latitude, value[0].position.longitude),
           zoom: 15.0)));
     });
+  }
+
+  //Widget for when a marker is tapped
+  Widget confirmFinalPosition() {
+    if ((FirebaseFunctions.currentUserData["userName"] ==
+            FirebaseFunctions.roomData["host"]) &&
+        (confirmDialogTrigger == true)) {
+      print("DialogBox should appear");
+      return Padding(
+          padding: const EdgeInsets.fromLTRB(0.0, 10.0, 0.0, 0.0),
+          child: FloatingActionButton(
+            onPressed: () {
+              setState(() {
+                FirebaseFunctions.setFinalPosition(
+                    finalLocName, finalLocAddress);
+              });
+            },
+            materialTapTargetSize: MaterialTapTargetSize.padded,
+            backgroundColor: Colors.greenAccent,
+            child: const Icon(
+              Icons.check_circle,
+              size: 36.0,
+            ),
+          ));
+    }
+    return SizedBox.shrink(); //FloatingActionButton();//Container();
   }
 
   /*
@@ -439,7 +496,8 @@ class _GoogleMapsState extends State<GoogleMaps> {
                             Icons.add_location,
                             size: 36.0,
                           ),
-                        )
+                        ),
+                        confirmFinalPosition(),
                       ],
                     ),
                   ),

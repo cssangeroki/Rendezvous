@@ -1,6 +1,6 @@
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
-
+import 'dart:async';
 import '../appBar.dart';
 import 'firebaseFunctions.dart';
 
@@ -26,23 +26,34 @@ final firebase = Firestore.instance;
 
 
 class MapRender extends StatefulWidget {
-  final String userDocID = FirebaseFunctions.currentUID;
-  final String roomDocID = FirebaseFunctions.currentUserData["roomCode"];
   @override
   _MapRenderState createState() => _MapRenderState();
 }
 
 class _MapRenderState extends State<MapRender> {
   List <String> nameList = Global.nameList;
-
+  final String userDocID = FirebaseFunctions.currentUID;
+  final String roomDocID = FirebaseFunctions.currentUserData["roomCode"];
+  StreamSubscription<DocumentSnapshot> roomListener;
   @override
   void initState() {
     super.initState();
     Global.finalRad = midSliderVal;
     newPlacesListener();
     nameListListener();
+    listenToRoom();
   }
 
+  //Another function that creates a listener for the roomData (Not the users, but other room data)
+  void listenToRoom(){
+    roomListener = firebase.collection("rooms").document(roomDocID).snapshots().listen((event){
+      setState(() {
+        FirebaseFunctions.roomData["host"] = event.data["host"];
+        FirebaseFunctions.roomData["Final Location"] = event.data["Final Location"];
+        FirebaseFunctions.roomData["Final Location Address"] = event.data["Final Location Address"];
+      });
+    });
+  }
   //This function will be used to set a listener for whenever findingYelpPlaces is called in other widgets
   void newPlacesListener(){
     Global.mapRPfindYPListener.addListener(() {
@@ -315,7 +326,53 @@ class _MapRenderState extends State<MapRender> {
                 padding: EdgeInsets.fromLTRB(30, 0, 0, 0),
                 child: ListTile(
                   title: Text(
-                    "${FirebaseFunctions.currentUserData["host"]}",
+                    "${FirebaseFunctions.roomData["host"]}",
+                    style: TextStyle(
+                      fontSize: 20,
+                    ),
+                  ),
+                  onTap: null,
+                ),
+              ),
+              Container(
+                child: ListTile(
+                  title: Text(
+                    'Final Location:',
+                    style: TextStyle(
+                      fontSize: 20,
+                    ),
+                  ),
+                  onTap: null,
+                ),
+              ),
+              Container(
+                padding: EdgeInsets.fromLTRB(30, 0, 0, 0),
+                child: ListTile(
+                  title: Text(
+                    "${FirebaseFunctions.roomData["Final Location"]}" ?? "No location set",
+                    style: TextStyle(
+                      fontSize: 20,
+                    ),
+                  ),
+                  onTap: null,
+                ),
+              ),
+              Container(
+                child: ListTile(
+                  title: Text(
+                    'Final Location Address:',
+                    style: TextStyle(
+                      fontSize: 20,
+                    ),
+                  ),
+                  onTap: null,
+                ),
+              ),
+              Container(
+                padding: EdgeInsets.fromLTRB(30, 0, 0, 0),
+                child: ListTile(
+                  title: Text(
+                    "${FirebaseFunctions.roomData["Final Location Address"]}" ?? "No address set",
                     style: TextStyle(
                       fontSize: 20,
                     ),
@@ -349,17 +406,6 @@ class _MapRenderState extends State<MapRender> {
                 ),
               ),
               _midpointSlider(),
-              /*Container(
-                    child: ListTile(
-                      title: Text(
-                        'Range from your location: ${userSliderVal} mi',
-                        style: TextStyle(
-                          fontSize: 18,
-                        ),
-                      ),
-                      onTap: null,
-                    ),
-                  ),*/
               Container(
                 child: ListTile(
                   title: Text(
@@ -529,6 +575,7 @@ class _MapRenderState extends State<MapRender> {
             print("I'm running");
             print(data.documents.length);
             Global.memberListener.cancel();
+            roomListener.cancel();
             FirebaseFunctions.removeCurrentUserFromRoom(
                 roomCodeString, data.documents.length);
           });
