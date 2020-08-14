@@ -114,7 +114,8 @@ class FirebaseFunctions {
           .then((value) {
         roomData["host"] = value.data["host"];
         roomData["Final Location"] = value.data["Final Location"];
-        roomData["Final Location Address"] = value.data["Final Location Address"];
+        roomData["Final Location Address"] =
+            value.data["Final Location Address"];
       });
       await Firestore.instance
           .collection("users")
@@ -144,23 +145,34 @@ class FirebaseFunctions {
           .collection("users")
           .document(FirebaseFunctions?.currentUID)
           .delete()
-          .then((value) {
-        FirebaseFunctions.roomData = {"roomCode": null};
-        FirebaseFunctions.currentUserData = {"roomCode": null};
-      });
+          .then((value) {});
+      //If there is more than 1 person in the room, we will change the host to the next user in the room
+      await changeHost();
+      FirebaseFunctions.roomData = {
+        "roomCode": null,
+        "host": null,
+        "Final Location": null,
+        "Final Location Address": null
+      };
+      FirebaseFunctions.currentUserData = {"roomCode": null};
+      //If there is only 1 person in the room, we will delete the room
       if (membersLength == 1) {
         print("This is the length of members");
         print(membersLength);
         await deleteRoom(roomCode);
         return;
       }
-      //If there is more than 1 person in the room, we will change the host to the next user in the room
-      changeHost();
-    });
+
+  });
+
   }
 
   //This function changes the host of the room for when someone leaves the room
   static changeHost() async {
+    //If the user isn't the host, we don't need to worry about changing the host
+    if (roomData["host"] != currentUserData["userName"]) {
+      return;
+    }
     await Firestore.instance
         .collection("rooms")
         .document(roomData["roomCode"])
