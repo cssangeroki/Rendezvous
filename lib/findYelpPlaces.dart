@@ -16,6 +16,8 @@ class YelpPlaces {
     Global.urls.clear();
     Global.images.clear();
     Global.ratings.clear();
+    Global.phoneNums.clear();
+    Global.prices.clear();
     double finalRadMiles = Global.finalRad * 1609.344;
     var businesses = "";
     businesses = await BackendMethods.getLocations(
@@ -28,6 +30,8 @@ class YelpPlaces {
     var image;
     var rating;
     var open;
+    var phone;
+    var price;
 
     for (var place in jsonDecode(businesses)) {
       lat = place['coordinates']['latitude'];
@@ -55,9 +59,15 @@ class YelpPlaces {
       open = place['isOpen'];
       Global.isOpen.add(open);
 
+      phone= place['phone'];
+      Global.phoneNums.add(phone);
+
+      price=place['price'];
+      Global.prices.add(price);
+
 
     }
-    print(Global.ratings);
+    print(Global.phoneNums);
     // print("Locations: ${Global.resultCords}");
     // print("testing if I got a response:");
   }

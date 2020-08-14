@@ -12,6 +12,9 @@ class Global{
   static List images = [];
   static List ratings =[];
   static List isOpen=[];
+  static List phoneNums=[];
+  static List prices=[];
+  
   static double finalLon;
   static double finalLat;
   static String finalCategory;
