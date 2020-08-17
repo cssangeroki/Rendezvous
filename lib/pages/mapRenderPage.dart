@@ -348,11 +348,12 @@ class _MapRenderState extends State<MapRender> {
               Container(
                 padding: EdgeInsets.fromLTRB(30, 0, 0, 0),
                 child: ListTile(
-                  title: Text(
+                  title: SelectableText(
                     "${FirebaseFunctions.roomData["Final Location"]}" ?? "No location set",
                     style: TextStyle(
                       fontSize: 20,
                     ),
+                    enableInteractiveSelection: true,
                   ),
                   onTap: null,
                 ),
@@ -371,11 +372,12 @@ class _MapRenderState extends State<MapRender> {
               Container(
                 padding: EdgeInsets.fromLTRB(30, 0, 0, 0),
                 child: ListTile(
-                  title: Text(
+                  title:SelectableText(
                     "${FirebaseFunctions.roomData["Final Location Address"]}" ?? "No address set",
                     style: TextStyle(
                       fontSize: 20,
                     ),
+                    enableInteractiveSelection: true,
                   ),
                   onTap: null,
                 ),
