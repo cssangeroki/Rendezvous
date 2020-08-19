@@ -3,9 +3,9 @@ import 'package:flutter/material.dart';
 import 'dart:async';
 import '../appBar.dart';
 import 'firebaseFunctions.dart';
+import '../expandedSection.dart';
 
 import 'package:cloud_firestore/cloud_firestore.dart';
-
 
 import 'package:sliding_up_panel/sliding_up_panel.dart';
 
@@ -13,7 +13,6 @@ import 'package:link/link.dart';
 import "../googleMaps.dart";
 import "../globalVar.dart";
 import "../findYelpPlaces.dart";
-
 
 //Below are variables we will use for the sliders
 double midSliderVal = 5;
@@ -23,18 +22,20 @@ String category;
 //Here I'm creating a reference to our firebase
 final firebase = Firestore.instance;
 
-
-
 class MapRender extends StatefulWidget {
+  final Widget child;
+  final bool expand;
+  MapRender({this.expand = false, this.child});
   @override
   _MapRenderState createState() => _MapRenderState();
 }
 
 class _MapRenderState extends State<MapRender> {
-  List <String> nameList = Global.nameList;
+  List<String> nameList = Global.nameList;
   final String userDocID = FirebaseFunctions.currentUID;
   final String roomDocID = FirebaseFunctions.currentUserData["roomCode"];
   StreamSubscription<DocumentSnapshot> roomListener;
+  var _isExpanded = new List<bool>.filled(50, false, growable: true);
   @override
   void initState() {
     super.initState();
@@ -45,17 +46,24 @@ class _MapRenderState extends State<MapRender> {
   }
 
   //Another function that creates a listener for the roomData (Not the users, but other room data)
-  void listenToRoom(){
-    roomListener = firebase.collection("rooms").document(roomDocID).snapshots().listen((event){
+  void listenToRoom() {
+    roomListener = firebase
+        .collection("rooms")
+        .document(roomDocID)
+        .snapshots()
+        .listen((event) {
       setState(() {
         FirebaseFunctions.roomData["host"] = event.data["host"];
-        FirebaseFunctions.roomData["Final Location"] = event.data["Final Location"];
-        FirebaseFunctions.roomData["Final Location Address"] = event.data["Final Location Address"];
+        FirebaseFunctions.roomData["Final Location"] =
+            event.data["Final Location"];
+        FirebaseFunctions.roomData["Final Location Address"] =
+            event.data["Final Location Address"];
       });
     });
   }
+
   //This function will be used to set a listener for whenever findingYelpPlaces is called in other widgets
-  void newPlacesListener(){
+  void newPlacesListener() {
     Global.mapRPfindYPListener.addListener(() {
       _updateYelpVenues();
       Global.mapRPfindYPListener.value = false;
@@ -63,7 +71,7 @@ class _MapRenderState extends State<MapRender> {
   }
 
   //This function just lets the app reset to show the users names whenever the users change
-  void nameListListener(){
+  void nameListListener() {
     Global.mapRPnameListListener.addListener(() {
       setState(() {
         nameList = Global.nameList;
@@ -71,6 +79,7 @@ class _MapRenderState extends State<MapRender> {
       Global.mapRPnameListListener.value = false;
     });
   }
+
   //This functions is used when we search a category for yelp
   void _searchingYelpCategory() async {
     print("Entered searchingYelpCategory");
@@ -90,6 +99,12 @@ class _MapRenderState extends State<MapRender> {
     });
   }
 
+  void _toggleExpand(var index) {
+    setState(() {
+      _isExpanded[index] = !_isExpanded[index];
+    });
+  }
+
   Widget _viewYelp() {
     _updateYelpVenues();
     if (_arrLength == null) {
@@ -104,7 +119,7 @@ class _MapRenderState extends State<MapRender> {
       return Container(
         height: 500,
         width: 500,
-        color: Color(0xffd8eefe),
+        color: Color(0xfffddd75),
         child: Text(
           "No Places Found.",
           style: TextStyle(
@@ -124,13 +139,9 @@ class _MapRenderState extends State<MapRender> {
             return new Container(
               margin: EdgeInsets.fromLTRB(15, 10, 15, 10),
               decoration: BoxDecoration(
-                color: Colors.white,
+                color: Color(0xfff0f0f0),
                 border: Border.all(color: Colors.black38),
-                borderRadius: BorderRadius.only(
-                    topLeft: Radius.circular(10),
-                    topRight: Radius.circular(10),
-                    bottomLeft: Radius.circular(10),
-                    bottomRight: Radius.circular(10)),
+                borderRadius: BorderRadius.all(Radius.circular(10)),
                 boxShadow: [
                   BoxShadow(
                     color: Colors.grey.withOpacity(0.3),
@@ -143,11 +154,167 @@ class _MapRenderState extends State<MapRender> {
               child: Container(
                 //padding: EdgeInsets.fromLTRB(10, 0, 10, 0),
 
-                child: Link(
-                  url: Global.urls[index],
-                  child: Row(
-                    children: <Widget>[
-                      Container(
+                /*child: Link(
+                  url: Global.urls[index],*/
+                child: Row(
+                  children: <Widget>[
+                    Center(
+                      child: Container(
+                        width: 368.0,
+                        child: Column(
+                          mainAxisSize: MainAxisSize.min,
+                          children: <Widget>[
+                            Container(
+                              width: double.infinity,
+                              decoration: BoxDecoration(
+                                borderRadius: BorderRadius.only(
+                                    topLeft: Radius.circular(10),
+                                    topRight: Radius.circular(10)),
+                              ),
+                              child: InkWell(
+                                onTap: () => _toggleExpand(index),
+                                child: Container(
+                                  child: Row(
+                                    children: <Widget>[
+                                      Container(
+                                        width: 90,
+                                        height: 90,
+                                        padding: EdgeInsets.all(8),
+                                        child: ClipRRect(
+                                          borderRadius: BorderRadius.all(
+                                            Radius.circular(10),
+                                          ),
+                                          child: Image.network(
+                                            Global.images[index] == null
+                                                ? 'https://firebasestorage.googleapis.com/v0/b/rendezvous-b51b4.appspot.com/o/photo-1550747545-c896b5f89ff7.jpeg?alt=media&token=eb3eb883-86da-4b89-87e1-7490fd518910'
+                                                : '${Global.images[index]}',
+                                            // 'https://firebasestorage.googleapis.com/v0/b/rendezvous-b51b4.appspot.com/o/photo-1550747545-c896b5f89ff7.jpeg?alt=media&token=eb3eb883-86da-4b89-87e1-7490fd518910',
+                                            fit: BoxFit.cover,
+                                          ),
+                                        ),
+                                      ),
+                                      SizedBox(width: 5.0),
+                                      Flexible(
+                                        child: Column(
+                                          crossAxisAlignment:
+                                              CrossAxisAlignment.start,
+                                          children: <Widget>[
+                                            MergeSemantics(
+                                              child: Row(
+                                                children: <Widget>[
+                                                  Flexible(
+                                                    child: Container(
+                                                      padding:
+                                                          EdgeInsets.fromLTRB(
+                                                              0, 0, 0, 0),
+                                                      child: Text(
+                                                        "${Global.names[index]} ",
+                                                        overflow: TextOverflow
+                                                            .ellipsis,
+                                                        softWrap: true,
+                                                        style: TextStyle(
+                                                          fontFamily:
+                                                              'GoldPlay',
+                                                          color: Colors.black
+                                                              .withAlpha(200),
+                                                          fontWeight:
+                                                              FontWeight.normal,
+                                                          fontSize: 18,
+                                                        ),
+                                                        textAlign:
+                                                            TextAlign.left,
+                                                      ),
+                                                    ),
+                                                    //textAlign: TextAlign.right,
+                                                  ),
+                                                ],
+                                              ),
+                                            ),
+                                            SizedBox(height: 5),
+                                            AnimatedOpacity(
+                                              // If the widget is visible, animate to 0.0 (invisible).
+                                              // If the widget is hidden, animate to 1.0 (fully visible).
+                                              opacity: !_isExpanded[index]
+                                                  ? 1.0
+                                                  : 0.0,
+                                              duration:
+                                                  Duration(milliseconds: 500),
+
+                                              child: Text(
+                                                'Click to see more information',
+                                                maxLines: 1,
+                                                style: TextStyle(
+                                                    fontSize: 12,
+                                                    fontWeight: FontWeight.w500,
+                                                    color: Colors.grey),
+                                              ),
+                                            ),
+                                            SizedBox(height: 5),
+                                          ],
+                                        ),
+                                      )
+                                    ],
+                                  ),
+                                ),
+                              ),
+                            ),
+                            ExpandedSection(
+                                expand: _isExpanded[index],
+                                child: Column(
+                                  children: <Widget>[
+                                    Container(
+                                      padding: EdgeInsets.fromLTRB(60, 0, 0, 5),
+                                      width: double.infinity,
+                                      child: Text(
+                                        "Rating: ${Global.ratings[index]} ",
+                                        overflow: TextOverflow.ellipsis,
+                                        softWrap: true,
+                                        style: TextStyle(
+                                          color: Color(0xff757575),
+                                          fontWeight: FontWeight.bold,
+                                          fontSize: 15,
+                                        ),
+                                        textAlign: TextAlign.left,
+                                      ),
+                                    ),
+                                    Container(
+                                      padding: EdgeInsets.fromLTRB(60, 0, 0, 5),
+                                      width: double.infinity,
+                                      child: Text(
+                                        Global.phoneNums[index] == ''
+                                            ? 'Phone number is unavailable'
+                                            : 'Phone Number: ${Global.phoneNums[index]}',
+                                        overflow: TextOverflow.ellipsis,
+                                        softWrap: true,
+                                        style: TextStyle(
+                                            fontWeight: FontWeight.bold,
+                                            fontSize: 15,
+                                            color: Color(0xff757575)),
+                                        textAlign: TextAlign.left,
+                                      ),
+                                    ),
+                                    Container(
+                                      padding: EdgeInsets.fromLTRB(60, 0, 0, 5),
+                                      width: double.infinity,
+                                      child: Text(
+                                        Global.prices[index] == null
+                                            ? 'Price is unavailable'
+                                            : 'Price: ${Global.prices[index]}',
+                                        overflow: TextOverflow.ellipsis,
+                                        softWrap: true,
+                                        style: TextStyle(
+                                            fontWeight: FontWeight.bold,
+                                            fontSize: 15,
+                                            color: Color(0xff757575)),
+                                        textAlign: TextAlign.left,
+                                      ),
+                                    ),
+                                    Container(
+                                        child: Text(
+                                            'INSERT BUTTON FOR YELP LINK HERE')),
+                                  ],
+                                )),
+                            /*Container(
                         margin: EdgeInsets.fromLTRB(8, 8, 8, 8),
                         height: 90,
                         width: 90,
@@ -207,9 +374,13 @@ class _MapRenderState extends State<MapRender> {
                             SizedBox(height: 5),
                           ],
                         ),
-                      )
-                    ],
-                  ),
+                      )*/
+                          ],
+                          // ),
+                        ),
+                      ),
+                    ),
+                  ],
                 ),
               ),
             );
@@ -230,7 +401,7 @@ class _MapRenderState extends State<MapRender> {
       panel: Center(
         child: Container(
             decoration: BoxDecoration(
-              color: Color(0xffd8eefe),
+              color: Color(0xfffddd75),
               borderRadius: BorderRadius.only(
                 topLeft: Radius.circular(75.0),
                 topRight: Radius.circular(75.0),
@@ -241,7 +412,7 @@ class _MapRenderState extends State<MapRender> {
       ),
       collapsed: Container(
         decoration: BoxDecoration(
-          color: Color(0xffd8eefe),
+          color: Color(0xfffddd75),
           borderRadius: BorderRadius.only(
               topLeft: Radius.circular(75.0), topRight: Radius.circular(75.0)),
         ),
@@ -261,7 +432,7 @@ class _MapRenderState extends State<MapRender> {
     return Theme(
       data: Theme.of(context).copyWith(
         canvasColor:
-            Color(0xffffccbb), //This will change the drawer background to blue.
+            Color(0xfffddd75), //This will change the drawer background to blue.
         //other styles
       ),
       child: Container(
@@ -334,10 +505,11 @@ class _MapRenderState extends State<MapRender> {
                   onTap: null,
                 ),
               ),
+
               Container(
                 child: ListTile(
                   title: Text(
-                    'Final Location:',
+                    'Final Location: ',
                     style: TextStyle(
                       fontSize: 20,
                     ),
@@ -349,7 +521,8 @@ class _MapRenderState extends State<MapRender> {
                 padding: EdgeInsets.fromLTRB(30, 0, 0, 0),
                 child: ListTile(
                   title: SelectableText(
-                    "${FirebaseFunctions.roomData["Final Location"]}" ?? "No location set",
+                    "${FirebaseFunctions.roomData["Final Location"]}" ??
+                        "No location set",
                     style: TextStyle(
                       fontSize: 20,
                     ),
@@ -372,8 +545,9 @@ class _MapRenderState extends State<MapRender> {
               Container(
                 padding: EdgeInsets.fromLTRB(30, 0, 0, 0),
                 child: ListTile(
-                  title:SelectableText(
-                    "${FirebaseFunctions.roomData["Final Location Address"]}" ?? "No address set",
+                  title: SelectableText(
+                    "${FirebaseFunctions.roomData["Final Location Address"]}" ??
+                        "No address set",
                     style: TextStyle(
                       fontSize: 20,
                     ),
@@ -479,13 +653,13 @@ class _MapRenderState extends State<MapRender> {
   Widget _midpointSlider() {
     return SliderTheme(
         data: SliderTheme.of(context).copyWith(
-          activeTrackColor: Colors.red[500],
-          inactiveTrackColor: Colors.white,
+          activeTrackColor: Colors.black,
+          inactiveTrackColor: Color(0xff757575),
           trackShape: RectangularSliderTrackShape(),
-          trackHeight: 5.0,
+          trackHeight: 8.0,
           thumbColor: Colors.white,
           thumbShape: RoundSliderThumbShape(enabledThumbRadius: 10.0),
-          overlayColor: Colors.red.withAlpha(32),
+          overlayColor: Colors.orange.withAlpha(300),
           overlayShape: RoundSliderOverlayShape(overlayRadius: 28.0),
         ),
         child: Container(
@@ -559,9 +733,9 @@ class _MapRenderState extends State<MapRender> {
             style: new TextStyle(fontSize: 20.0, color: Colors.black)),
         onPressed: () async {
           //Adding some code to turn off all listeners
-          Global.mapRPnameListListener.removeListener((){});
+          Global.mapRPnameListListener.removeListener(() {});
           //Global.mapRPnameListListener.dispose();
-          Global.mapRPfindYPListener.removeListener((){});
+          Global.mapRPfindYPListener.removeListener(() {});
           //Global.mapRPfindYPListener.dispose();
           Global.findYPCalled.removeListener(() {});
           //Global.findYPCalled.dispose();
@@ -602,4 +776,3 @@ class _MapRenderState extends State<MapRender> {
 //);
   }
 }
-

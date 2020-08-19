@@ -10,7 +10,7 @@ Widget appBarMain(BuildContext context) {
       'Rendezvous',
       style: TextStyle(color: Colors.black, fontFamily: 'Goldplay'),
     ),
-    backgroundColor: Color(0xffcaf7dc),
+    backgroundColor: Color(0xfffddd75),
   );
 }
 
