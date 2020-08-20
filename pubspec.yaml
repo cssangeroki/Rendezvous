@@ -25,6 +25,7 @@ dependencies:
     sdk: flutter
   geolocator: ^5.3.2+2 #API for location services
   google_maps_flutter: ^0.5.28+1 #API for Maps services
+  flutter_polyline_points: ^0.2.2 #API to display routes on Google Map
   http: ^0.12.0+1
   json_serializable: ^3.3.0
   sliding_up_panel: ^1.0.2 # adds slide up panel functionality

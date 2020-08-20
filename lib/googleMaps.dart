@@ -11,6 +11,7 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 
 import "globalVar.dart";
 import "findYelpPlaces.dart";
+import 'package:flutter_polyline_points/flutter_polyline_points.dart';
 
 //Here I'm creating a reference to our firebase
 final firebase = Firestore.instance;
@@ -65,7 +66,7 @@ class _GoogleMapsState extends State<GoogleMaps> {
 
 //Creating a variable currPosition that will be used to store the users current position
   Position currPosition;
-
+  LatLng currLocation;
   //static List<String> nameList = [];
 
   //static StreamSubscription<QuerySnapshot> memberListener;
@@ -82,6 +83,15 @@ class _GoogleMapsState extends State<GoogleMaps> {
 //Creating a variable markers that will be used to implement a marker in google maps
   Set<Marker> _markers = {};
 
+  //Creating a variable that will be used to store the Paths
+  Set<Polyline> _polylines = {};
+
+  //This will hold each polyline coordinate as a LatLng pair
+  List<LatLng> polylineCoordinates = [];
+
+  //This is what will actually be used to generate the polylines between each LatLng
+  PolylinePoints polylinePoints = PolylinePoints();
+
 //Going to create a string which will store the midpoint address
   String midAddress;
 
@@ -89,6 +99,7 @@ class _GoogleMapsState extends State<GoogleMaps> {
   bool confirmDialogTrigger = false;
   String finalLocName;
   String finalLocAddress;
+  LatLng finalLatLng;
 
 //Marker _markers;
 //Function initState initialises the state of variables
@@ -256,8 +267,10 @@ class _GoogleMapsState extends State<GoogleMaps> {
   void addYelpMarkers() {
     print("Entered Yelp markers. resultCords = ${Global.resultCords.length}");
     //First, remove all the current yelp markers
-    _markers.removeWhere((element) => (element.infoWindow.snippet != 'Your Location' &&
-        element.infoWindow.snippet != "Midpoint" && element.infoWindow.snippet != ''));
+    _markers.removeWhere((element) =>
+        (element.infoWindow.snippet != 'Your Location' &&
+            element.infoWindow.snippet != "Midpoint" &&
+            element.infoWindow.snippet != ''));
     //For every location we found, we need to add a marker
     setState(() {
       for (int i = 0; i < Global.resultCords.length; i++) {
@@ -275,6 +288,8 @@ class _GoogleMapsState extends State<GoogleMaps> {
               confirmDialogTrigger = true;
               finalLocName = Global.names[i];
               finalLocAddress = Global.locations[i];
+              finalLatLng = LatLng(Global.resultCords[i].latitude,
+                  Global.resultCords[i].longitude);
               //confirmFinalPosition();
             });
           }, //Want to add a stateless widget here,
@@ -326,6 +341,7 @@ class _GoogleMapsState extends State<GoogleMaps> {
               confirmDialogTrigger = true;
               finalLocName = "Midpoint";
               finalLocAddress = midAddress;
+              finalLatLng = LatLng(currentMidLat, currentMidLon);
               //confirmFinalPosition();
             });
           } //Setting midpoint marker to blue so it's identifiable
@@ -349,7 +365,7 @@ class _GoogleMapsState extends State<GoogleMaps> {
         .document(userDocID)
         .updateData(
             {"location": GeoPoint(_center.latitude, _center.longitude)});
-    print("Updated users location");
+    //print("Updated users location");
   }
 
   //This function will change the marker of the current user, so that a user can only edit their own marker
@@ -358,6 +374,7 @@ class _GoogleMapsState extends State<GoogleMaps> {
 //Getting the correct address in searchAddr. Using await to ensure we get the right address.
     //print("Entered _onAddMarkerButtonPressed. Center = $_center");
     await _getUserAddress();
+    currLocation = _lastMapPosition;
     //First I remove the toRemove marker from _markers
     setState(() {
       _markers.removeWhere((marker) => marker.markerId.value == "User");
@@ -394,12 +411,32 @@ class _GoogleMapsState extends State<GoogleMaps> {
     });
   }
 
+  void setPolyLines() async {
+    polylineCoordinates.clear();
+    PointLatLng userLocation =
+        PointLatLng(currLocation.latitude, currLocation.longitude);
+    PointLatLng destination =
+        PointLatLng(finalLatLng.latitude, finalLatLng.longitude);
+    //Get the route using the google api key
+    PolylineResult route = await polylinePoints?.getRouteBetweenCoordinates(
+        "AIzaSyAFGuq9qZc6xGWB6S5NHZgpyExhUldiwjU", userLocation, destination);
+    if (route != null) {
+      route.points.forEach((element) {
+        polylineCoordinates.add(LatLng(element.latitude, element.longitude));
+      });
+    }
+    //This line actually changes the route on the map
+    setState(() {
+      _polylines.clear();
+      _polylines.add(Polyline(polylineId: PolylineId("Final Route"), color: Colors.deepPurpleAccent, points: polylineCoordinates));
+    });
+  }
+
   //Widget for when a marker is tapped
   Widget confirmFinalPosition() {
     if ((FirebaseFunctions.currentUserData["userName"] ==
             FirebaseFunctions.roomData["host"]) &&
         (confirmDialogTrigger == true)) {
-      print("DialogBox should appear");
       return Padding(
           padding: const EdgeInsets.fromLTRB(0.0, 10.0, 0.0, 0.0),
           child: FloatingActionButton(
@@ -408,6 +445,7 @@ class _GoogleMapsState extends State<GoogleMaps> {
                 FirebaseFunctions.setFinalPosition(
                     finalLocName, finalLocAddress);
               });
+              setPolyLines();
             },
             materialTapTargetSize: MaterialTapTargetSize.padded,
             backgroundColor: Colors.greenAccent,
@@ -450,8 +488,9 @@ class _GoogleMapsState extends State<GoogleMaps> {
                   ),
                   markers: _markers,
 //Adding the marker property to Google Maps Widget
-                  onCameraMove:
-                      _onCameraMove, //Moving the center each time we move on the map, by calling _onCameraMove
+                  onCameraMove: _onCameraMove,
+                  polylines:
+                      _polylines, //Moving the center each time we move on the map, by calling _onCameraMove
                 ),
                 Positioned(
                   top: 30,
