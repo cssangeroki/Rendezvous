@@ -518,10 +518,8 @@ class GoogleMapsState extends State<GoogleMaps> {
                         _polylines, //Moving the center each time we move on the map, by calling _onCameraMove
                   ),
                 ),
-                Positioned(
-                    top: 60,
-                    right: 330,
-                    left: 0,
+                Container(
+                    padding: EdgeInsets.fromLTRB(10, 60, 0, 0),
                     child: FloatingActionButton(
                       backgroundColor: Color(Global.backgroundColor),
                       child: Icon(

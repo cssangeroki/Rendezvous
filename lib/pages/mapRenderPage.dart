@@ -124,7 +124,7 @@ class _MapRenderState extends State<MapRender> {
       return Container(
         height: 500,
         width: 500,
-        color: Color(Global.primaryColor),
+        color: Color(Global.backgroundColor),
         child: Text(
           "No Places Found.",
           style: TextStyle(
@@ -156,223 +156,238 @@ class _MapRenderState extends State<MapRender> {
                   ),
                 ],
               ),
-              child: Container(
-                //padding: EdgeInsets.fromLTRB(10, 0, 10, 0),
+              child: Column(
+                children: <Widget>[
+                  Container(
+                    //padding: EdgeInsets.fromLTRB(10, 0, 10, 0),
 
-                /*child: Link(
+                    /*child: Link(
                   url: Global.urls[index],*/
-                child: Row(
-                  children: <Widget>[
-                    Center(
-                      child: Container(
-                        width: 368.0,
-                        child: Column(
-                          mainAxisSize: MainAxisSize.min,
-                          children: <Widget>[
-                            Container(
-                              width: double.infinity,
-                              decoration: BoxDecoration(
-                                borderRadius: BorderRadius.only(
-                                    topLeft: Radius.circular(10),
-                                    topRight: Radius.circular(10)),
-                              ),
-                              child: InkWell(
-                                onTap: () => _toggleExpand(index),
-                                child: Container(
-                                  child: Row(
-                                    children: <Widget>[
-                                      Container(
-                                        width: 90,
-                                        height: 90,
-                                        padding: EdgeInsets.all(8),
-                                        child: ClipRRect(
-                                          borderRadius: BorderRadius.all(
-                                            Radius.circular(10),
+                    child: Row(
+                      children: <Widget>[
+                        Center(
+                          child: Container(
+                            width: MediaQuery.of(context).size.width * 0.87,
+                            child: Column(
+                              mainAxisSize: MainAxisSize.min,
+                              children: <Widget>[
+                                Container(
+                                  width: double.infinity,
+                                  decoration: BoxDecoration(
+                                    borderRadius: BorderRadius.only(
+                                        topLeft: Radius.circular(10),
+                                        topRight: Radius.circular(10)),
+                                  ),
+                                  child: InkWell(
+                                    onTap: () => _toggleExpand(index),
+                                    child: Container(
+                                      child: Row(
+                                        children: <Widget>[
+                                          Container(
+                                            width: 90,
+                                            height: 90,
+                                            padding: EdgeInsets.all(8),
+                                            child: ClipRRect(
+                                              borderRadius: BorderRadius.all(
+                                                Radius.circular(10),
+                                              ),
+                                              child: Image.network(
+                                                Global.images[index] == null
+                                                    ? 'https://firebasestorage.googleapis.com/v0/b/rendezvous-b51b4.appspot.com/o/photo-1550747545-c896b5f89ff7.jpeg?alt=media&token=eb3eb883-86da-4b89-87e1-7490fd518910'
+                                                    : '${Global.images[index]}',
+                                                // 'https://firebasestorage.googleapis.com/v0/b/rendezvous-b51b4.appspot.com/o/photo-1550747545-c896b5f89ff7.jpeg?alt=media&token=eb3eb883-86da-4b89-87e1-7490fd518910',
+                                                fit: BoxFit.cover,
+                                              ),
+                                            ),
                                           ),
-                                          child: Image.network(
-                                            Global.images[index] == null
-                                                ? 'https://firebasestorage.googleapis.com/v0/b/rendezvous-b51b4.appspot.com/o/photo-1550747545-c896b5f89ff7.jpeg?alt=media&token=eb3eb883-86da-4b89-87e1-7490fd518910'
-                                                : '${Global.images[index]}',
-                                            // 'https://firebasestorage.googleapis.com/v0/b/rendezvous-b51b4.appspot.com/o/photo-1550747545-c896b5f89ff7.jpeg?alt=media&token=eb3eb883-86da-4b89-87e1-7490fd518910',
-                                            fit: BoxFit.cover,
-                                          ),
-                                        ),
-                                      ),
-                                      SizedBox(width: 5.0),
-                                      Flexible(
-                                        child: Column(
-                                          crossAxisAlignment:
-                                              CrossAxisAlignment.start,
-                                          children: <Widget>[
-                                            MergeSemantics(
-                                              child: Row(
-                                                children: <Widget>[
-                                                  Flexible(
-                                                    child: Container(
-                                                      padding:
-                                                          EdgeInsets.fromLTRB(
-                                                              0, 0, 0, 0),
-                                                      child: Text(
-                                                        "${Global.names[index]} ",
-                                                        overflow: TextOverflow
-                                                            .ellipsis,
-                                                        softWrap: true,
-                                                        style: TextStyle(
-                                                          fontFamily:
-                                                              'GoldPlay',
-                                                          color: Colors.black
-                                                              .withAlpha(200),
-                                                          fontWeight:
-                                                              FontWeight.normal,
-                                                          fontSize: 18,
+                                          SizedBox(width: 5.0),
+                                          Flexible(
+                                            child: Column(
+                                              crossAxisAlignment:
+                                                  CrossAxisAlignment.start,
+                                              children: <Widget>[
+                                                MergeSemantics(
+                                                  child: Row(
+                                                    children: <Widget>[
+                                                      Flexible(
+                                                        child: Container(
+                                                          padding: EdgeInsets
+                                                              .fromLTRB(
+                                                                  0, 0, 0, 0),
+                                                          child: Text(
+                                                            "${Global.names[index]} ",
+                                                            overflow:
+                                                                TextOverflow
+                                                                    .ellipsis,
+                                                            softWrap: true,
+                                                            style: TextStyle(
+                                                              fontFamily:
+                                                                  'GoldPlay',
+                                                              color: Colors
+                                                                  .black
+                                                                  .withAlpha(
+                                                                      200),
+                                                              fontWeight:
+                                                                  FontWeight
+                                                                      .normal,
+                                                              fontSize: 18,
+                                                            ),
+                                                            textAlign:
+                                                                TextAlign.left,
+                                                          ),
                                                         ),
-                                                        textAlign:
-                                                            TextAlign.left,
+                                                        //textAlign: TextAlign.right,
                                                       ),
-                                                    ),
-                                                    //textAlign: TextAlign.right,
+                                                    ],
                                                   ),
-                                                ],
-                                              ),
-                                            ),
-                                            SizedBox(height: 5),
-                                            AnimatedOpacity(
-                                              // If the widget is visible, animate to 0.0 (invisible).
-                                              // If the widget is hidden, animate to 1.0 (fully visible).
-                                              opacity: !_isExpanded[index]
-                                                  ? 1.0
-                                                  : 0.0,
-                                              duration:
-                                                  Duration(milliseconds: 500),
+                                                ),
+                                                SizedBox(height: 5),
+                                                AnimatedOpacity(
+                                                  // If the widget is visible, animate to 0.0 (invisible).
+                                                  // If the widget is hidden, animate to 1.0 (fully visible).
+                                                  opacity: !_isExpanded[index]
+                                                      ? 1.0
+                                                      : 0.0,
+                                                  duration: Duration(
+                                                      milliseconds: 500),
 
-                                              child: Text(
-                                                'Click to see more information',
-                                                maxLines: 1,
-                                                style: TextStyle(
-                                                    fontSize: 12,
-                                                    fontWeight: FontWeight.w500,
-                                                    color: Colors.grey),
-                                              ),
+                                                  child: Text(
+                                                    'Click to see more information',
+                                                    maxLines: 1,
+                                                    style: TextStyle(
+                                                        fontSize: 12,
+                                                        fontWeight:
+                                                            FontWeight.w500,
+                                                        color: Colors.grey),
+                                                  ),
+                                                ),
+                                                SizedBox(height: 5),
+                                              ],
                                             ),
-                                            SizedBox(height: 5),
-                                          ],
-                                        ),
-                                      )
-                                    ],
+                                          )
+                                        ],
+                                      ),
+                                    ),
                                   ),
                                 ),
-                              ),
-                            ),
-                            ExpandedSection(
-                                expand: _isExpanded[index],
-                                child: Column(
-                                  children: <Widget>[
-                                    Container(
-                                      padding: EdgeInsets.fromLTRB(60, 0, 0, 5),
-                                      width: double.infinity,
-                                      child: Text(
-                                        "Rating: ${Global.ratings[index]} ",
-                                        overflow: TextOverflow.ellipsis,
-                                        softWrap: true,
-                                        style: TextStyle(
-                                          color: Color(Global.blackColor),
-                                          fontWeight: FontWeight.bold,
-                                          fontSize: 15,
-                                        ),
-                                        textAlign: TextAlign.left,
-                                      ),
-                                    ),
-                                    Container(
-                                      padding: EdgeInsets.fromLTRB(60, 0, 0, 5),
-                                      width: double.infinity,
-                                      child: Text(
-                                        Global.phoneNums[index] == ''
-                                            ? 'Phone number is unavailable'
-                                            : 'Phone Number: ${Global.phoneNums[index]}',
-                                        overflow: TextOverflow.ellipsis,
-                                        softWrap: true,
-                                        style: TextStyle(
-                                            fontWeight: FontWeight.bold,
-                                            fontSize: 15,
-                                            color: Color(Global.blackColor)),
-                                        textAlign: TextAlign.left,
-                                      ),
-                                    ),
-                                    Container(
-                                      padding: EdgeInsets.fromLTRB(60, 0, 0, 5),
-                                      width: double.infinity,
-                                      child: Text(
-                                        Global.prices[index] == null
-                                            ? 'Price is unavailable'
-                                            : 'Price: ${Global.prices[index]}',
-                                        overflow: TextOverflow.ellipsis,
-                                        softWrap: true,
-                                        style: TextStyle(
-                                            fontWeight: FontWeight.bold,
-                                            fontSize: 15,
-                                            color: Color(0xff757575)),
-                                        textAlign: TextAlign.left,
-                                      ),
-                                    ),
-                                    Container(
-                                      width: double.infinity,
-                                      height: 95,
-                                      child: Stack(children: <Widget>[
-                                        //Final Position Button
-                                        Positioned(
-                                          top: 10,
-                                          left: 30,
-                                          child: Container(
-                                            height: 70,
-                                            width: 70,
-                                            child: FittedBox(
-                                              child: FloatingActionButton(
-                                                backgroundColor:
-                                                    Color(0xff21bf73),
-                                                child: Icon(
-                                                  Icons.check_circle,
-                                                  size: 40,
-                                                ),
-                                                elevation: 2,
-                                                onPressed: null,
-                                              ),
+                                ExpandedSection(
+                                    expand: _isExpanded[index],
+                                    child: Column(
+                                      children: <Widget>[
+                                        Container(
+                                          padding:
+                                              EdgeInsets.fromLTRB(60, 0, 0, 5),
+                                          width: double.infinity,
+                                          child: Text(
+                                            "Rating: ${Global.ratings[index]} ",
+                                            overflow: TextOverflow.ellipsis,
+                                            softWrap: true,
+                                            style: TextStyle(
+                                              color: Color(Global.blackColor),
+                                              fontWeight: FontWeight.bold,
+                                              fontSize: 15,
                                             ),
+                                            textAlign: TextAlign.left,
                                           ),
                                         ),
-                                        //Yelp Button
-                                        Positioned(
-                                          top: 10,
-                                          left: 260,
-                                          child: Container(
+                                        Container(
+                                          padding:
+                                              EdgeInsets.fromLTRB(60, 0, 0, 5),
+                                          width: double.infinity,
+                                          child: Text(
+                                            Global.phoneNums[index] == ''
+                                                ? 'Phone number is unavailable'
+                                                : 'Phone Number: ${Global.phoneNums[index]}',
+                                            overflow: TextOverflow.ellipsis,
+                                            softWrap: true,
+                                            style: TextStyle(
+                                                fontWeight: FontWeight.bold,
+                                                fontSize: 15,
+                                                color:
+                                                    Color(Global.blackColor)),
+                                            textAlign: TextAlign.left,
+                                          ),
+                                        ),
+                                        Container(
+                                          padding:
+                                              EdgeInsets.fromLTRB(60, 0, 0, 5),
+                                          width: double.infinity,
+                                          child: Text(
+                                            Global.prices[index] == null
+                                                ? 'Price is unavailable'
+                                                : 'Price: ${Global.prices[index]}',
+                                            overflow: TextOverflow.ellipsis,
+                                            softWrap: true,
+                                            style: TextStyle(
+                                                fontWeight: FontWeight.bold,
+                                                fontSize: 15,
+                                                color: Color(0xff757575)),
+                                            textAlign: TextAlign.left,
+                                          ),
+                                        ),
+                                        Container(
+                                          width: double.infinity,
+                                          height: 95,
+                                          child: Row(children: <Widget>[
+                                            //Final Position Button
+
+                                            Container(
+                                              margin: EdgeInsets.fromLTRB(
+                                                  20, 0, 0, 0),
                                               height: 70,
                                               width: 70,
                                               child: FittedBox(
                                                 child: FloatingActionButton(
-                                                    backgroundColor:
-                                                        Color(0xffaa1802),
-                                                    child: Container(
-                                                      height: 50,
-                                                      width: 50,
-                                                      child: Image.asset(
-                                                        'images/yelp_icon.png',
-                                                      ),
-                                                    ),
-                                                    elevation: 2,
-                                                    onPressed: () {
-                                                      launch(
-                                                          Global.urls[index]);
-                                                    }),
-                                              )),
-                                        ),
+                                                  backgroundColor:
+                                                      Color(0xff21bf73),
+                                                  child: Icon(
+                                                    Icons.check_circle,
+                                                    size: 40,
+                                                  ),
+                                                  elevation: 2,
+                                                  onPressed: null,
+                                                ),
+                                              ),
+                                            ),
 
-                                        SizedBox(
-                                          height: 20,
-                                        )
-                                      ]),
-                                    ),
-                                  ],
-                                )),
-                            /*Container(
+                                            //Yelp Button
+                                            Container(
+                                                height: 70,
+                                                width: 70,
+                                                margin: EdgeInsets.fromLTRB(
+                                                    MediaQuery.of(context)
+                                                            .size
+                                                            .width *
+                                                        0.44,
+                                                    0,
+                                                    0,
+                                                    0),
+                                                child: FittedBox(
+                                                  child: FloatingActionButton(
+                                                      backgroundColor:
+                                                          Color(0xffaa1802),
+                                                      child: Container(
+                                                        height: 50,
+                                                        width: 50,
+                                                        child: Image.asset(
+                                                          'images/yelp_icon.png',
+                                                        ),
+                                                      ),
+                                                      elevation: 2,
+                                                      onPressed: () {
+                                                        launch(
+                                                            Global.urls[index]);
+                                                      }),
+                                                )),
+
+                                            SizedBox(
+                                              height: 20,
+                                            )
+                                          ]),
+                                        ),
+                                      ],
+                                    )),
+                                /*Container(
                         margin: EdgeInsets.fromLTRB(8, 8, 8, 8),
                         height: 90,
                         width: 90,
@@ -433,13 +448,15 @@ class _MapRenderState extends State<MapRender> {
                           ],
                         ),
                       )*/
-                          ],
-                          // ),
+                              ],
+                              // ),
+                            ),
+                          ),
                         ),
-                      ),
+                      ],
                     ),
-                  ],
-                ),
+                  ),
+                ],
               ),
             );
           },
