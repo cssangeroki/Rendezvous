@@ -1,9 +1,10 @@
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'dart:async';
-import '../appBar.dart';
+
 import 'firebaseFunctions.dart';
 import '../expandedSection.dart';
+import 'package:url_launcher/url_launcher.dart';
 
 import 'package:cloud_firestore/cloud_firestore.dart';
 
@@ -21,10 +22,12 @@ double userSliderVal = 5;
 String category;
 //Here I'm creating a reference to our firebase
 final firebase = Firestore.instance;
+GlobalKey<_MapRenderState> renderKey = GlobalKey<_MapRenderState>();
 
 class MapRender extends StatefulWidget {
   final Widget child;
   final bool expand;
+
   MapRender({this.expand = false, this.child});
   @override
   _MapRenderState createState() => _MapRenderState();
@@ -35,7 +38,9 @@ class _MapRenderState extends State<MapRender> {
   final String userDocID = FirebaseFunctions.currentUID;
   final String roomDocID = FirebaseFunctions.currentUserData["roomCode"];
   StreamSubscription<DocumentSnapshot> roomListener;
+
   var _isExpanded = new List<bool>.filled(50, false, growable: true);
+
   @override
   void initState() {
     super.initState();
@@ -81,7 +86,7 @@ class _MapRenderState extends State<MapRender> {
   }
 
   //This functions is used when we search a category for yelp
-  void _searchingYelpCategory() async {
+  void searchingYelpCategory() async {
     print("Entered searchingYelpCategory");
     await YelpPlaces.findingPlaces();
     print("Returned from findingPlaces");
@@ -119,7 +124,7 @@ class _MapRenderState extends State<MapRender> {
       return Container(
         height: 500,
         width: 500,
-        color: Color(0xfffddd75),
+        color: Color(Global.primaryColor),
         child: Text(
           "No Places Found.",
           style: TextStyle(
@@ -139,15 +144,15 @@ class _MapRenderState extends State<MapRender> {
             return new Container(
               margin: EdgeInsets.fromLTRB(15, 10, 15, 10),
               decoration: BoxDecoration(
-                color: Color(0xfff0f0f0),
-                border: Border.all(color: Colors.black38),
+                color: Color(Global.whiteColor),
+                //border: Border.all(color: Colors.black38),
                 borderRadius: BorderRadius.all(Radius.circular(10)),
                 boxShadow: [
                   BoxShadow(
-                    color: Colors.grey.withOpacity(0.3),
+                    color: Colors.grey.withOpacity(0.6),
                     spreadRadius: 0.5,
                     blurRadius: 6,
-                    offset: Offset(8, 5), // changes position of shadow
+                    offset: Offset(7, 6), // changes position of shadow
                   ),
                 ],
               ),
@@ -270,7 +275,7 @@ class _MapRenderState extends State<MapRender> {
                                         overflow: TextOverflow.ellipsis,
                                         softWrap: true,
                                         style: TextStyle(
-                                          color: Color(0xff757575),
+                                          color: Color(Global.blackColor),
                                           fontWeight: FontWeight.bold,
                                           fontSize: 15,
                                         ),
@@ -289,7 +294,7 @@ class _MapRenderState extends State<MapRender> {
                                         style: TextStyle(
                                             fontWeight: FontWeight.bold,
                                             fontSize: 15,
-                                            color: Color(0xff757575)),
+                                            color: Color(Global.blackColor)),
                                         textAlign: TextAlign.left,
                                       ),
                                     ),
@@ -310,8 +315,61 @@ class _MapRenderState extends State<MapRender> {
                                       ),
                                     ),
                                     Container(
-                                        child: Text(
-                                            'INSERT BUTTON FOR YELP LINK HERE')),
+                                      width: double.infinity,
+                                      height: 95,
+                                      child: Stack(children: <Widget>[
+                                        //Final Position Button
+                                        Positioned(
+                                          top: 10,
+                                          left: 30,
+                                          child: Container(
+                                            height: 70,
+                                            width: 70,
+                                            child: FittedBox(
+                                              child: FloatingActionButton(
+                                                backgroundColor:
+                                                    Color(0xff21bf73),
+                                                child: Icon(
+                                                  Icons.check_circle,
+                                                  size: 40,
+                                                ),
+                                                elevation: 2,
+                                                onPressed: null,
+                                              ),
+                                            ),
+                                          ),
+                                        ),
+                                        //Yelp Button
+                                        Positioned(
+                                          top: 10,
+                                          left: 260,
+                                          child: Container(
+                                              height: 70,
+                                              width: 70,
+                                              child: FittedBox(
+                                                child: FloatingActionButton(
+                                                    backgroundColor:
+                                                        Color(0xffaa1802),
+                                                    child: Container(
+                                                      height: 50,
+                                                      width: 50,
+                                                      child: Image.asset(
+                                                        'images/yelp_icon.png',
+                                                      ),
+                                                    ),
+                                                    elevation: 2,
+                                                    onPressed: () {
+                                                      launch(
+                                                          Global.urls[index]);
+                                                    }),
+                                              )),
+                                        ),
+
+                                        SizedBox(
+                                          height: 20,
+                                        )
+                                      ]),
+                                    ),
                                   ],
                                 )),
                             /*Container(
@@ -395,16 +453,16 @@ class _MapRenderState extends State<MapRender> {
       //maxHeight: 600,
       backdropEnabled: true,
       borderRadius: BorderRadius.only(
-        topLeft: Radius.circular(75.0),
-        topRight: Radius.circular(75.0),
+        topLeft: Radius.circular(20.0),
+        topRight: Radius.circular(20.0),
       ),
       panel: Center(
         child: Container(
             decoration: BoxDecoration(
-              color: Color(0xfffddd75),
+              color: Color(Global.backgroundColor),
               borderRadius: BorderRadius.only(
-                topLeft: Radius.circular(75.0),
-                topRight: Radius.circular(75.0),
+                topLeft: Radius.circular(20.0),
+                topRight: Radius.circular(20.0),
               ),
             ),
             padding: EdgeInsets.fromLTRB(0, 80, 0, 0),
@@ -412,18 +470,14 @@ class _MapRenderState extends State<MapRender> {
       ),
       collapsed: Container(
         decoration: BoxDecoration(
-          color: Color(0xfffddd75),
+          color: Color(Global.backgroundColor),
           borderRadius: BorderRadius.only(
-              topLeft: Radius.circular(75.0), topRight: Radius.circular(75.0)),
+              topLeft: Radius.circular(20.0), topRight: Radius.circular(20.0)),
         ),
-        child: Center(
-          child: Text(
-            'Swipe up for menu',
-            style: TextStyle(fontSize: 20, fontFamily: 'Goldplay'),
-          ),
-        ),
+        child: Center(child: Container()),
       ),
-      minHeight: 100,
+      minHeight: MediaQuery.of(context).size.height * 0.10,
+      maxHeight: MediaQuery.of(context).size.height * 0.70,
       body: GoogleMaps(),
     );
   }
@@ -431,8 +485,8 @@ class _MapRenderState extends State<MapRender> {
   Widget _viewDrawer() {
     return Theme(
       data: Theme.of(context).copyWith(
-        canvasColor:
-            Color(0xfffddd75), //This will change the drawer background to blue.
+        canvasColor: Color(Global
+            .backgroundColor), //This will change the drawer background to blue.
         //other styles
       ),
       child: Container(
@@ -637,7 +691,7 @@ class _MapRenderState extends State<MapRender> {
             contentPadding: EdgeInsets.only(left: 15.0, top: 15.0),
             suffixIcon: IconButton(
               icon: Icon(Icons.search),
-              onPressed: _searchingYelpCategory,
+              onPressed: searchingYelpCategory,
               iconSize: 20.0,
             )),
         onChanged: (val) {
@@ -659,7 +713,7 @@ class _MapRenderState extends State<MapRender> {
           trackHeight: 8.0,
           thumbColor: Colors.white,
           thumbShape: RoundSliderThumbShape(enabledThumbRadius: 10.0),
-          overlayColor: Colors.orange.withAlpha(300),
+          overlayColor: Colors.red.withAlpha(300),
           overlayShape: RoundSliderOverlayShape(overlayRadius: 28.0),
         ),
         child: Container(
@@ -676,7 +730,7 @@ class _MapRenderState extends State<MapRender> {
                 //can I do this
                 Global.finalRad = val;
               });
-              _searchingYelpCategory();
+              searchingYelpCategory();
             },
             min: 1,
             max: 25,
@@ -768,8 +822,16 @@ class _MapRenderState extends State<MapRender> {
     return MaterialApp(
       debugShowCheckedModeBanner: false,
       home: Scaffold(
-        appBar: appBarMain(context),
-        body: _slideUpPanel(),
+        //appBar: appBarMain(context),
+        body: Container(
+          color: Color(Global.backgroundColor),
+          child: ClipRRect(
+              borderRadius: BorderRadius.only(
+                topLeft: Radius.circular(10),
+                topRight: Radius.circular(10),
+              ),
+              child: _slideUpPanel()),
+        ),
         drawer: _viewDrawer(),
       ),
     );

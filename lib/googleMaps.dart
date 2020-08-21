@@ -3,9 +3,10 @@
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'pages/firebaseFunctions.dart';
+import 'package:flutter/services.dart';
 import 'dart:async';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
-
+import 'pages/mapRenderPage.dart';
 import 'package:geolocator/geolocator.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 
@@ -15,7 +16,8 @@ import 'package:flutter_polyline_points/flutter_polyline_points.dart';
 
 //Here I'm creating a reference to our firebase
 final firebase = Firestore.instance;
-
+String _mapStyle;
+GlobalKey<GoogleMapsState> mapsKey = GlobalKey<GoogleMapsState>();
 //Below is a function that gets the users current location, or last known location.
 //The function will return a Position variable
 Future<Position> currentLocation() async {
@@ -49,26 +51,24 @@ class GoogleMaps extends StatefulWidget {
 //      : context.findAncestorStateOfType<_GoogleMapsState>();
 
   @override
-  _GoogleMapsState createState() => _GoogleMapsState(); //mapsState;
+  GoogleMapsState createState() => GoogleMapsState(); //mapsState;
 
 //  void addYelpMarkers(){
 //    mapsState.addYelpMarkers();
 //  }
 }
 
-class _GoogleMapsState extends State<GoogleMaps> {
+class GoogleMapsState extends State<GoogleMaps> {
   //Creating a global key to access class state outside of the class
-  //GlobalKey<_GoogleMapsState> _myKey = GlobalKey();
 
   final String userDocID = FirebaseFunctions.currentUID;
   final String roomDocID = FirebaseFunctions.currentUserData["roomCode"];
   GoogleMapController mapController;
-
 //Creating a variable currPosition that will be used to store the users current position
   Position currPosition;
   LatLng currLocation;
   //static List<String> nameList = [];
-
+  BitmapDescriptor myIcon;
   //static StreamSubscription<QuerySnapshot> memberListener;
 
 //Initializing center of map
@@ -107,7 +107,23 @@ class _GoogleMapsState extends State<GoogleMaps> {
   @override
   void initState() {
     super.initState();
+    setBitmapIcon();
+    setMapStyle();
     initFunctionCaller();
+  }
+
+  void setMapStyle() {
+    rootBundle.loadString('assets/map_style.txt').then((string) {
+      _mapStyle = string;
+    });
+  }
+
+  void setBitmapIcon() {
+    BitmapDescriptor.fromAssetImage(
+            ImageConfiguration(size: Size(2, 2)), 'images/person.png')
+        .then((onValue) {
+      myIcon = onValue;
+    });
   }
 
   void initFunctionCaller() async {
@@ -245,6 +261,8 @@ class _GoogleMapsState extends State<GoogleMaps> {
   void _onMapCreated(GoogleMapController controller) async {
     print("Creating Map");
     mapController = controller;
+    mapController.setMapStyle(_mapStyle);
+
     print("Done creating Map!");
     _lastMapPosition = _center;
   }
@@ -383,8 +401,7 @@ class _GoogleMapsState extends State<GoogleMaps> {
           markerId: MarkerId("User"),
           position: _lastMapPosition,
           infoWindow: InfoWindow(title: searchAddr, snippet: 'Your Location'),
-//infoWindow: InfoWindow(),
-          icon: BitmapDescriptor.defaultMarker,
+          icon: myIcon,
           onTap: () {
             setState(() {
               confirmDialogTrigger = false;
@@ -394,7 +411,7 @@ class _GoogleMapsState extends State<GoogleMaps> {
     updateUserLocation();
   }
 
-  void _searchandNavigate() async {
+  void searchAndNavigate() async {
 //Get the placemark from the search address, and then store the center and userAddress
     await Geolocator().placemarkFromAddress(searchAddr).then((value) async {
       //Set our _center location to the new position
@@ -428,7 +445,10 @@ class _GoogleMapsState extends State<GoogleMaps> {
     //This line actually changes the route on the map
     setState(() {
       _polylines.clear();
-      _polylines.add(Polyline(polylineId: PolylineId("Final Route"), color: Colors.deepPurpleAccent, points: polylineCoordinates));
+      _polylines.add(Polyline(
+          polylineId: PolylineId("Final Route"),
+          color: Colors.deepPurpleAccent,
+          points: polylineCoordinates));
     });
   }
 
@@ -473,34 +493,53 @@ class _GoogleMapsState extends State<GoogleMaps> {
               child: Text(
                 'loading map..',
                 style: TextStyle(
-                    fontFamily: 'Avenir-Medium', color: Colors.grey[400]),
+                  fontSize: 50,
+                  fontFamily: 'Avenir-Medium',
+                  color: Color(Global.blackColor),
+                ),
               ),
             ),
           )
         : Container(
             child: Stack(
               children: <Widget>[
-                GoogleMap(
-                  onMapCreated: _onMapCreated,
-                  initialCameraPosition: CameraPosition(
-                    target: _center,
-                    zoom: 11.0,
-                  ),
-                  markers: _markers,
+                Container(
+                  child: GoogleMap(
+                    onMapCreated: _onMapCreated,
+
+                    initialCameraPosition: CameraPosition(
+                      target: _center,
+                      zoom: 14.0,
+                    ),
+                    markers: _markers,
 //Adding the marker property to Google Maps Widget
-                  onCameraMove: _onCameraMove,
-                  polylines:
-                      _polylines, //Moving the center each time we move on the map, by calling _onCameraMove
+                    onCameraMove: _onCameraMove,
+                    polylines:
+                        _polylines, //Moving the center each time we move on the map, by calling _onCameraMove
+                  ),
                 ),
                 Positioned(
-                  top: 30,
+                    top: 60,
+                    right: 330,
+                    left: 0,
+                    child: FloatingActionButton(
+                      backgroundColor: Color(Global.backgroundColor),
+                      child: Icon(
+                        Icons.menu,
+                        size: 40,
+                        color: Colors.black.withAlpha(150),
+                      ),
+                      onPressed: () => Scaffold.of(context).openDrawer(),
+                    )),
+                Positioned(
+                  top: 63,
                   right: 15,
-                  left: 15,
+                  left: 80,
                   child: Container(
                     height: 50.0,
                     width: double.infinity,
                     decoration: BoxDecoration(
-                      borderRadius: BorderRadius.circular(5.0),
+                      borderRadius: BorderRadius.circular(10.0),
                       color: Colors.white,
                     ),
                     child: TextField(
@@ -511,7 +550,7 @@ class _GoogleMapsState extends State<GoogleMaps> {
                               EdgeInsets.only(left: 15.0, top: 15.0),
                           suffixIcon: IconButton(
                             icon: Icon(Icons.search),
-                            onPressed: _searchandNavigate,
+                            onPressed: searchAndNavigate,
                             iconSize: 30.0,
                           )),
                       onChanged: (val) {
@@ -521,7 +560,7 @@ class _GoogleMapsState extends State<GoogleMaps> {
                   ),
                 ),
                 Padding(
-                  padding: const EdgeInsets.fromLTRB(16.0, 100.0, 16.0, 16.0),
+                  padding: const EdgeInsets.fromLTRB(16.0, 140.0, 16.0, 16.0),
                   child: Align(
                     alignment: Alignment.topRight,
                     child: Column(
