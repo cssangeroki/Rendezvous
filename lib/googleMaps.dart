@@ -137,6 +137,7 @@ class GoogleMapsState extends State<GoogleMaps> {
     _lastMapPosition = _center;
     await _onAddMarkerButtonPressed();
     await _initMarkers();
+    await initialiseFinalRouteOnEnter();
   }
 
   //This functions will listen to when the function addYelpMarkers is called outside and will add the yelpMarkers to the widget
@@ -153,15 +154,29 @@ class GoogleMapsState extends State<GoogleMaps> {
   //This function will be used to listen to if the final location was set on the slide up bar
   void setFinalLocationWhenButtonPressedOnSlideBar() {
     Global.finalLocationChanged.addListener(() async {
-      print("Location changed. Final Address = ${FirebaseFunctions.roomData["Final Location Address"]}");
-      await Geolocator()
-          .placemarkFromAddress(
-              FirebaseFunctions.roomData["Final Location Address"])
-          .then((value) async{
-            finalLatLng = LatLng(value[0].position.latitude, value[0].position.longitude);
-            await setPolyLines();
-      });
+      //print(
+        //  "Location changed. Final Address = ${FirebaseFunctions.roomData["Final Location Address"]}");
+      await routeToFinalLoc();
       Global.finalLocationChanged.value = false;
+    });
+  }
+
+  //This function will be used initialise the route to the final location when someone enters a room
+  Future<void> initialiseFinalRouteOnEnter() async{
+    if (FirebaseFunctions.roomData["Final Location"] != null) {
+      await routeToFinalLoc();
+    }
+  }
+
+  //Helper function that just gets the LatLng of the Final Address, and then calls setPolyLines
+  Future<void> routeToFinalLoc() async {
+    await Geolocator()
+        .placemarkFromAddress(
+            FirebaseFunctions.roomData["Final Location Address"])
+        .then((value) async {
+      finalLatLng =
+          LatLng(value[0].position.latitude, value[0].position.longitude);
+      setPolyLines();
     });
   }
 
@@ -429,6 +444,8 @@ class GoogleMapsState extends State<GoogleMaps> {
           }));
     });
     updateUserLocation();
+    //Reroute to the final location from the users new position
+    await routeToFinalLoc();
   }
 
   void searchAndNavigate() async {
