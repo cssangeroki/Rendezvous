@@ -155,14 +155,14 @@ class GoogleMapsState extends State<GoogleMaps> {
   void setFinalLocationWhenButtonPressedOnSlideBar() {
     Global.finalLocationChanged.addListener(() async {
       //print(
-        //  "Location changed. Final Address = ${FirebaseFunctions.roomData["Final Location Address"]}");
+      //  "Location changed. Final Address = ${FirebaseFunctions.roomData["Final Location Address"]}");
       await routeToFinalLoc();
       Global.finalLocationChanged.value = false;
     });
   }
 
   //This function will be used initialise the route to the final location when someone enters a room
-  Future<void> initialiseFinalRouteOnEnter() async{
+  Future<void> initialiseFinalRouteOnEnter() async {
     if (FirebaseFunctions.roomData["Final Location"] != null) {
       await routeToFinalLoc();
     }
@@ -176,7 +176,28 @@ class GoogleMapsState extends State<GoogleMaps> {
         .then((value) async {
       finalLatLng =
           LatLng(value[0].position.latitude, value[0].position.longitude);
+      addFinalLocMarker();
       setPolyLines();
+    });
+  }
+
+  void addFinalLocMarker() {
+    setState(() {
+      _markers
+          .removeWhere((element) => element.markerId.value == "Final Location");
+      _markers.add(Marker(
+          markerId: MarkerId("Final Location"),
+          position: LatLng(finalLatLng.latitude, finalLatLng.longitude),
+          infoWindow: InfoWindow(
+              title: FirebaseFunctions.roomData["Final Location"],
+              snippet: "Final Location"),
+          icon:
+              BitmapDescriptor.defaultMarkerWithHue(BitmapDescriptor.hueYellow),
+          onTap: () {
+            setState(() {
+              confirmDialogTrigger = false;
+            });
+          }));
     });
   }
 
@@ -227,7 +248,7 @@ class GoogleMapsState extends State<GoogleMaps> {
     setState(() {
       _markers.removeWhere((element) =>
           element.markerId.value != "User" &&
-          element.markerId.value != "Midpoint");
+          element.markerId.value != "Midpoint" && element.markerId.value != "Final Location");
     });
   }
 
@@ -323,6 +344,7 @@ class GoogleMapsState extends State<GoogleMaps> {
     _markers.removeWhere((element) =>
         (element.infoWindow.snippet != 'Your Location' &&
             element.infoWindow.snippet != "Midpoint" &&
+            element.infoWindow.snippet != "Final Location" &&
             element.infoWindow.snippet != ''));
     //For every location we found, we need to add a marker
     setState(() {
