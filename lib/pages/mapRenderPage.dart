@@ -10,7 +10,7 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 
 import 'package:sliding_up_panel/sliding_up_panel.dart';
 
-import 'package:link/link.dart';
+//import 'package:link/link.dart';
 import "../googleMaps.dart";
 import "../globalVar.dart";
 import "../findYelpPlaces.dart";
@@ -52,6 +52,7 @@ class _MapRenderState extends State<MapRender> {
 
   //Another function that creates a listener for the roomData (Not the users, but other room data)
   void listenToRoom() {
+    var locChanged = false;
     roomListener = firebase
         .collection("rooms")
         .document(roomDocID)
@@ -59,10 +60,17 @@ class _MapRenderState extends State<MapRender> {
         .listen((event) {
       setState(() {
         FirebaseFunctions.roomData["host"] = event.data["host"];
+        //If the final location changed, we will alert the listener so that the route can be changed
+        if (FirebaseFunctions.roomData["Final Location"] != event.data["Final Location"]){
+          locChanged = true;
+        }
         FirebaseFunctions.roomData["Final Location"] =
             event.data["Final Location"];
         FirebaseFunctions.roomData["Final Location Address"] =
             event.data["Final Location Address"];
+        if (locChanged == true){
+          Global.finalLocationChanged.notifyListeners();
+        }
       });
     });
   }
@@ -276,6 +284,22 @@ class _MapRenderState extends State<MapRender> {
                                       children: <Widget>[
                                         Container(
                                           padding:
+                                          EdgeInsets.fromLTRB(60, 0, 0, 5),
+                                          width: double.infinity,
+                                          child: Text(
+                                            "Address: ${Global.locations[index]} ",
+                                            overflow: TextOverflow.ellipsis,
+                                            softWrap: true,
+                                            style: TextStyle(
+                                              color: Color(Global.blackColor),
+                                              fontWeight: FontWeight.bold,
+                                              fontSize: 15,
+                                            ),
+                                            textAlign: TextAlign.left,
+                                          ),
+                                        ),
+                                        Container(
+                                          padding:
                                               EdgeInsets.fromLTRB(60, 0, 0, 5),
                                           width: double.infinity,
                                           child: Text(
@@ -345,7 +369,9 @@ class _MapRenderState extends State<MapRender> {
                                                     size: 40,
                                                   ),
                                                   elevation: 2,
-                                                  onPressed: null,
+                                                  onPressed: (){
+                                                    FirebaseFunctions.setFinalPosition(Global.names[index], Global.locations[index]);
+                                                  },
                                                 ),
                                               ),
                                             ),
@@ -810,6 +836,7 @@ class _MapRenderState extends State<MapRender> {
           //Global.mapRPfindYPListener.dispose();
           Global.findYPCalled.removeListener(() {});
           //Global.findYPCalled.dispose();
+          Global.finalLocationChanged.removeListener(() {});
 
           String roomCodeString = FirebaseFunctions.roomData["roomCode"];
 

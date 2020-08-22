@@ -35,4 +35,6 @@ class Global {
   static ValueNotifier mapRPfindYPListener = ValueNotifier(false);
 
   static ValueNotifier mapRPnameListListener = ValueNotifier(false);
+
+  static ValueNotifier finalLocationChanged = ValueNotifier(false);
 }

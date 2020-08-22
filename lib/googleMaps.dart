@@ -6,7 +6,8 @@ import 'pages/firebaseFunctions.dart';
 import 'package:flutter/services.dart';
 import 'dart:async';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
-import 'pages/mapRenderPage.dart';
+
+//import 'pages/mapRenderPage.dart';
 import 'package:geolocator/geolocator.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 
@@ -64,11 +65,14 @@ class GoogleMapsState extends State<GoogleMaps> {
   final String userDocID = FirebaseFunctions.currentUID;
   final String roomDocID = FirebaseFunctions.currentUserData["roomCode"];
   GoogleMapController mapController;
+
 //Creating a variable currPosition that will be used to store the users current position
   Position currPosition;
   LatLng currLocation;
+
   //static List<String> nameList = [];
   BitmapDescriptor myIcon;
+
   //static StreamSubscription<QuerySnapshot> memberListener;
 
 //Initializing center of map
@@ -128,6 +132,7 @@ class GoogleMapsState extends State<GoogleMaps> {
 
   void initFunctionCaller() async {
     addYelpMarkersWhenFindYPCalled();
+    setFinalLocationWhenButtonPressedOnSlideBar();
     await _getUserLocation();
     _lastMapPosition = _center;
     await _onAddMarkerButtonPressed();
@@ -143,6 +148,21 @@ class GoogleMapsState extends State<GoogleMaps> {
       });
     });
     //Global.findYPCalled.value = false;
+  }
+
+  //This function will be used to listen to if the final location was set on the slide up bar
+  void setFinalLocationWhenButtonPressedOnSlideBar() {
+    Global.finalLocationChanged.addListener(() async {
+      print("Location changed. Final Address = ${FirebaseFunctions.roomData["Final Location Address"]}");
+      await Geolocator()
+          .placemarkFromAddress(
+              FirebaseFunctions.roomData["Final Location Address"])
+          .then((value) async{
+            finalLatLng = LatLng(value[0].position.latitude, value[0].position.longitude);
+            await setPolyLines();
+      });
+      Global.finalLocationChanged.value = false;
+    });
   }
 
 //Function used to get users original position
@@ -465,7 +485,7 @@ class GoogleMapsState extends State<GoogleMaps> {
                 FirebaseFunctions.setFinalPosition(
                     finalLocName, finalLocAddress);
               });
-              setPolyLines();
+              //setPolyLines();
             },
             materialTapTargetSize: MaterialTapTargetSize.padded,
             backgroundColor: Colors.greenAccent,
