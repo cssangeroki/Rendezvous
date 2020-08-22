@@ -248,7 +248,8 @@ class GoogleMapsState extends State<GoogleMaps> {
     setState(() {
       _markers.removeWhere((element) =>
           element.markerId.value != "User" &&
-          element.markerId.value != "Midpoint" && element.markerId.value != "Final Location");
+          element.markerId.value != "Midpoint" &&
+          element.markerId.value != "Final Location");
     });
   }
 
@@ -384,18 +385,20 @@ class GoogleMapsState extends State<GoogleMaps> {
       _markers.removeWhere((marker) => marker.markerId.value == "Midpoint");
     });
 //   var newLoc = locations[0];
+    int length = 0;
     for (var userPosition in userPositions) {
 //Want to skip the midpoint and remove it in case it is still there
-      if (userPosition.markerId.value == "Midpoint") {
-        _markers.removeWhere((marker) => marker.markerId.value == "Midpoint");
+      if (userPosition.markerId.value == "Final Location") {
+       // _markers.removeWhere((marker) => marker.markerId.value == "Midpoint");
         continue;
       }
       currentMidLat = (userPosition.position.latitude + currentMidLat);
       currentMidLon = (userPosition.position.longitude + currentMidLon);
+      length += 1;
     }
     //print("Number of markers = ${userPositions.length})");
-    currentMidLat = currentMidLat / (userPositions.length);
-    currentMidLon = currentMidLon / (userPositions.length);
+    currentMidLat = currentMidLat / (length);
+    currentMidLon = currentMidLon / (length);
 
     Global.finalLat = currentMidLat;
     Global.finalLon = currentMidLon;
@@ -463,12 +466,22 @@ class GoogleMapsState extends State<GoogleMaps> {
             setState(() {
               confirmDialogTrigger = false;
             });
+          },
+          draggable: true,
+          onDragEnd: (newLatLng) async{
+            _center = newLatLng;
+            mapController.animateCamera(CameraUpdate.newCameraPosition(CameraPosition(
+                target:
+                LatLng(newLatLng.latitude, newLatLng.longitude),
+                zoom: 15.0)));
+            await _onAddMarkerButtonPressed();
           }));
     });
     updateUserLocation();
     //Reroute to the final location from the users new position
     await routeToFinalLoc();
   }
+
 
   void searchAndNavigate() async {
 //Get the placemark from the search address, and then store the center and userAddress
