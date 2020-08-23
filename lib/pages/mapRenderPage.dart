@@ -14,6 +14,7 @@ import 'package:sliding_up_panel/sliding_up_panel.dart';
 import "../googleMaps.dart";
 import "../globalVar.dart";
 import "../findYelpPlaces.dart";
+import 'package:share/share.dart';
 
 //Below are variables we will use for the sliders
 double midSliderVal = 5;
@@ -29,6 +30,7 @@ class MapRender extends StatefulWidget {
   final bool expand;
 
   MapRender({this.expand = false, this.child});
+
   @override
   _MapRenderState createState() => _MapRenderState();
 }
@@ -61,14 +63,15 @@ class _MapRenderState extends State<MapRender> {
       setState(() {
         FirebaseFunctions.roomData["host"] = event.data["host"];
         //If the final location changed, we will alert the listener so that the route can be changed
-        if (FirebaseFunctions.roomData["Final Location"] != event.data["Final Location"]){
+        if (FirebaseFunctions.roomData["Final Location"] !=
+            event.data["Final Location"]) {
           locChanged = true;
         }
         FirebaseFunctions.roomData["Final Location"] =
             event.data["Final Location"];
         FirebaseFunctions.roomData["Final Location Address"] =
             event.data["Final Location Address"];
-        if (locChanged == true){
+        if (locChanged == true) {
           Global.finalLocationChanged.notifyListeners();
         }
       });
@@ -284,7 +287,7 @@ class _MapRenderState extends State<MapRender> {
                                       children: <Widget>[
                                         Container(
                                           padding:
-                                          EdgeInsets.fromLTRB(60, 0, 0, 5),
+                                              EdgeInsets.fromLTRB(60, 0, 0, 5),
                                           width: double.infinity,
                                           child: Text(
                                             "Address: ${Global.locations[index]} ",
@@ -369,8 +372,12 @@ class _MapRenderState extends State<MapRender> {
                                                     size: 40,
                                                   ),
                                                   elevation: 2,
-                                                  onPressed: (){
-                                                    FirebaseFunctions.setFinalPosition(Global.names[index], Global.locations[index]);
+                                                  onPressed: () {
+                                                    FirebaseFunctions
+                                                        .setFinalPosition(
+                                                            Global.names[index],
+                                                            Global.locations[
+                                                                index]);
                                                   },
                                                 ),
                                               ),
@@ -624,6 +631,9 @@ class _MapRenderState extends State<MapRender> {
                       fontSize: 20,
                     ),
                     enableInteractiveSelection: true,
+                      onTap: () {
+                        Share.share("${FirebaseFunctions.roomData["Final Location"]}");
+                      }
                   ),
                   onTap: null,
                 ),
@@ -649,6 +659,9 @@ class _MapRenderState extends State<MapRender> {
                       fontSize: 20,
                     ),
                     enableInteractiveSelection: true,
+                    onTap: () {
+                      Share.share("${FirebaseFunctions.roomData["Final Location Address"]}");
+                    },
                   ),
                   onTap: null,
                 ),
@@ -700,6 +713,10 @@ class _MapRenderState extends State<MapRender> {
                       fontSize: 35,
                     ),
                     enableInteractiveSelection: true,
+                    onTap: () {
+                      Share.share("${FirebaseFunctions.roomData["roomCode"]}",
+                          subject: "Let's Rendezvous! Join my room!");
+                    },
                   ),
                   onTap: null,
                 ),
@@ -782,6 +799,7 @@ class _MapRenderState extends State<MapRender> {
           ),
         ));
   }
+
 /*
   Widget _userSlider() {
     return SliderTheme(
