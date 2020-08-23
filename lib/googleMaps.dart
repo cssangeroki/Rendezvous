@@ -175,6 +175,11 @@ class GoogleMapsState extends State<GoogleMaps> {
 
   //Helper function that just gets the LatLng of the Final Address, and then calls setPolyLines
   Future<void> routeToFinalLoc() async {
+    //If no final location is set, no routing needs to be done
+    if (FirebaseFunctions.roomData["Final Location"] == null){
+      return;
+    }
+    //Otherwise, we route the user to the final location
     await Geolocator()
         .placemarkFromAddress(
             FirebaseFunctions.roomData["Final Location Address"])
@@ -456,13 +461,9 @@ class GoogleMapsState extends State<GoogleMaps> {
 
   //This function will change the marker of the current user, so that a user can only edit their own marker
   Future<void> _onAddMarkerButtonPressed() async {
-    //Here I find if there is already a user marker. If there is, toRemove is set to that marker. Otherwise toRemove is set to NULL
 //Getting the correct address in searchAddr. Using await to ensure we get the right address.
-    //print("Entered _onAddMarkerButtonPressed. Center = $_center");
-    print("Last Map Position before getting address: $_lastMapPosition");
     await _getUserAddress();
     currLocation = _lastMapPosition;
-    print("Last Map Position after getting address: $_lastMapPosition");
     //First I remove the toRemove marker from _markers
     setState(() {
       _markers.removeWhere((marker) => marker.markerId.value == "User");

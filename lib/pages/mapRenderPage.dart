@@ -693,12 +693,13 @@ class _MapRenderState extends State<MapRender> {
               Container(
                 padding: EdgeInsets.fromLTRB(0, 0, 0, 0),
                 child: ListTile(
-                  title: Text(
+                  title: SelectableText(
                     "${FirebaseFunctions.roomData["roomCode"]}" ??
                         "roomCode is Null",
                     style: TextStyle(
                       fontSize: 35,
                     ),
+                    enableInteractiveSelection: true,
                   ),
                   onTap: null,
                 ),
