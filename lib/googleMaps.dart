@@ -101,6 +101,11 @@ class GoogleMapsState extends State<GoogleMaps> {
 
   //Creating a variable that will trigger the confirm location dialog box
   bool confirmDialogTrigger = false;
+
+  //Boolean that will let us know if the user dragged their marker or not
+  bool userMarkerDragged = false;
+
+
   String finalLocName;
   String finalLocAddress;
   LatLng finalLatLng;
@@ -214,7 +219,7 @@ class GoogleMapsState extends State<GoogleMaps> {
     try {
       List<Placemark> p = await Geolocator()
           .placemarkFromCoordinates(_center.latitude, _center.longitude);
-
+      print(_center);
       Placemark place = p[0];
 
       setState(() {
@@ -284,7 +289,6 @@ class GoogleMapsState extends State<GoogleMaps> {
   //In this function, I iterate through every user in the document, and get there location and add it to markers
   //All other users will have their BitMapDescriptor as Magenta in color, so that we can differentiate from other users
   Future<void> addOtherUserMarkers(DocumentSnapshot userLocations) async {
-    print("Users doc ID = " + userLocations.documentID);
     GeoPoint newUserLoc = userLocations.data["location"];
     //If for some reason the user doesn't have a location yet, simply return
     if (newUserLoc == null) {
@@ -311,6 +315,10 @@ class GoogleMapsState extends State<GoogleMaps> {
   }
 
   void _onCameraMove(CameraPosition position) {
+    if (userMarkerDragged == true){
+      return;
+    }
+    print("Camera Moved");
     _center = position.target;
     _lastMapPosition = position.target;
   }
@@ -335,12 +343,12 @@ class GoogleMapsState extends State<GoogleMaps> {
       midAddress =
           "${place.name}, ${place.subLocality}, ${place.locality}, ${place.postalCode}, ${place.country}";
     });
-    print("MidAddress updated to $midAddress");
+    //print("MidAddress updated to $midAddress");
   }
 
   //This function will be used to add the yelp markers
   void addYelpMarkers() {
-    print("Entered Yelp markers. resultCords = ${Global.resultCords.length}");
+    //print("Entered Yelp markers. resultCords = ${Global.resultCords.length}");
     //First, remove all the current yelp markers
     _markers.removeWhere((element) =>
         (element.infoWindow.snippet != 'Your Location' &&
@@ -372,12 +380,12 @@ class GoogleMapsState extends State<GoogleMaps> {
         ));
       }
     });
-    print(_markers.length);
-    print(_markers);
+    //print(_markers.length);
+    //print(_markers);
   }
 
   Future<void> findMidpoint(Set<Marker> userPositions) async {
-    print("Entered findMidpoint");
+    //print("Entered findMidpoint");
     double currentMidLat = 0;
     double currentMidLon = 0;
     //Start off by removing the midpoint marker
@@ -403,7 +411,7 @@ class GoogleMapsState extends State<GoogleMaps> {
     Global.finalLat = currentMidLat;
     Global.finalLon = currentMidLon;
 
-    print("Lat = $currentMidLat, and Long = $currentMidLon");
+    //print("Lat = $currentMidLat, and Long = $currentMidLon");
     await placefromLatLng(LatLng(currentMidLat, currentMidLon));
 //      currentMidLat = currentMidLat / (locations.length);
 //      currentMidLon = currentMidLon / (locations.length);
@@ -451,8 +459,10 @@ class GoogleMapsState extends State<GoogleMaps> {
     //Here I find if there is already a user marker. If there is, toRemove is set to that marker. Otherwise toRemove is set to NULL
 //Getting the correct address in searchAddr. Using await to ensure we get the right address.
     //print("Entered _onAddMarkerButtonPressed. Center = $_center");
+    print("Last Map Position before getting address: $_lastMapPosition");
     await _getUserAddress();
     currLocation = _lastMapPosition;
+    print("Last Map Position after getting address: $_lastMapPosition");
     //First I remove the toRemove marker from _markers
     setState(() {
       _markers.removeWhere((marker) => marker.markerId.value == "User");
@@ -469,17 +479,21 @@ class GoogleMapsState extends State<GoogleMaps> {
           },
           draggable: true,
           onDragEnd: (newLatLng) async{
+            userMarkerDragged = true;
             _center = newLatLng;
+            _lastMapPosition = newLatLng;
+            _onCameraMove(CameraPosition(target: newLatLng));
             mapController.animateCamera(CameraUpdate.newCameraPosition(CameraPosition(
                 target:
                 LatLng(newLatLng.latitude, newLatLng.longitude),
                 zoom: 15.0)));
             await _onAddMarkerButtonPressed();
-          }));
+          },));
     });
     updateUserLocation();
     //Reroute to the final location from the users new position
     await routeToFinalLoc();
+    userMarkerDragged = false;
   }
 
 
