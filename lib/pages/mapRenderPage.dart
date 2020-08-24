@@ -15,11 +15,13 @@ import "../googleMaps.dart";
 import "../globalVar.dart";
 import "../findYelpPlaces.dart";
 import 'package:share/share.dart';
+import '../tabDrawer.dart';
 
 //Below are variables we will use for the sliders
 double midSliderVal = 5;
 double userSliderVal = 5;
 
+bool slideUpPanelCollapsed = true;
 String category;
 //Here I'm creating a reference to our firebase
 final firebase = Firestore.instance;
@@ -282,7 +284,9 @@ class _MapRenderState extends State<MapRender> {
                                   ),
                                 ),
                                 ExpandedSection(
-                                    expand: _isExpanded[index],
+                                  expand: _isExpanded[index],
+                                  child: Container(
+                                    height: 300,
                                     child: Column(
                                       children: <Widget>[
                                         Container(
@@ -419,7 +423,9 @@ class _MapRenderState extends State<MapRender> {
                                           ]),
                                         ),
                                       ],
-                                    )),
+                                    ),
+                                  ),
+                                ),
                                 /*Container(
                         margin: EdgeInsets.fromLTRB(8, 8, 8, 8),
                         height: 90,
@@ -501,6 +507,7 @@ class _MapRenderState extends State<MapRender> {
   Widget _slideUpPanel() {
     return SlidingUpPanel(
       //maxHeight: 600,
+
       backdropEnabled: true,
       borderRadius: BorderRadius.only(
         topLeft: Radius.circular(20.0),
@@ -515,20 +522,221 @@ class _MapRenderState extends State<MapRender> {
                 topRight: Radius.circular(20.0),
               ),
             ),
-            padding: EdgeInsets.fromLTRB(0, 80, 0, 0),
             child: _viewYelp()),
       ),
+
       collapsed: Container(
         decoration: BoxDecoration(
           color: Color(Global.backgroundColor),
           borderRadius: BorderRadius.only(
               topLeft: Radius.circular(20.0), topRight: Radius.circular(20.0)),
         ),
-        child: Center(child: Container()),
+        child: Align(
+          alignment: Alignment.topCenter,
+          child: Container(
+            margin: EdgeInsets.fromLTRB(0, 10, 0, 0),
+            decoration: BoxDecoration(
+              color: Colors.white,
+              borderRadius: BorderRadius.all(Radius.circular(20)),
+              boxShadow: [
+                BoxShadow(
+                  color: Colors.grey.withOpacity(0.6),
+                  spreadRadius: 0.8,
+                  blurRadius: 4,
+                  offset: Offset(2, 4), // changes position of shadow
+                ),
+              ],
+            ),
+            child: SizedBox(
+              width: 60,
+              height: 8,
+            ),
+          ),
+        ),
       ),
       minHeight: MediaQuery.of(context).size.height * 0.10,
       maxHeight: MediaQuery.of(context).size.height * 0.70,
       body: GoogleMaps(),
+    );
+  }
+
+  Widget _tab1Contents() {
+    return new Container(
+      height: MediaQuery.of(context).size.height,
+      width: double.infinity,
+      child: ListView(
+        children: <Widget>[
+          Container(
+            child: ListTile(
+              title: Text(
+                'Final Location: ',
+                style: TextStyle(
+                  fontSize: 20,
+                ),
+              ),
+              onTap: null,
+            ),
+          ),
+          Container(
+            padding: EdgeInsets.fromLTRB(30, 0, 0, 10),
+            child: SelectableText(
+                FirebaseFunctions.roomData["Final Location"] != null
+                    ? "${FirebaseFunctions.roomData["Final Location"]}"
+                    : "No location set",
+                style: TextStyle(
+                  fontSize: 20,
+                ),
+                enableInteractiveSelection: true, onTap: () {
+              Share.share("${FirebaseFunctions.roomData["Final Location"]}");
+            }),
+          ),
+          Container(
+            child: ListTile(
+              title: Text(
+                'Final Location Address:',
+                style: TextStyle(
+                  fontSize: 20,
+                ),
+              ),
+              onTap: null,
+            ),
+          ),
+          Container(
+            padding: EdgeInsets.fromLTRB(30, 0, 0, 10),
+            child: SelectableText(
+              FirebaseFunctions.roomData["Final Location"] != null
+                  ? "${FirebaseFunctions.roomData["Final Location Address"]}"
+                  : "No address set",
+              style: TextStyle(
+                fontSize: 20,
+              ),
+              enableInteractiveSelection: true,
+              onTap: () {
+                Share.share(
+                    "${FirebaseFunctions.roomData["Final Location Address"]}");
+              },
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+
+  Widget _tab2Contents() {
+    return Container(
+      height: MediaQuery.of(context).size.height,
+      width: double.infinity,
+      child: ListView(
+        children: <Widget>[
+          Container(
+            child: ListTile(
+              title: Text(
+                'People in this room:',
+                style: TextStyle(
+                  fontSize: 20,
+                ),
+              ),
+              onTap: null,
+            ),
+          ),
+          Container(
+            padding: EdgeInsets.fromLTRB(30, 0, 0, 0),
+            child: Text(
+              "${nameList.join("\n")}" ?? "Name is Null",
+              style: TextStyle(
+                fontSize: 20,
+              ),
+            ),
+          ),
+          Container(
+            child: ListTile(
+              title: Text(
+                'Host:',
+                style: TextStyle(
+                  fontSize: 20,
+                ),
+              ),
+              onTap: null,
+            ),
+          ),
+          Container(
+            padding: EdgeInsets.fromLTRB(30, 0, 0, 0),
+            child: Text(
+              "${FirebaseFunctions.roomData["host"]}",
+              style: TextStyle(
+                fontSize: 20,
+              ),
+            ),
+          ),
+          Container(
+            child: ListTile(
+              title: Text(
+                'Searching for:',
+                style: TextStyle(
+                  fontSize: 20,
+                ),
+              ),
+              onTap: null,
+            ),
+          ),
+          //Search bar
+          _categoryBar(),
+
+          Container(
+            child: ListTile(
+              title: Text(
+                'Range from midpoint: $midSliderVal mi',
+                style: TextStyle(
+                  fontSize: 18,
+                ),
+              ),
+              onTap: null,
+            ),
+          ),
+          _midpointSlider(),
+          Container(
+            child: ListTile(
+              title: Text(
+                'Your Code:',
+                style: TextStyle(
+                  fontSize: 20,
+                ),
+              ),
+              onTap: null,
+            ),
+          ),
+          Container(
+            padding: EdgeInsets.fromLTRB(0, 0, 0, 0),
+            child: ListTile(
+              title: SelectableText(
+                "${FirebaseFunctions.roomData["roomCode"]}" ??
+                    "roomCode is Null",
+                style: TextStyle(
+                  fontSize: 35,
+                ),
+                enableInteractiveSelection: true,
+                onTap: () {
+                  Share.share("${FirebaseFunctions.roomData["roomCode"]}",
+                      subject: "Let's Rendezvous! Join my room!");
+                },
+              ),
+              onTap: null,
+            ),
+          ),
+          Container(
+              padding: EdgeInsets.fromLTRB(20.0, 20.0, 20.0, 15.0),
+              width: 50,
+              child: _leaveRoomButton()),
+        ],
+      ),
+    );
+  }
+
+  Widget _tab3Contents() {
+    return new Container(
+      height: MediaQuery.of(context).size.height,
+      width: double.infinity,
+      child: Container(),
     );
   }
 
@@ -542,28 +750,23 @@ class _MapRenderState extends State<MapRender> {
       child: Container(
         width: 350,
         child: Drawer(
-// Add a ListView to the drawer. This ensures the user can scroll
-// through the options in the drawer if there isn't enough vertical
-// space to fit everything.
           child: ListView(
-// Important: Remove any padding from the ListView.
-//padding: EdgeInsets.only(),
             children: <Widget>[
               Container(
-                height: 80.0,
-                margin: EdgeInsets.all(0),
-                child: DrawerHeader(
-                  child: Container(
-                    child: Text(
-                      'Settings',
-                      style: TextStyle(
-                        fontSize: 30,
-                      ),
-                    ),
-                  ),
+                height: MediaQuery.of(context).size.height * 0.10,
+              ),
+              SafeArea(
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: <Widget>[
+                    Tabs(refresh: () => setState(() {})),
+                    Global.tabValue == 0 ? _tab1Contents() : Container(),
+                    Global.tabValue == 1 ? _tab2Contents() : Container(),
+                    Global.tabValue == 2 ? _tab3Contents() : Container(),
+                  ],
                 ),
               ),
-              Container(
+              /*Container(
                 child: ListTile(
                   title: Text(
                     'People in this room:',
@@ -625,16 +828,15 @@ class _MapRenderState extends State<MapRender> {
                 padding: EdgeInsets.fromLTRB(30, 0, 0, 0),
                 child: ListTile(
                   title: SelectableText(
-                    "${FirebaseFunctions.roomData["Final Location"]}" ??
-                        "No location set",
-                    style: TextStyle(
-                      fontSize: 20,
-                    ),
-                    enableInteractiveSelection: true,
-                      onTap: () {
-                        Share.share("${FirebaseFunctions.roomData["Final Location"]}");
-                      }
-                  ),
+                      "${FirebaseFunctions.roomData["Final Location"]}" ??
+                          "No location set",
+                      style: TextStyle(
+                        fontSize: 20,
+                      ),
+                      enableInteractiveSelection: true, onTap: () {
+                    Share.share(
+                        "${FirebaseFunctions.roomData["Final Location"]}");
+                  }),
                   onTap: null,
                 ),
               ),
@@ -660,7 +862,8 @@ class _MapRenderState extends State<MapRender> {
                     ),
                     enableInteractiveSelection: true,
                     onTap: () {
-                      Share.share("${FirebaseFunctions.roomData["Final Location Address"]}");
+                      Share.share(
+                          "${FirebaseFunctions.roomData["Final Location Address"]}");
                     },
                   ),
                   onTap: null,
@@ -724,7 +927,7 @@ class _MapRenderState extends State<MapRender> {
               Container(
                   padding: EdgeInsets.fromLTRB(20.0, 20.0, 20.0, 15.0),
                   width: 50,
-                  child: _leaveRoomButton()),
+                  child: _leaveRoomButton()),*/
             ],
           ),
         ),
@@ -771,11 +974,11 @@ class _MapRenderState extends State<MapRender> {
           activeTrackColor: Colors.black,
           inactiveTrackColor: Color(0xff757575),
           trackShape: RectangularSliderTrackShape(),
-          trackHeight: 8.0,
+          trackHeight: 3.0,
           thumbColor: Colors.white,
           thumbShape: RoundSliderThumbShape(enabledThumbRadius: 10.0),
-          overlayColor: Colors.red.withAlpha(300),
-          overlayShape: RoundSliderOverlayShape(overlayRadius: 28.0),
+          overlayColor: Color(Global.yellowColor).withAlpha(90),
+          overlayShape: RoundSliderOverlayShape(overlayRadius: 23.0),
         ),
         child: Container(
           child: Slider(

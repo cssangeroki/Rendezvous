@@ -105,7 +105,6 @@ class GoogleMapsState extends State<GoogleMaps> {
   //Boolean that will let us know if the user dragged their marker or not
   bool userMarkerDragged = false;
 
-
   String finalLocName;
   String finalLocAddress;
   LatLng finalLatLng;
@@ -176,7 +175,7 @@ class GoogleMapsState extends State<GoogleMaps> {
   //Helper function that just gets the LatLng of the Final Address, and then calls setPolyLines
   Future<void> routeToFinalLoc() async {
     //If no final location is set, no routing needs to be done
-    if (FirebaseFunctions.roomData["Final Location"] == null){
+    if (FirebaseFunctions.roomData["Final Location"] == null) {
       return;
     }
     //Otherwise, we route the user to the final location
@@ -320,7 +319,7 @@ class GoogleMapsState extends State<GoogleMaps> {
   }
 
   void _onCameraMove(CameraPosition position) {
-    if (userMarkerDragged == true){
+    if (userMarkerDragged == true) {
       return;
     }
     print("Camera Moved");
@@ -402,7 +401,7 @@ class GoogleMapsState extends State<GoogleMaps> {
     for (var userPosition in userPositions) {
 //Want to skip the midpoint and remove it in case it is still there
       if (userPosition.markerId.value == "Final Location") {
-       // _markers.removeWhere((marker) => marker.markerId.value == "Midpoint");
+        // _markers.removeWhere((marker) => marker.markerId.value == "Midpoint");
         continue;
       }
       currentMidLat = (userPosition.position.latitude + currentMidLat);
@@ -469,34 +468,34 @@ class GoogleMapsState extends State<GoogleMaps> {
       _markers.removeWhere((marker) => marker.markerId.value == "User");
       //Then I add the Users new location
       _markers.add(Marker(
-          markerId: MarkerId("User"),
-          position: _lastMapPosition,
-          infoWindow: InfoWindow(title: searchAddr, snippet: 'Your Location'),
-          icon: myIcon,
-          onTap: () {
-            setState(() {
-              confirmDialogTrigger = false;
-            });
-          },
-          draggable: true,
-          onDragEnd: (newLatLng) async{
-            userMarkerDragged = true;
-            _center = newLatLng;
-            _lastMapPosition = newLatLng;
-            _onCameraMove(CameraPosition(target: newLatLng));
-            mapController.animateCamera(CameraUpdate.newCameraPosition(CameraPosition(
-                target:
-                LatLng(newLatLng.latitude, newLatLng.longitude),
-                zoom: 15.0)));
-            await _onAddMarkerButtonPressed();
-          },));
+        markerId: MarkerId("User"),
+        position: _lastMapPosition,
+        infoWindow: InfoWindow(title: searchAddr, snippet: 'Your Location'),
+        icon: myIcon,
+        onTap: () {
+          setState(() {
+            confirmDialogTrigger = false;
+          });
+        },
+        draggable: true,
+        onDragEnd: (newLatLng) async {
+          userMarkerDragged = true;
+          _center = newLatLng;
+          _lastMapPosition = newLatLng;
+          _onCameraMove(CameraPosition(target: newLatLng));
+          mapController.animateCamera(CameraUpdate.newCameraPosition(
+              CameraPosition(
+                  target: LatLng(newLatLng.latitude, newLatLng.longitude),
+                  zoom: 15.0)));
+          await _onAddMarkerButtonPressed();
+        },
+      ));
     });
     updateUserLocation();
     //Reroute to the final location from the users new position
     await routeToFinalLoc();
     userMarkerDragged = false;
   }
-
 
   void searchAndNavigate() async {
 //Get the placemark from the search address, and then store the center and userAddress
@@ -606,7 +605,7 @@ class GoogleMapsState extends State<GoogleMaps> {
                   ),
                 ),
                 Container(
-                    padding: EdgeInsets.fromLTRB(10, 60, 0, 0),
+                    padding: EdgeInsets.fromLTRB(10, 88, 0, 0),
                     child: FloatingActionButton(
                       backgroundColor: Color(Global.backgroundColor),
                       child: Icon(
@@ -617,7 +616,7 @@ class GoogleMapsState extends State<GoogleMaps> {
                       onPressed: () => Scaffold.of(context).openDrawer(),
                     )),
                 Positioned(
-                  top: 63,
+                  top: 90,
                   right: 15,
                   left: 80,
                   child: Container(
@@ -645,7 +644,7 @@ class GoogleMapsState extends State<GoogleMaps> {
                   ),
                 ),
                 Padding(
-                  padding: const EdgeInsets.fromLTRB(16.0, 140.0, 16.0, 16.0),
+                  padding: const EdgeInsets.fromLTRB(16.0, 150.0, 16.0, 16.0),
                   child: Align(
                     alignment: Alignment.topRight,
                     child: Column(

@@ -25,8 +25,11 @@ class Global {
   static var blackColor = 0xff888888;
   static var backgroundColor = 0xfff4f4f4;
   static var whiteColor = 0xffffffff;
+  static var yellowColor = 0xffffcd3c;
 
   static var arrLength;
+
+  static var tabValue = 1;
 
   static List<String> nameList = [];
 
