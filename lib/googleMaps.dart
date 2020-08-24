@@ -597,6 +597,8 @@ class GoogleMapsState extends State<GoogleMaps> {
                       target: _center,
                       zoom: 14.0,
                     ),
+                    zoomControlsEnabled: false,
+                    myLocationButtonEnabled: false,
                     markers: _markers,
 //Adding the marker property to Google Maps Widget
                     onCameraMove: _onCameraMove,
