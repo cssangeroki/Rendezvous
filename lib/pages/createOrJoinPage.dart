@@ -94,7 +94,7 @@ class _Page2State extends State<Page2> {
                 padding: EdgeInsets.all(10.0),
                 buttonColor: Color(0xffcaf7dc),
                 child: RaisedButton(
-                  child: Text("Create a Room", style: buttonTextSize20()),
+                  child: Text("Create a Room", style: textSize20()),
                   onPressed: () {
                     createRoomCode();
                   },
@@ -108,7 +108,7 @@ class _Page2State extends State<Page2> {
               buttonColor: Color(0xffcaf7dc),
               hoverColor: Color(0xffffccbb),
               child: RaisedButton(
-                child: Text("Join a Room", style: buttonTextSize20()),
+                child: Text("Join a Room", style: textSize20()),
                 onPressed: () {
                   Navigator.push(context,
                       MaterialPageRoute(builder: (context) => Page4()));

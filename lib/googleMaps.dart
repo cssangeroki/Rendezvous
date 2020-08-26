@@ -181,7 +181,7 @@ class GoogleMapsState extends State<GoogleMaps> {
     //Otherwise, we route the user to the final location
     await Geolocator()
         .placemarkFromAddress(
-            FirebaseFunctions.roomData["Final Location Address"])
+            "${FirebaseFunctions.roomData["Final Location"]}, ${FirebaseFunctions.roomData["Final Location Address"]}")
         .then((value) async {
       finalLatLng =
           LatLng(value[0].position.latitude, value[0].position.longitude);
@@ -486,7 +486,7 @@ class GoogleMapsState extends State<GoogleMaps> {
           mapController.animateCamera(CameraUpdate.newCameraPosition(
               CameraPosition(
                   target: LatLng(newLatLng.latitude, newLatLng.longitude),
-                  zoom: 15.0)));
+                  zoom: 11.0)));
           await _onAddMarkerButtonPressed();
         },
       ));
@@ -597,6 +597,8 @@ class GoogleMapsState extends State<GoogleMaps> {
                       target: _center,
                       zoom: 14.0,
                     ),
+                    zoomControlsEnabled: false,
+                    myLocationButtonEnabled: false,
                     markers: _markers,
 //Adding the marker property to Google Maps Widget
                     onCameraMove: _onCameraMove,

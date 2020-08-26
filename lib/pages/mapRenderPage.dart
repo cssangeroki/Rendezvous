@@ -2,6 +2,7 @@ import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'dart:async';
 
+import '../appBar.dart';
 import 'firebaseFunctions.dart';
 import '../expandedSection.dart';
 import 'package:url_launcher/url_launcher.dart';
@@ -128,8 +129,7 @@ class _MapRenderState extends State<MapRender> {
     if (_arrLength == null) {
       return Text(
         "Loading Places",
-        style: TextStyle(
-            color: Colors.black, fontFamily: 'Goldplay', fontSize: 30),
+        style: textSize30(),
       );
     }
 
@@ -140,8 +140,7 @@ class _MapRenderState extends State<MapRender> {
         color: Color(Global.backgroundColor),
         child: Text(
           "No Places Found.",
-          style: TextStyle(
-              color: Colors.black, fontFamily: 'Goldplay', fontSize: 30),
+          style: textSize30(),
         ),
         alignment: Alignment.center,
       );
@@ -187,9 +186,7 @@ class _MapRenderState extends State<MapRender> {
                                 Container(
                                   width: double.infinity,
                                   decoration: BoxDecoration(
-                                    borderRadius: BorderRadius.only(
-                                        topLeft: Radius.circular(10),
-                                        topRight: Radius.circular(10)),
+                                    borderRadius: onlyTop10(),
                                   ),
                                   child: InkWell(
                                     onTap: () => _toggleExpand(index),
@@ -233,18 +230,8 @@ class _MapRenderState extends State<MapRender> {
                                                                 TextOverflow
                                                                     .ellipsis,
                                                             softWrap: true,
-                                                            style: TextStyle(
-                                                              fontFamily:
-                                                                  'GoldPlay',
-                                                              color: Colors
-                                                                  .black
-                                                                  .withAlpha(
-                                                                      200),
-                                                              fontWeight:
-                                                                  FontWeight
-                                                                      .normal,
-                                                              fontSize: 18,
-                                                            ),
+                                                            style:
+                                                                textSize18Alpha(),
                                                             textAlign:
                                                                 TextAlign.left,
                                                           ),
@@ -267,11 +254,7 @@ class _MapRenderState extends State<MapRender> {
                                                   child: Text(
                                                     'Click to see more information',
                                                     maxLines: 1,
-                                                    style: TextStyle(
-                                                        fontSize: 12,
-                                                        fontWeight:
-                                                            FontWeight.w500,
-                                                        color: Colors.grey),
+                                                    style: textSize12Grey(),
                                                   ),
                                                 ),
                                                 SizedBox(height: 5),
@@ -297,11 +280,7 @@ class _MapRenderState extends State<MapRender> {
                                             "Address: ${Global.locations[index]} ",
                                             overflow: TextOverflow.ellipsis,
                                             softWrap: true,
-                                            style: TextStyle(
-                                              color: Color(Global.blackColor),
-                                              fontWeight: FontWeight.bold,
-                                              fontSize: 15,
-                                            ),
+                                            style: textSize15Black45(),
                                             textAlign: TextAlign.left,
                                           ),
                                         ),
@@ -313,11 +292,7 @@ class _MapRenderState extends State<MapRender> {
                                             "Rating: ${Global.ratings[index]} ",
                                             overflow: TextOverflow.ellipsis,
                                             softWrap: true,
-                                            style: TextStyle(
-                                              color: Color(Global.blackColor),
-                                              fontWeight: FontWeight.bold,
-                                              fontSize: 15,
-                                            ),
+                                            style: textSize15Black45(),
                                             textAlign: TextAlign.left,
                                           ),
                                         ),
@@ -331,11 +306,7 @@ class _MapRenderState extends State<MapRender> {
                                                 : 'Phone Number: ${Global.phoneNums[index]}',
                                             overflow: TextOverflow.ellipsis,
                                             softWrap: true,
-                                            style: TextStyle(
-                                                fontWeight: FontWeight.bold,
-                                                fontSize: 15,
-                                                color:
-                                                    Color(Global.blackColor)),
+                                            style: textSize15Black45(),
                                             textAlign: TextAlign.left,
                                           ),
                                         ),
@@ -349,10 +320,7 @@ class _MapRenderState extends State<MapRender> {
                                                 : 'Price: ${Global.prices[index]}',
                                             overflow: TextOverflow.ellipsis,
                                             softWrap: true,
-                                            style: TextStyle(
-                                                fontWeight: FontWeight.bold,
-                                                fontSize: 15,
-                                                color: Color(0xff757575)),
+                                            style: textSize15Grey(),
                                             textAlign: TextAlign.left,
                                           ),
                                         ),
@@ -509,18 +477,12 @@ class _MapRenderState extends State<MapRender> {
       //maxHeight: 600,
 
       backdropEnabled: true,
-      borderRadius: BorderRadius.only(
-        topLeft: Radius.circular(20.0),
-        topRight: Radius.circular(20.0),
-      ),
+      borderRadius: onlyTop20(),
       panel: Center(
         child: Container(
             decoration: BoxDecoration(
               color: Color(Global.backgroundColor),
-              borderRadius: BorderRadius.only(
-                topLeft: Radius.circular(20.0),
-                topRight: Radius.circular(20.0),
-              ),
+              borderRadius: onlyTop20(),
             ),
             child: _viewYelp()),
       ),
@@ -528,8 +490,7 @@ class _MapRenderState extends State<MapRender> {
       collapsed: Container(
         decoration: BoxDecoration(
           color: Color(Global.backgroundColor),
-          borderRadius: BorderRadius.only(
-              topLeft: Radius.circular(20.0), topRight: Radius.circular(20.0)),
+          borderRadius: onlyTop20(),
         ),
         child: Align(
           alignment: Alignment.topCenter,
@@ -570,9 +531,7 @@ class _MapRenderState extends State<MapRender> {
             child: ListTile(
               title: Text(
                 'Final Location: ',
-                style: TextStyle(
-                  fontSize: 20,
-                ),
+                style: textSize20(),
               ),
               onTap: null,
             ),
@@ -583,9 +542,7 @@ class _MapRenderState extends State<MapRender> {
                 FirebaseFunctions.roomData["Final Location"] != null
                     ? "${FirebaseFunctions.roomData["Final Location"]}"
                     : "No location set",
-                style: TextStyle(
-                  fontSize: 20,
-                ),
+                style: textSize20(),
                 enableInteractiveSelection: true, onTap: () {
               Share.share("${FirebaseFunctions.roomData["Final Location"]}");
             }),
@@ -594,9 +551,7 @@ class _MapRenderState extends State<MapRender> {
             child: ListTile(
               title: Text(
                 'Final Location Address:',
-                style: TextStyle(
-                  fontSize: 20,
-                ),
+                style: textSize20(),
               ),
               onTap: null,
             ),
@@ -607,9 +562,7 @@ class _MapRenderState extends State<MapRender> {
               FirebaseFunctions.roomData["Final Location"] != null
                   ? "${FirebaseFunctions.roomData["Final Location Address"]}"
                   : "No address set",
-              style: TextStyle(
-                fontSize: 20,
-              ),
+              style: textSize20(),
               enableInteractiveSelection: true,
               onTap: () {
                 Share.share(
@@ -632,9 +585,7 @@ class _MapRenderState extends State<MapRender> {
             child: ListTile(
               title: Text(
                 'People in this room:',
-                style: TextStyle(
-                  fontSize: 20,
-                ),
+                style: textSize20(),
               ),
               onTap: null,
             ),
@@ -643,18 +594,14 @@ class _MapRenderState extends State<MapRender> {
             padding: EdgeInsets.fromLTRB(30, 0, 0, 0),
             child: Text(
               "${nameList.join("\n")}" ?? "Name is Null",
-              style: TextStyle(
-                fontSize: 20,
-              ),
+              style: textSize20(),
             ),
           ),
           Container(
             child: ListTile(
               title: Text(
                 'Host:',
-                style: TextStyle(
-                  fontSize: 20,
-                ),
+                style: textSize20(),
               ),
               onTap: null,
             ),
@@ -663,18 +610,14 @@ class _MapRenderState extends State<MapRender> {
             padding: EdgeInsets.fromLTRB(30, 0, 0, 0),
             child: Text(
               "${FirebaseFunctions.roomData["host"]}",
-              style: TextStyle(
-                fontSize: 20,
-              ),
+              style: textSize20(),
             ),
           ),
           Container(
             child: ListTile(
               title: Text(
                 'Searching for:',
-                style: TextStyle(
-                  fontSize: 20,
-                ),
+                style: textSize20(),
               ),
               onTap: null,
             ),
@@ -686,9 +629,7 @@ class _MapRenderState extends State<MapRender> {
             child: ListTile(
               title: Text(
                 'Range from midpoint: $midSliderVal mi',
-                style: TextStyle(
-                  fontSize: 18,
-                ),
+                style: textSize18(),
               ),
               onTap: null,
             ),
@@ -698,9 +639,7 @@ class _MapRenderState extends State<MapRender> {
             child: ListTile(
               title: Text(
                 'Your Code:',
-                style: TextStyle(
-                  fontSize: 20,
-                ),
+                style: textSize20(),
               ),
               onTap: null,
             ),
@@ -711,9 +650,7 @@ class _MapRenderState extends State<MapRender> {
               title: SelectableText(
                 "${FirebaseFunctions.roomData["roomCode"]}" ??
                     "roomCode is Null",
-                style: TextStyle(
-                  fontSize: 35,
-                ),
+                style: textSize35(),
                 enableInteractiveSelection: true,
                 onTap: () {
                   Share.share("${FirebaseFunctions.roomData["roomCode"]}",
@@ -962,12 +899,7 @@ class _MapRenderState extends State<MapRender> {
         //appBar: appBarMain(context),
         body: Container(
           color: Color(Global.backgroundColor),
-          child: ClipRRect(
-              borderRadius: BorderRadius.only(
-                topLeft: Radius.circular(10),
-                topRight: Radius.circular(10),
-              ),
-              child: _slideUpPanel()),
+          child: ClipRRect(borderRadius: onlyTop10(), child: _slideUpPanel()),
         ),
         drawer: _viewDrawer(),
       ),

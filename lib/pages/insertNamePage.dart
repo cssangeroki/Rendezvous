@@ -51,7 +51,6 @@ class _Page1State extends State<Page1> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-//      backgroundColor: Color(0xffd4f9ff),
       appBar: appBarMain(context),
       body: SafeArea(
         child: SingleChildScrollView(
