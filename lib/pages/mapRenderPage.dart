@@ -750,6 +750,42 @@ class _MapRenderState extends State<MapRender> {
       child: Container(
         width: 350,
         child: Drawer(
+          child: DefaultTabController(
+            length: 3,
+            child: Column(
+              mainAxisSize: MainAxisSize.max,
+              children: <Widget>[
+                Container(
+                  height: MediaQuery.of(context).size.height * 0.1,
+                ),
+                Container(
+                  height: 50,
+                  child: TabBar(
+                      labelColor: Colors.black,
+                      unselectedLabelColor: Colors.black38,
+                      indicatorColor: Color(Global.yellowColor),
+                      indicator: UnderlineTabIndicator(
+                          borderSide: BorderSide(width: 4.0),
+                          insets: EdgeInsets.symmetric(horizontal: 22.0)),
+                      tabs: [
+                        Tab(text: "First"),
+                        Tab(text: "Second"),
+                        Tab(text: "Third"),
+                      ]),
+                ),
+                Expanded(
+                  child: Container(
+                    child: TabBarView(children: [
+                      _tab1Contents(),
+                      _tab2Contents(),
+                      _tab3Contents(),
+                    ]),
+                  ),
+                ),
+              ],
+            ),
+          ),
+        ), /*Drawer(
           child: ListView(
             children: <Widget>[
               Container(
@@ -765,172 +801,7 @@ class _MapRenderState extends State<MapRender> {
                     Global.tabValue == 2 ? _tab3Contents() : Container(),
                   ],
                 ),
-              ),
-              /*Container(
-                child: ListTile(
-                  title: Text(
-                    'People in this room:',
-                    style: TextStyle(
-                      fontSize: 20,
-                    ),
-                  ),
-                  onTap: null,
-                ),
-              ),
-              Container(
-                padding: EdgeInsets.fromLTRB(30, 0, 0, 0),
-                child: ListTile(
-                  title: Text(
-                    "${nameList.join("\n")}" ?? "Name is Null",
-                    style: TextStyle(
-                      fontSize: 20,
-                    ),
-                  ),
-                  onTap: null,
-                ),
-              ),
-              Container(
-                child: ListTile(
-                  title: Text(
-                    'Host:',
-                    style: TextStyle(
-                      fontSize: 20,
-                    ),
-                  ),
-                  onTap: null,
-                ),
-              ),
-              Container(
-                padding: EdgeInsets.fromLTRB(30, 0, 0, 0),
-                child: ListTile(
-                  title: Text(
-                    "${FirebaseFunctions.roomData["host"]}",
-                    style: TextStyle(
-                      fontSize: 20,
-                    ),
-                  ),
-                  onTap: null,
-                ),
-              ),
-
-              Container(
-                child: ListTile(
-                  title: Text(
-                    'Final Location: ',
-                    style: TextStyle(
-                      fontSize: 20,
-                    ),
-                  ),
-                  onTap: null,
-                ),
-              ),
-              Container(
-                padding: EdgeInsets.fromLTRB(30, 0, 0, 0),
-                child: ListTile(
-                  title: SelectableText(
-                      "${FirebaseFunctions.roomData["Final Location"]}" ??
-                          "No location set",
-                      style: TextStyle(
-                        fontSize: 20,
-                      ),
-                      enableInteractiveSelection: true, onTap: () {
-                    Share.share(
-                        "${FirebaseFunctions.roomData["Final Location"]}");
-                  }),
-                  onTap: null,
-                ),
-              ),
-              Container(
-                child: ListTile(
-                  title: Text(
-                    'Final Location Address:',
-                    style: TextStyle(
-                      fontSize: 20,
-                    ),
-                  ),
-                  onTap: null,
-                ),
-              ),
-              Container(
-                padding: EdgeInsets.fromLTRB(30, 0, 0, 0),
-                child: ListTile(
-                  title: SelectableText(
-                    "${FirebaseFunctions.roomData["Final Location Address"]}" ??
-                        "No address set",
-                    style: TextStyle(
-                      fontSize: 20,
-                    ),
-                    enableInteractiveSelection: true,
-                    onTap: () {
-                      Share.share(
-                          "${FirebaseFunctions.roomData["Final Location Address"]}");
-                    },
-                  ),
-                  onTap: null,
-                ),
-              ),
-              Container(
-                child: ListTile(
-                  title: Text(
-                    'Searching for:',
-                    style: TextStyle(
-                      fontSize: 20,
-                    ),
-                  ),
-                  onTap: null,
-                ),
-              ),
-              //Search bar
-              _categoryBar(),
-
-              Container(
-                child: ListTile(
-                  title: Text(
-                    'Range from midpoint: $midSliderVal mi',
-                    style: TextStyle(
-                      fontSize: 18,
-                    ),
-                  ),
-                  onTap: null,
-                ),
-              ),
-              _midpointSlider(),
-              Container(
-                child: ListTile(
-                  title: Text(
-                    'Your Code:',
-                    style: TextStyle(
-                      fontSize: 20,
-                    ),
-                  ),
-                  onTap: null,
-                ),
-              ),
-              Container(
-                padding: EdgeInsets.fromLTRB(0, 0, 0, 0),
-                child: ListTile(
-                  title: SelectableText(
-                    "${FirebaseFunctions.roomData["roomCode"]}" ??
-                        "roomCode is Null",
-                    style: TextStyle(
-                      fontSize: 35,
-                    ),
-                    enableInteractiveSelection: true,
-                    onTap: () {
-                      Share.share("${FirebaseFunctions.roomData["roomCode"]}",
-                          subject: "Let's Rendezvous! Join my room!");
-                    },
-                  ),
-                  onTap: null,
-                ),
-              ),
-              Container(
-                  padding: EdgeInsets.fromLTRB(20.0, 20.0, 20.0, 15.0),
-                  width: 50,
-                  child: _leaveRoomButton()),*/
-            ],
-          ),
-        ),
+              ),*/
       ),
     );
   }
