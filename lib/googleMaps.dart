@@ -607,7 +607,7 @@ class GoogleMapsState extends State<GoogleMaps> {
                   ),
                 ),
                 Container(
-                    padding: EdgeInsets.fromLTRB(10, 88, 0, 0),
+                    padding: EdgeInsets.fromLTRB(10, 63, 0, 0),
                     child: FloatingActionButton(
                       backgroundColor: Color(Global.backgroundColor),
                       child: Icon(
@@ -618,7 +618,7 @@ class GoogleMapsState extends State<GoogleMaps> {
                       onPressed: () => Scaffold.of(context).openDrawer(),
                     )),
                 Positioned(
-                  top: 90,
+                  top: 65,
                   right: 15,
                   left: 80,
                   child: Container(
@@ -646,7 +646,7 @@ class GoogleMapsState extends State<GoogleMaps> {
                   ),
                 ),
                 Padding(
-                  padding: const EdgeInsets.fromLTRB(16.0, 150.0, 16.0, 16.0),
+                  padding: const EdgeInsets.fromLTRB(16.0, 130.0, 16.0, 16.0),
                   child: Align(
                     alignment: Alignment.topRight,
                     child: Column(

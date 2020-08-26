@@ -2,6 +2,7 @@ import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'dart:async';
 
+import 'package:bubble_tab_indicator/bubble_tab_indicator.dart';
 import '../appBar.dart';
 import 'firebaseFunctions.dart';
 import '../expandedSection.dart';
@@ -16,7 +17,6 @@ import "../googleMaps.dart";
 import "../globalVar.dart";
 import "../findYelpPlaces.dart";
 import 'package:share/share.dart';
-import '../tabDrawer.dart';
 
 //Below are variables we will use for the sliders
 double midSliderVal = 5;
@@ -148,351 +148,339 @@ class _MapRenderState extends State<MapRender> {
 
     return Container(
       margin: EdgeInsets.fromLTRB(7, 0, 7, 0),
-      child: Container(
-        child: ListView.builder(
-          itemCount: _arrLength,
-          itemBuilder: (BuildContext context, int index) {
-            //return new Text(names[index]);
-            return new Container(
-              margin: EdgeInsets.fromLTRB(15, 10, 15, 10),
-              decoration: BoxDecoration(
-                color: Color(Global.whiteColor),
-                //border: Border.all(color: Colors.black38),
-                borderRadius: BorderRadius.all(Radius.circular(10)),
-                boxShadow: [
-                  BoxShadow(
-                    color: Colors.grey.withOpacity(0.6),
-                    spreadRadius: 0.5,
-                    blurRadius: 6,
-                    offset: Offset(7, 6), // changes position of shadow
-                  ),
-                ],
-              ),
-              child: Column(
-                children: <Widget>[
-                  Container(
-                    //padding: EdgeInsets.fromLTRB(10, 0, 10, 0),
+      child: Column(children: <Widget>[
+        Container(
+          height: 100,
+          alignment: Alignment.centerLeft,
+          padding: EdgeInsets.fromLTRB(0, 20, 0, 0),
+          child: Text(
+              Global.finalCategory != null
+                  ? "Searching for: ${Global.finalCategory}"
+                  : "Searching for: All",
+              style: TextStyle(
+                fontSize: 20,
+                fontFamily: 'Goldplay',
+              )),
+        ),
+        Align(
+          alignment: Alignment.topCenter,
+          child: Container(
+            margin: EdgeInsets.fromLTRB(0, 10, 0, 0),
+            decoration: BoxDecoration(
+              color: Colors.black87,
+              borderRadius: BorderRadius.all(Radius.circular(20)),
+            ),
+            child: SizedBox(
+              width: double.infinity,
+              height: 2,
+            ),
+          ),
+        ),
+        Expanded(
+          child: ListView.builder(
+            itemCount: _arrLength,
+            itemBuilder: (BuildContext context, int index) {
+              //return new Text(names[index]);
+              return new Container(
+                margin: EdgeInsets.fromLTRB(15, 5, 15, 10),
+                decoration: BoxDecoration(
+                  color: Color(Global.whiteColor),
+                  //border: Border.all(color: Colors.black38),
+                  borderRadius: BorderRadius.all(Radius.circular(10)),
+                  boxShadow: [
+                    BoxShadow(
+                      color: Colors.grey.withOpacity(0.6),
+                      spreadRadius: 0.5,
+                      blurRadius: 6,
+                      offset: Offset(7, 6), // changes position of shadow
+                    ),
+                  ],
+                ),
+                child: Column(
+                  children: <Widget>[
+                    Container(
+                      //padding: EdgeInsets.fromLTRB(10, 0, 10, 0),
 
-                    /*child: Link(
+                      /*child: Link(
                   url: Global.urls[index],*/
-                    child: Row(
-                      children: <Widget>[
-                        Center(
-                          child: Container(
-                            width: MediaQuery.of(context).size.width * 0.87,
-                            child: Column(
-                              mainAxisSize: MainAxisSize.min,
-                              children: <Widget>[
-                                Container(
-                                  width: double.infinity,
-                                  decoration: BoxDecoration(
-                                    borderRadius: onlyTop10(),
+                      child: Row(
+                        children: <Widget>[
+                          Center(
+                            child: Container(
+                              width: MediaQuery.of(context).size.width * 0.87,
+                              child: Column(
+                                mainAxisSize: MainAxisSize.min,
+                                children: <Widget>[
+                                  Container(
+                                    width: double.infinity,
+                                    decoration: BoxDecoration(
+                                      borderRadius: onlyTop10(),
+                                    ),
+                                    child: InkWell(
+                                      onTap: () => _toggleExpand(index),
+                                      child: Container(
+                                        child: Row(
+                                          children: <Widget>[
+                                            Container(
+                                              width: 90,
+                                              height: 90,
+                                              padding: EdgeInsets.all(8),
+                                              child: ClipRRect(
+                                                borderRadius: BorderRadius.all(
+                                                  Radius.circular(10),
+                                                ),
+                                                child: Image.network(
+                                                  Global.images[index] == null
+                                                      ? 'https://firebasestorage.googleapis.com/v0/b/rendezvous-b51b4.appspot.com/o/photo-1550747545-c896b5f89ff7.jpeg?alt=media&token=eb3eb883-86da-4b89-87e1-7490fd518910'
+                                                      : '${Global.images[index]}',
+                                                  // 'https://firebasestorage.googleapis.com/v0/b/rendezvous-b51b4.appspot.com/o/photo-1550747545-c896b5f89ff7.jpeg?alt=media&token=eb3eb883-86da-4b89-87e1-7490fd518910',
+                                                  fit: BoxFit.cover,
+                                                ),
+                                              ),
+                                            ),
+                                            SizedBox(width: 5.0),
+                                            Flexible(
+                                              child: Column(
+                                                crossAxisAlignment:
+                                                    CrossAxisAlignment.start,
+                                                children: <Widget>[
+                                                  MergeSemantics(
+                                                    child: Row(
+                                                      children: <Widget>[
+                                                        Flexible(
+                                                          child: Container(
+                                                            padding: EdgeInsets
+                                                                .fromLTRB(
+                                                                    0, 0, 0, 0),
+                                                            child: Text(
+                                                              "${Global.names[index]} ",
+                                                              overflow:
+                                                                  TextOverflow
+                                                                      .ellipsis,
+                                                              softWrap: true,
+                                                              style:
+                                                                  textSize18Alpha(),
+                                                              textAlign:
+                                                                  TextAlign
+                                                                      .left,
+                                                            ),
+                                                          ),
+                                                          //textAlign: TextAlign.right,
+                                                        ),
+                                                      ],
+                                                    ),
+                                                  ),
+                                                  SizedBox(height: 5),
+                                                  AnimatedOpacity(
+                                                    // If the widget is visible, animate to 0.0 (invisible).
+                                                    // If the widget is hidden, animate to 1.0 (fully visible).
+                                                    opacity: !_isExpanded[index]
+                                                        ? 1.0
+                                                        : 0.0,
+                                                    duration: Duration(
+                                                        milliseconds: 500),
+
+                                                    child: Text(
+                                                      'Click to see more information',
+                                                      maxLines: 1,
+                                                      style: textSize12Grey(),
+                                                    ),
+                                                  ),
+                                                  SizedBox(height: 5),
+                                                ],
+                                              ),
+                                            )
+                                          ],
+                                        ),
+                                      ),
+                                    ),
                                   ),
-                                  child: InkWell(
-                                    onTap: () => _toggleExpand(index),
+                                  ExpandedSection(
+                                    expand: _isExpanded[index],
                                     child: Container(
-                                      child: Row(
+                                      height: 300,
+                                      child: Column(
                                         children: <Widget>[
                                           Container(
-                                            width: 90,
-                                            height: 90,
-                                            padding: EdgeInsets.all(8),
-                                            child: ClipRRect(
-                                              borderRadius: BorderRadius.all(
-                                                Radius.circular(10),
-                                              ),
-                                              child: Image.network(
-                                                Global.images[index] == null
-                                                    ? 'https://firebasestorage.googleapis.com/v0/b/rendezvous-b51b4.appspot.com/o/photo-1550747545-c896b5f89ff7.jpeg?alt=media&token=eb3eb883-86da-4b89-87e1-7490fd518910'
-                                                    : '${Global.images[index]}',
-                                                // 'https://firebasestorage.googleapis.com/v0/b/rendezvous-b51b4.appspot.com/o/photo-1550747545-c896b5f89ff7.jpeg?alt=media&token=eb3eb883-86da-4b89-87e1-7490fd518910',
-                                                fit: BoxFit.cover,
-                                              ),
+                                            padding: EdgeInsets.fromLTRB(
+                                                60, 0, 0, 5),
+                                            width: double.infinity,
+                                            child: Text(
+                                              "Address: ${Global.locations[index]} ",
+                                              overflow: TextOverflow.ellipsis,
+                                              softWrap: true,
+                                              style: textSize15Black45(),
+                                              textAlign: TextAlign.left,
                                             ),
                                           ),
-                                          SizedBox(width: 5.0),
-                                          Flexible(
-                                            child: Column(
-                                              crossAxisAlignment:
-                                                  CrossAxisAlignment.start,
-                                              children: <Widget>[
-                                                MergeSemantics(
-                                                  child: Row(
-                                                    children: <Widget>[
-                                                      Flexible(
+                                          Container(
+                                            padding: EdgeInsets.fromLTRB(
+                                                60, 0, 0, 5),
+                                            width: double.infinity,
+                                            child: Text(
+                                              "Rating: ${Global.ratings[index]} ",
+                                              overflow: TextOverflow.ellipsis,
+                                              softWrap: true,
+                                              style: textSize15Black45(),
+                                              textAlign: TextAlign.left,
+                                            ),
+                                          ),
+                                          Container(
+                                            padding: EdgeInsets.fromLTRB(
+                                                60, 0, 0, 5),
+                                            width: double.infinity,
+                                            child: Text(
+                                              Global.phoneNums[index] == ''
+                                                  ? 'Phone number is unavailable'
+                                                  : 'Phone Number: ${Global.phoneNums[index]}',
+                                              overflow: TextOverflow.ellipsis,
+                                              softWrap: true,
+                                              style: textSize15Black45(),
+                                              textAlign: TextAlign.left,
+                                            ),
+                                          ),
+                                          Container(
+                                            padding: EdgeInsets.fromLTRB(
+                                                60, 0, 0, 5),
+                                            width: double.infinity,
+                                            child: Text(
+                                              Global.prices[index] == null
+                                                  ? 'Price is unavailable'
+                                                  : 'Price: ${Global.prices[index]}',
+                                              overflow: TextOverflow.ellipsis,
+                                              softWrap: true,
+                                              style: textSize15Grey(),
+                                              textAlign: TextAlign.left,
+                                            ),
+                                          ),
+                                          Container(
+                                            width: double.infinity,
+                                            height: 95,
+                                            child: Row(children: <Widget>[
+                                              //Final Position Button
+
+                                              Container(
+                                                margin: EdgeInsets.fromLTRB(
+                                                    20, 0, 0, 0),
+                                                height: 70,
+                                                width: 70,
+                                                child: FittedBox(
+                                                  child: FloatingActionButton(
+                                                    backgroundColor:
+                                                        Color(0xff21bf73),
+                                                    child: Icon(
+                                                      Icons.check_circle,
+                                                      size: 40,
+                                                    ),
+                                                    elevation: 2,
+                                                    onPressed: () {
+                                                      FirebaseFunctions
+                                                          .setFinalPosition(
+                                                              Global
+                                                                  .names[index],
+                                                              Global.locations[
+                                                                  index]);
+                                                    },
+                                                  ),
+                                                ),
+                                              ),
+
+                                              //Yelp Button
+                                              Container(
+                                                  height: 70,
+                                                  width: 70,
+                                                  margin: EdgeInsets.fromLTRB(
+                                                      MediaQuery.of(context)
+                                                              .size
+                                                              .width *
+                                                          0.44,
+                                                      0,
+                                                      0,
+                                                      0),
+                                                  child: FittedBox(
+                                                    child: FloatingActionButton(
+                                                        backgroundColor:
+                                                            Color(0xffaa1802),
                                                         child: Container(
-                                                          padding: EdgeInsets
-                                                              .fromLTRB(
-                                                                  0, 0, 0, 0),
-                                                          child: Text(
-                                                            "${Global.names[index]} ",
-                                                            overflow:
-                                                                TextOverflow
-                                                                    .ellipsis,
-                                                            softWrap: true,
-                                                            style:
-                                                                textSize18Alpha(),
-                                                            textAlign:
-                                                                TextAlign.left,
+                                                          height: 50,
+                                                          width: 50,
+                                                          child: Image.asset(
+                                                            'images/yelp_icon.png',
                                                           ),
                                                         ),
-                                                        //textAlign: TextAlign.right,
-                                                      ),
-                                                    ],
-                                                  ),
-                                                ),
-                                                SizedBox(height: 5),
-                                                AnimatedOpacity(
-                                                  // If the widget is visible, animate to 0.0 (invisible).
-                                                  // If the widget is hidden, animate to 1.0 (fully visible).
-                                                  opacity: !_isExpanded[index]
-                                                      ? 1.0
-                                                      : 0.0,
-                                                  duration: Duration(
-                                                      milliseconds: 500),
+                                                        elevation: 2,
+                                                        onPressed: () {
+                                                          launch(Global
+                                                              .urls[index]);
+                                                        }),
+                                                  )),
 
-                                                  child: Text(
-                                                    'Click to see more information',
-                                                    maxLines: 1,
-                                                    style: textSize12Grey(),
-                                                  ),
-                                                ),
-                                                SizedBox(height: 5),
-                                              ],
-                                            ),
-                                          )
+                                              SizedBox(
+                                                height: 20,
+                                              )
+                                            ]),
+                                          ),
                                         ],
                                       ),
                                     ),
                                   ),
-                                ),
-                                ExpandedSection(
-                                  expand: _isExpanded[index],
-                                  child: Container(
-                                    height: 300,
-                                    child: Column(
-                                      children: <Widget>[
-                                        Container(
-                                          padding:
-                                              EdgeInsets.fromLTRB(60, 0, 0, 5),
-                                          width: double.infinity,
-                                          child: Text(
-                                            "Address: ${Global.locations[index]} ",
-                                            overflow: TextOverflow.ellipsis,
-                                            softWrap: true,
-                                            style: textSize15Black45(),
-                                            textAlign: TextAlign.left,
-                                          ),
-                                        ),
-                                        Container(
-                                          padding:
-                                              EdgeInsets.fromLTRB(60, 0, 0, 5),
-                                          width: double.infinity,
-                                          child: Text(
-                                            "Rating: ${Global.ratings[index]} ",
-                                            overflow: TextOverflow.ellipsis,
-                                            softWrap: true,
-                                            style: textSize15Black45(),
-                                            textAlign: TextAlign.left,
-                                          ),
-                                        ),
-                                        Container(
-                                          padding:
-                                              EdgeInsets.fromLTRB(60, 0, 0, 5),
-                                          width: double.infinity,
-                                          child: Text(
-                                            Global.phoneNums[index] == ''
-                                                ? 'Phone number is unavailable'
-                                                : 'Phone Number: ${Global.phoneNums[index]}',
-                                            overflow: TextOverflow.ellipsis,
-                                            softWrap: true,
-                                            style: textSize15Black45(),
-                                            textAlign: TextAlign.left,
-                                          ),
-                                        ),
-                                        Container(
-                                          padding:
-                                              EdgeInsets.fromLTRB(60, 0, 0, 5),
-                                          width: double.infinity,
-                                          child: Text(
-                                            Global.prices[index] == null
-                                                ? 'Price is unavailable'
-                                                : 'Price: ${Global.prices[index]}',
-                                            overflow: TextOverflow.ellipsis,
-                                            softWrap: true,
-                                            style: textSize15Grey(),
-                                            textAlign: TextAlign.left,
-                                          ),
-                                        ),
-                                        Container(
-                                          width: double.infinity,
-                                          height: 95,
-                                          child: Row(children: <Widget>[
-                                            //Final Position Button
-
-                                            Container(
-                                              margin: EdgeInsets.fromLTRB(
-                                                  20, 0, 0, 0),
-                                              height: 70,
-                                              width: 70,
-                                              child: FittedBox(
-                                                child: FloatingActionButton(
-                                                  backgroundColor:
-                                                      Color(0xff21bf73),
-                                                  child: Icon(
-                                                    Icons.check_circle,
-                                                    size: 40,
-                                                  ),
-                                                  elevation: 2,
-                                                  onPressed: () {
-                                                    FirebaseFunctions
-                                                        .setFinalPosition(
-                                                            Global.names[index],
-                                                            Global.locations[
-                                                                index]);
-                                                  },
-                                                ),
-                                              ),
-                                            ),
-
-                                            //Yelp Button
-                                            Container(
-                                                height: 70,
-                                                width: 70,
-                                                margin: EdgeInsets.fromLTRB(
-                                                    MediaQuery.of(context)
-                                                            .size
-                                                            .width *
-                                                        0.44,
-                                                    0,
-                                                    0,
-                                                    0),
-                                                child: FittedBox(
-                                                  child: FloatingActionButton(
-                                                      backgroundColor:
-                                                          Color(0xffaa1802),
-                                                      child: Container(
-                                                        height: 50,
-                                                        width: 50,
-                                                        child: Image.asset(
-                                                          'images/yelp_icon.png',
-                                                        ),
-                                                      ),
-                                                      elevation: 2,
-                                                      onPressed: () {
-                                                        launch(
-                                                            Global.urls[index]);
-                                                      }),
-                                                )),
-
-                                            SizedBox(
-                                              height: 20,
-                                            )
-                                          ]),
-                                        ),
-                                      ],
-                                    ),
-                                  ),
-                                ),
-                                /*Container(
-                        margin: EdgeInsets.fromLTRB(8, 8, 8, 8),
-                        height: 90,
-                        width: 90,
-                        child: ClipRRect(
-                          borderRadius: BorderRadius.all(Radius.circular(10)),
-                          child: Image.network(
-                            Global.images[index] == null
-                                ? 'https://firebasestorage.googleapis.com/v0/b/rendezvous-b51b4.appspot.com/o/photo-1550747545-c896b5f89ff7.jpeg?alt=media&token=eb3eb883-86da-4b89-87e1-7490fd518910'
-                                : '${Global.images[index]}',
-                            // 'https://firebasestorage.googleapis.com/v0/b/rendezvous-b51b4.appspot.com/o/photo-1550747545-c896b5f89ff7.jpeg?alt=media&token=eb3eb883-86da-4b89-87e1-7490fd518910',
-                            fit: BoxFit.cover,
-                          ),
-                        ),
-                      ),
-                      SizedBox(
-                        width: 5.0,
-                      ),
-                      Flexible(
-                        child: Column(
-                          crossAxisAlignment: CrossAxisAlignment.start,
-                          children: <Widget>[
-                            MergeSemantics(
-                              child: Row(
-                                children: <Widget>[
-                                  Flexible(
-                                    child: Container(
-                                      padding: EdgeInsets.fromLTRB(0, 0, 0, 0),
-                                      child: Text(
-                                        "${Global.names[index]} ",
-                                        overflow: TextOverflow.ellipsis,
-                                        softWrap: true,
-                                        style: TextStyle(
-                                            fontWeight: FontWeight.bold,
-                                            fontSize: 15,
-                                            color:
-                                                Theme.of(context).primaryColor),
-                                        textAlign: TextAlign.left,
-                                      ),
-                                    ),
-                                    //textAlign: TextAlign.right,
-                                  ),
                                 ],
+                                // ),
                               ),
-                            ),
-                            SizedBox(height: 5),
-                            Container(
-                              padding: EdgeInsets.fromLTRB(0, 0, 0, 0),
-                              child: Text(
-                                'Click to open Yelp page',
-                                maxLines: 1,
-                                style: TextStyle(
-                                    fontSize: 12,
-                                    fontWeight: FontWeight.w500,
-                                    color: Colors.grey),
-                              ),
-                            ),
-                            SizedBox(height: 5),
-                          ],
-                        ),
-                      )*/
-                              ],
-                              // ),
                             ),
                           ),
-                        ),
-                      ],
+                        ],
+                      ),
                     ),
-                  ),
-                ],
-              ),
-            );
-          },
+                  ],
+                ),
+              );
+            },
+          ),
         ),
-      ),
+      ]),
     );
   }
 
   Widget _slideUpPanel() {
-    return SlidingUpPanel(
-      //maxHeight: 600,
-
-      backdropEnabled: true,
-      borderRadius: onlyTop20(),
-      panel: Center(
-        child: Container(
-            decoration: BoxDecoration(
-              color: Color(Global.backgroundColor),
-              borderRadius: onlyTop20(),
-            ),
-            child: _viewYelp()),
-      ),
-
-      collapsed: Container(
-        decoration: BoxDecoration(
-          color: Color(Global.backgroundColor),
-          borderRadius: onlyTop20(),
+    return SingleChildScrollView(
+      child: SlidingUpPanel(
+        //maxHeight: 600,
+        color: Colors.transparent,
+        boxShadow: [
+          BoxShadow(
+            color: Colors.grey.withOpacity(0.5),
+            spreadRadius: 3,
+            blurRadius: 9,
+            offset: Offset(0, 15),
+          ),
+        ],
+        backdropEnabled: true,
+        borderRadius: onlyTop20(),
+        panel: Container(
+          padding: EdgeInsets.fromLTRB(0, 25, 0, 0),
+          child: Center(
+            child: Container(
+                decoration: BoxDecoration(
+                  color: Color(Global.backgroundColor),
+                  borderRadius: onlyTop20(),
+                ),
+                child: _viewYelp()),
+          ),
         ),
-        child: Align(
+
+        collapsed: _collapsedSlideUpPanel(),
+        minHeight: 135,
+        maxHeight: MediaQuery.of(context).size.height * 0.75,
+        body: GoogleMaps(),
+      ),
+    );
+  }
+
+  Widget _collapsedSlideUpPanel() {
+    return Stack(
+      children: <Widget>[
+        Align(
           alignment: Alignment.topCenter,
           child: Container(
             margin: EdgeInsets.fromLTRB(0, 10, 0, 0),
@@ -509,15 +497,29 @@ class _MapRenderState extends State<MapRender> {
               ],
             ),
             child: SizedBox(
-              width: 60,
+              width: 80,
               height: 8,
             ),
           ),
         ),
-      ),
-      minHeight: MediaQuery.of(context).size.height * 0.10,
-      maxHeight: MediaQuery.of(context).size.height * 0.70,
-      body: GoogleMaps(),
+        Container(
+          margin: EdgeInsets.fromLTRB(0, 25, 0, 0),
+          width: double.infinity,
+          height: double.infinity,
+          decoration: BoxDecoration(
+            color: Color(Global.backgroundColor),
+            borderRadius: onlyTop20(),
+          ),
+          child: Container(
+            padding: EdgeInsets.fromLTRB(10, 10, 0, 0),
+            child: Text(
+              FirebaseFunctions.roomData["Final Location"] != null
+                  ? "Chosen Location is: ${FirebaseFunctions.roomData["Final Location Address"]}"
+                  : "Chosen Location is: No address set",
+            ),
+          ),
+        ),
+      ],
     );
   }
 
@@ -685,7 +687,7 @@ class _MapRenderState extends State<MapRender> {
         //other styles
       ),
       child: Container(
-        width: 350,
+        width: 340,
         child: Drawer(
           child: DefaultTabController(
             length: 3,
@@ -693,21 +695,27 @@ class _MapRenderState extends State<MapRender> {
               mainAxisSize: MainAxisSize.max,
               children: <Widget>[
                 Container(
-                  height: MediaQuery.of(context).size.height * 0.1,
+                  height: MediaQuery.of(context).size.height * 0.08,
                 ),
                 Container(
                   height: 50,
+                  color: Color(Global.backgroundColor),
                   child: TabBar(
                       labelColor: Colors.black,
                       unselectedLabelColor: Colors.black38,
-                      indicatorColor: Color(Global.yellowColor),
-                      indicator: UnderlineTabIndicator(
-                          borderSide: BorderSide(width: 4.0),
-                          insets: EdgeInsets.symmetric(horizontal: 22.0)),
+                      labelStyle:
+                          TextStyle(fontSize: 20, fontFamily: 'Goldplay'),
+                      unselectedLabelStyle:
+                          TextStyle(fontSize: 15, fontFamily: 'Goldplay'),
+                      indicator: BubbleTabIndicator(
+                        indicatorColor: Color(Global.yellowColor),
+                        padding: EdgeInsets.fromLTRB(-24, -10, -24, 16),
+                        indicatorHeight: 2,
+                      ),
                       tabs: [
-                        Tab(text: "First"),
-                        Tab(text: "Second"),
-                        Tab(text: "Third"),
+                        Tab(text: "Venue"),
+                        Tab(text: "Info"),
+                        Tab(text: "Chat"),
                       ]),
                 ),
                 Expanded(
@@ -722,23 +730,7 @@ class _MapRenderState extends State<MapRender> {
               ],
             ),
           ),
-        ), /*Drawer(
-          child: ListView(
-            children: <Widget>[
-              Container(
-                height: MediaQuery.of(context).size.height * 0.10,
-              ),
-              SafeArea(
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: <Widget>[
-                    Tabs(refresh: () => setState(() {})),
-                    Global.tabValue == 0 ? _tab1Contents() : Container(),
-                    Global.tabValue == 1 ? _tab2Contents() : Container(),
-                    Global.tabValue == 2 ? _tab3Contents() : Container(),
-                  ],
-                ),
-              ),*/
+        ),
       ),
     );
   }
