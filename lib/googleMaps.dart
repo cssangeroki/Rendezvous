@@ -232,7 +232,7 @@ class GoogleMapsState extends State<GoogleMaps> {
         int timeTaken = decoded['rows'][0]["elements"][0]["duration"]["value"];
         print("Time taken is $timeTaken");
         Global.hours = (timeTaken / 3600).floor();
-        Global.minutes = (timeTaken / 60).ceil();
+        Global.minutes = ((timeTaken % 3600)/ 60).ceil();
         //Notify other parts that the time changed
         Global.timeChanged.notifyListeners();
 
