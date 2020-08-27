@@ -40,4 +40,12 @@ class Global {
   static ValueNotifier mapRPnameListListener = ValueNotifier(false);
 
   static ValueNotifier finalLocationChanged = ValueNotifier(false);
+
+  //Variables used to display travel time
+  static int hours;
+  static int minutes;
+
+  //
+  static ValueNotifier timeChanged = ValueNotifier(false);
+
 }

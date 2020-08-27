@@ -45,6 +45,8 @@ class _MapRenderState extends State<MapRender>
   final String userDocID = FirebaseFunctions.currentUID;
   final String roomDocID = FirebaseFunctions.currentUserData["roomCode"];
   StreamSubscription<DocumentSnapshot> roomListener;
+  int hours;
+  int min;
 
   var _isExpanded = new List<bool>.filled(50, false, growable: true);
 
@@ -52,6 +54,7 @@ class _MapRenderState extends State<MapRender>
   void initState() {
     super.initState();
     Global.finalRad = midSliderVal;
+    listenToTime();
     newPlacesListener();
     nameListListener();
     listenToRoom();
@@ -83,6 +86,15 @@ class _MapRenderState extends State<MapRender>
     });
   }
 
+  void listenToTime(){
+    Global.timeChanged.addListener((){
+      setState(() {
+        hours = Global.hours;
+        min = Global.minutes;
+      });
+      Global.timeChanged.value = false;
+    });
+  }
   //This function will be used to set a listener for whenever findingYelpPlaces is called in other widgets
   void newPlacesListener() {
     Global.mapRPfindYPListener.addListener(() {
@@ -607,6 +619,25 @@ class _MapRenderState extends State<MapRender>
               },
             ),
           ),
+          Container(
+            child: ListTile(
+              title: Text(
+                'Time Taken:',
+                style: textSize20(),
+              ),
+              onTap: null,
+            ),
+          ),
+          Container(
+            padding: EdgeInsets.fromLTRB(30, 0, 0, 10),
+            child: SelectableText(
+              hours != null
+                  ? "Approximately ${hours}hrs ${min}min"
+                  : "0hrs 0min",
+              style: textSize20(),
+              enableInteractiveSelection: true,
+            ),
+          )
         ],
       ),
     );
