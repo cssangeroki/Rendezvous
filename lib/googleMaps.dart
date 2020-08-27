@@ -15,9 +15,14 @@ import "globalVar.dart";
 import "findYelpPlaces.dart";
 import 'package:flutter_polyline_points/flutter_polyline_points.dart';
 
+//Import needed for calculating route time
+import 'package:http/http.dart' as http;
+import 'dart:convert' as convert;
+
 //Here I'm creating a reference to our firebase
 final firebase = Firestore.instance;
 String _mapStyle;
+String mapsAPI_KEY = "AIzaSyBV961Ztopz9vyZrJq0AYAMJUTHmluu3FM";
 GlobalKey<GoogleMapsState> mapsKey = GlobalKey<GoogleMapsState>();
 //Below is a function that gets the users current location, or last known location.
 //The function will return a Position variable
@@ -187,6 +192,7 @@ class GoogleMapsState extends State<GoogleMaps> {
           LatLng(value[0].position.latitude, value[0].position.longitude);
       addFinalLocMarker();
       setPolyLines();
+      calculateTravelTime();
     });
   }
 
@@ -208,6 +214,29 @@ class GoogleMapsState extends State<GoogleMaps> {
             });
           }));
     });
+  }
+
+  //Function that will send an http request to google maps to calculate the travel time
+  void calculateTravelTime() async {
+    //We send an http request to get to the google maps api, to get the travel time
+    var response = await http.post(
+        "https://maps.googleapis.com/maps/api/distancematrix/json?units=imperial&origins=${currLocation.latitude},${currLocation
+        .longitude}&destinations=${finalLatLng.latitude},${finalLatLng.longitude}&departure_time=now&key=$mapsAPI_KEY");
+    //Now, we will decode the json response
+    if (response.statusCode == 200){
+        var decoded = convert.jsonDecode(response.body);
+        print("Decode = $decoded");
+        print("decoded datatype = ${decoded.runtimeType}");
+        //var rows = decoded['rows'];
+        int timeTaken = decoded['rows'][0]["elements"][0]["duration"]["value"];
+        print("Time taken is $timeTaken");
+        Global.hours = (timeTaken / 60).floor();
+        Global.minutes = (timeTaken % 60);
+        //Notify other parts that the time changed
+        Global.timeChanged.notifyListeners();
+
+    }
+
   }
 
 //Function used to get users original position
@@ -322,7 +351,7 @@ class GoogleMapsState extends State<GoogleMaps> {
     if (userMarkerDragged == true) {
       return;
     }
-    print("Camera Moved");
+    //print("Camera Moved");
     _center = position.target;
     _lastMapPosition = position.target;
   }
@@ -522,7 +551,7 @@ class GoogleMapsState extends State<GoogleMaps> {
         PointLatLng(finalLatLng.latitude, finalLatLng.longitude);
     //Get the route using the google api key
     PolylineResult route = await polylinePoints?.getRouteBetweenCoordinates(
-        "AIzaSyAFGuq9qZc6xGWB6S5NHZgpyExhUldiwjU", userLocation, destination);
+        mapsAPI_KEY, userLocation, destination);
     if (route != null) {
       route.points.forEach((element) {
         polylineCoordinates.add(LatLng(element.latitude, element.longitude));
