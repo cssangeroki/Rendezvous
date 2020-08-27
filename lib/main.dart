@@ -3,6 +3,7 @@ import 'package:flutter/services.dart';
 import 'pages/firebaseFunctions.dart';
 import 'pages/insertNamePage.dart';
 import 'pages/mapRenderPage.dart';
+import 'package:google_fonts/google_fonts.dart';
 
 import 'package:firebase_auth/firebase_auth.dart';
 
@@ -46,11 +47,7 @@ class MyApp extends StatelessWidget {
         title: 'Retrieve Text Input',
         theme: ThemeData(
           scaffoldBackgroundColor: Color(0xffd4f9ff),
-          textTheme: Theme.of(context).textTheme.apply(
-                fontFamily: 'Goldplay',
-                fontSizeFactor: 1.1,
-                fontSizeDelta: 2.0,
-              ),
+          fontFamily: 'Roboto',
         ),
         debugShowCheckedModeBanner: false,
         home: Page1(),
