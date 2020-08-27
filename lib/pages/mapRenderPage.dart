@@ -86,8 +86,8 @@ class _MapRenderState extends State<MapRender>
     });
   }
 
-  void listenToTime(){
-    Global.timeChanged.addListener((){
+  void listenToTime() {
+    Global.timeChanged.addListener(() {
       setState(() {
         hours = Global.hours;
         min = Global.minutes;
@@ -95,6 +95,7 @@ class _MapRenderState extends State<MapRender>
       Global.timeChanged.value = false;
     });
   }
+
   //This function will be used to set a listener for whenever findingYelpPlaces is called in other widgets
   void newPlacesListener() {
     Global.mapRPfindYPListener.addListener(() {
@@ -283,7 +284,7 @@ class _MapRenderState extends State<MapRender>
                 width: !_isExpanded[index]
                     ? 90
                     : MediaQuery.of(context).size.width * 0.8935,
-                duration: Duration(milliseconds: 1100),
+                duration: Duration(milliseconds: 1050),
                 curve: Curves.fastLinearToSlowEaseIn,
                 padding: !_isExpanded[index] ? EdgeInsets.all(8) : null,
                 child: !_isExpanded[index]
@@ -774,7 +775,7 @@ class _MapRenderState extends State<MapRender>
                           TextStyle(fontSize: 15, fontFamily: 'Roboto'),
                       indicator: BubbleTabIndicator(
                         indicatorColor: Color(Global.yellowColor),
-                        padding: EdgeInsets.fromLTRB(-24, -10, -24, 16),
+                        padding: EdgeInsets.fromLTRB(-24, -12, -24, 16),
                         indicatorHeight: 2,
                       ),
                       tabs: [
