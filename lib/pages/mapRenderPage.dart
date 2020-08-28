@@ -11,6 +11,7 @@ import 'package:url_launcher/url_launcher.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:sliding_up_panel/sliding_up_panel.dart';
+import 'package:smooth_star_rating/smooth_star_rating.dart';
 
 //import 'package:link/link.dart';
 import "../googleMaps.dart";
@@ -244,7 +245,7 @@ class _MapRenderState extends State<MapRender>
                           /*Center(
                             child: */
                           Container(
-                            width: MediaQuery.of(context).size.width * 0.8935,
+                            width: MediaQuery.of(context).size.width * 0.88266,
                             child: Column(
                               mainAxisSize: MainAxisSize.min,
                               children: <Widget>[
@@ -270,106 +271,108 @@ class _MapRenderState extends State<MapRender>
 
   Widget _collapsedContainer(index) {
     return Container(
-      width: double.infinity,
+      width: 500,
       decoration: BoxDecoration(
         borderRadius: onlyTop10(),
       ),
       child: InkWell(
         onTap: () => _toggleExpand(index),
         child: Container(
-          child: Row(
-            children: <Widget>[
-              AnimatedContainer(
-                height: !_isExpanded[index] ? 90 : 200,
-                width: !_isExpanded[index]
-                    ? 90
-                    : MediaQuery.of(context).size.width * 0.8935,
-                duration: Duration(milliseconds: 1050),
-                curve: Curves.fastLinearToSlowEaseIn,
-                padding: !_isExpanded[index] ? EdgeInsets.all(8) : null,
-                child: !_isExpanded[index]
-                    ? ClipRRect(
-                        borderRadius: BorderRadius.all(Radius.circular(10)),
-                        child: Image.network(
-                          Global.images[index] == null
-                              ? 'https://firebasestorage.googleapis.com/v0/b/rendezvous-b51b4.appspot.com/o/photo-1550747545-c896b5f89ff7.jpeg?alt=media&token=eb3eb883-86da-4b89-87e1-7490fd518910'
-                              : '${Global.images[index]}',
-                          // 'https://firebasestorage.googleapis.com/v0/b/rendezvous-b51b4.appspot.com/o/photo-1550747545-c896b5f89ff7.jpeg?alt=media&token=eb3eb883-86da-4b89-87e1-7490fd518910',
-                          fit: BoxFit.cover,
-                        ),
-                      )
-                    : ClipRRect(
-                        borderRadius: BorderRadius.only(
-                            topLeft: Radius.circular(10),
-                            topRight: Radius.circular(10)),
-                        child: Image.network(
-                          Global.images[index] == null
-                              ? 'https://firebasestorage.googleapis.com/v0/b/rendezvous-b51b4.appspot.com/o/photo-1550747545-c896b5f89ff7.jpeg?alt=media&token=eb3eb883-86da-4b89-87e1-7490fd518910'
-                              : '${Global.images[index]}',
-                          // 'https://firebasestorage.googleapis.com/v0/b/rendezvous-b51b4.appspot.com/o/photo-1550747545-c896b5f89ff7.jpeg?alt=media&token=eb3eb883-86da-4b89-87e1-7490fd518910',
-                          fit: BoxFit.cover,
-                        ),
-                      ),
-              ),
-              AnimatedContainer(
-                duration: Duration(milliseconds: 200),
-                width: !_isExpanded[index] ? 5 : 0,
-              ),
-              !_isExpanded[index]
-                  ? Flexible(
-                      child: Column(
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        children: <Widget>[
-                          MergeSemantics(
-                            child: Row(
-                              children: <Widget>[
-                                Flexible(
-                                  child: Container(
-                                    width: !_isExpanded[index]
-                                        ? double.infinity
-                                        : MediaQuery.of(context).size.width *
-                                            0.5,
-                                    padding: EdgeInsets.fromLTRB(0, 0, 0, 0),
-                                    child: Text(
-                                      "${Global.names[index]} ",
-                                      overflow: !_isExpanded[index]
-                                          ? TextOverflow.ellipsis
-                                          : null,
-                                      softWrap: true,
-                                      style: GoogleFonts.roboto(
-                                          fontWeight: FontWeight.w700,
-                                          fontSize: 18),
-                                      /*textAlign:
+          child: ClipRect(
+            child: Row(
+              children: <Widget>[
+                ClipRect(
+                  child: AnimatedContainer(
+                    height: !_isExpanded[index] ? 90 : 130,
+                    width: !_isExpanded[index]
+                        ? 90
+                        : MediaQuery.of(context).size.width * 0.88266,
+                    duration: Duration(milliseconds: 950),
+                    curve: Curves.fastLinearToSlowEaseIn,
+                    padding: !_isExpanded[index] ? EdgeInsets.all(8) : null,
+                    child: !_isExpanded[index]
+                        ? ClipRRect(
+                            borderRadius: BorderRadius.all(Radius.circular(10)),
+                            child: Image.network(
+                              Global.images[index] == null
+                                  ? 'https://firebasestorage.googleapis.com/v0/b/rendezvous-b51b4.appspot.com/o/photo-1550747545-c896b5f89ff7.jpeg?alt=media&token=eb3eb883-86da-4b89-87e1-7490fd518910'
+                                  : '${Global.images[index]}',
+                              // 'https://firebasestorage.googleapis.com/v0/b/rendezvous-b51b4.appspot.com/o/photo-1550747545-c896b5f89ff7.jpeg?alt=media&token=eb3eb883-86da-4b89-87e1-7490fd518910',
+                              fit: BoxFit.cover,
+                            ),
+                          )
+                        : ClipRRect(
+                            borderRadius: BorderRadius.only(
+                                topLeft: Radius.circular(10),
+                                topRight: Radius.circular(10)),
+                            child: Image.network(
+                              Global.images[index] == null
+                                  ? 'https://firebasestorage.googleapis.com/v0/b/rendezvous-b51b4.appspot.com/o/photo-1550747545-c896b5f89ff7.jpeg?alt=media&token=eb3eb883-86da-4b89-87e1-7490fd518910'
+                                  : '${Global.images[index]}',
+                              // 'https://firebasestorage.googleapis.com/v0/b/rendezvous-b51b4.appspot.com/o/photo-1550747545-c896b5f89ff7.jpeg?alt=media&token=eb3eb883-86da-4b89-87e1-7490fd518910',
+                              fit: BoxFit.cover,
+                            ),
+                          ),
+                  ),
+                ),
+                AnimatedContainer(
+                  duration: Duration(milliseconds: 200),
+                  width: !_isExpanded[index] ? 5 : 0,
+                ),
+                !_isExpanded[index]
+                    ? Flexible(
+                        child: Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: <Widget>[
+                            MergeSemantics(
+                              child: Row(
+                                children: <Widget>[
+                                  Flexible(
+                                    child: Container(
+                                      width: !_isExpanded[index]
+                                          ? double.infinity
+                                          : 0,
+                                      padding: EdgeInsets.fromLTRB(0, 0, 0, 0),
+                                      child: Text(
+                                        "${Global.names[index]} ",
+                                        overflow: !_isExpanded[index]
+                                            ? TextOverflow.ellipsis
+                                            : null,
+                                        softWrap: true,
+                                        style: GoogleFonts.roboto(
+                                            fontWeight: FontWeight.w700,
+                                            fontSize: 18),
+                                        /*textAlign:
                                                                   TextAlign
                                                                       .left,*/
+                                      ),
                                     ),
+                                    //textAlign: TextAlign.right,
                                   ),
-                                  //textAlign: TextAlign.right,
-                                ),
-                              ],
+                                ],
+                              ),
                             ),
-                          ),
-                          SizedBox(height: 5),
-                          AnimatedOpacity(
-                            // If the widget is visible, animate to 0.0 (invisible).
-                            // If the widget is hidden, animate to 1.0 (fully visible).
-                            opacity: !_isExpanded[index] ? 1.0 : 0.0,
-                            duration: Duration(milliseconds: 500),
-
-                            child: Text(
-                              'Click to see more information',
-                              maxLines: 1,
-                              style: textSize12Grey(),
+                            SizedBox(height: 5),
+                            AnimatedContainer(
+                              // If the widget is visible, animate to 0.0 (invisible).
+                              // If the widget is hidden, animate to 1.0 (fully visible).
+                              width: !_isExpanded[index] ? double.infinity : 0,
+                              duration: Duration(milliseconds: 500),
+                              child: Text(
+                                'Click to see more information',
+                                maxLines: 1,
+                                style: textSize12Grey(),
+                              ),
                             ),
-                          ),
-                          SizedBox(height: 5),
-                        ],
+                            SizedBox(height: 5),
+                          ],
+                        ),
+                      )
+                    : Container(
+                        color: Colors.transparent,
                       ),
-                    )
-                  : Container(
-                      color: Colors.transparent,
-                    ),
-            ],
+              ],
+            ),
           ),
         ),
       ),
@@ -430,7 +433,7 @@ class _MapRenderState extends State<MapRender>
                       : 'Price: ${Global.prices[index]}',
                   overflow: TextOverflow.ellipsis,
                   softWrap: true,
-                  style: textSize15Grey(),
+                  style: textSize15Black45(),
                   textAlign: TextAlign.left,
                 ),
               ),
