@@ -93,10 +93,10 @@ class _MapRenderState extends State<MapRender>
       setState(() {
         hours = Global.hours;
         min = Global.minutes;
-        if (hours == -1 || min == -1){
-          timeDisplayText = "Sorry, a problem occurred retrieving the travel time";
-        }
-        else{
+        if (hours == -1 || min == -1) {
+          timeDisplayText =
+              "Sorry, a problem occurred retrieving the travel time";
+        } else {
           timeDisplayText = "Approximately ${hours}hrs ${min}min";
         }
       });
@@ -221,55 +221,58 @@ class _MapRenderState extends State<MapRender>
           ),
         ),
         Expanded(
-          child: ListView.builder(
-            itemCount: _arrLength,
-            itemBuilder: (BuildContext context, int index) {
-              //return new Text(names[index]);
-              return new Container(
-                margin: EdgeInsets.fromLTRB(15, 5, 15, 10),
-                decoration: BoxDecoration(
-                  color: Color(Global.whiteColor),
-                  //border: Border.all(color: Colors.black38),
-                  borderRadius: BorderRadius.all(Radius.circular(10)),
-                  boxShadow: [
-                    BoxShadow(
-                      color: Colors.grey.withOpacity(0.6),
-                      spreadRadius: 0.3,
-                      blurRadius: 6,
-                      offset: Offset(0, 6), // changes position of shadow
-                    ),
-                  ],
-                ),
-                child: Column(
-                  children: <Widget>[
-                    Container(
-                      //padding: EdgeInsets.fromLTRB(10, 0, 10, 0),
-
-                      /*child: Link(
-                  url: Global.urls[index],*/
-                      child: Row(
-                        children: <Widget>[
-                          /*Center(
-                            child: */
-                          Container(
-                            width: MediaQuery.of(context).size.width * 0.88266,
-                            child: Column(
-                              mainAxisSize: MainAxisSize.min,
-                              children: <Widget>[
-                                _collapsedContainer(index),
-                                _expandedContainer(index),
-                              ],
-                              // ),
-                            ),
-                          ),
-                          //),
-                        ],
+          child: Container(
+            width: MediaQuery.of(context).size.width * 0.88,
+            child: ListView.builder(
+              itemCount: _arrLength,
+              itemBuilder: (BuildContext context, int index) {
+                //return new Text(names[index]);
+                return new Container(
+                  margin: EdgeInsets.fromLTRB(0, 5, 0, 10),
+                  decoration: BoxDecoration(
+                    //border: Border.all(color: Colors.black38),
+                    borderRadius: BorderRadius.all(Radius.circular(10)),
+                    color: Colors.white,
+                    boxShadow: [
+                      BoxShadow(
+                        color: Colors.grey.withOpacity(0.6),
+                        spreadRadius: 0.3,
+                        blurRadius: 6,
+                        offset: Offset(0, 6), // changes position of shadow
                       ),
-                    ),
-                  ],
-                ),
-              );
-            },
+                    ],
+                  ),
+                  child: Column(
+                    children: <Widget>[
+                      Container(
+                        //padding: EdgeInsets.fromLTRB(10, 0, 10, 0),
+
+                        /*child: Link(
+                  url: Global.urls[index],*/
+                        child: Row(
+                          children: <Widget>[
+                            /*Center(
+                            child: */
+                            Container(
+                              width: MediaQuery.of(context).size.width * 0.88,
+                              child: Column(
+                                mainAxisSize: MainAxisSize.min,
+                                children: <Widget>[
+                                  _collapsedContainer(index),
+                                  _expandedContainer(index),
+                                ],
+                                // ),
+                              ),
+                            ),
+                            //),
+                          ],
+                        ),
+                      ),
+                    ],
+                  ),
+                );
+              },
+            ),
           ),
         ),
       ]),
@@ -280,7 +283,8 @@ class _MapRenderState extends State<MapRender>
     return Container(
       width: 500,
       decoration: BoxDecoration(
-        borderRadius: onlyTop10(),
+        borderRadius: BorderRadius.all(Radius.circular(10)),
+        color: Colors.white,
       ),
       child: InkWell(
         onTap: () => _toggleExpand(index),
@@ -293,7 +297,7 @@ class _MapRenderState extends State<MapRender>
                     height: !_isExpanded[index] ? 90 : 130,
                     width: !_isExpanded[index]
                         ? 90
-                        : MediaQuery.of(context).size.width * 0.88266,
+                        : MediaQuery.of(context).size.width * 0.88,
                     duration: Duration(milliseconds: 950),
                     curve: Curves.fastLinearToSlowEaseIn,
                     padding: !_isExpanded[index] ? EdgeInsets.all(8) : null,
@@ -642,9 +646,7 @@ class _MapRenderState extends State<MapRender>
           Container(
             padding: EdgeInsets.fromLTRB(30, 0, 0, 10),
             child: SelectableText(
-              hours != null
-                  ? timeDisplayText
-                  : "0hrs 0min",
+              hours != null ? timeDisplayText : "0hrs 0min",
               style: textSize20(),
               enableInteractiveSelection: true,
             ),
