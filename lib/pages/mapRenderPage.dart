@@ -81,6 +81,7 @@ class _MapRenderState extends State<MapRender>
             event.data["Final Location"];
         FirebaseFunctions.roomData["Final Location Address"] =
             event.data["Final Location Address"];
+        FirebaseFunctions.roomData["Final LatLng"] = event.data["Final LatLng"];
         if (locChanged == true) {
           Global.finalLocationChanged.notifyListeners();
         }
@@ -468,7 +469,7 @@ class _MapRenderState extends State<MapRender>
                         elevation: 2,
                         onPressed: () {
                           FirebaseFunctions.setFinalPosition(
-                              Global.names[index], Global.locations[index]);
+                              Global.names[index], Global.locations[index], Global.resultCords[index]);
                         },
                       ),
                     ),
