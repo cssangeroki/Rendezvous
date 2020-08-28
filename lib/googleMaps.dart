@@ -181,11 +181,16 @@ class GoogleMapsState extends State<GoogleMaps> {
   //Helper function that just gets the LatLng of the Final Address, and then calls setPolyLines
   Future<void> routeToFinalLoc() async {
     //If no final location is set, no routing needs to be done
-    if (FirebaseFunctions.roomData["Final Location"] == null) {
+    if (FirebaseFunctions.roomData["Final LatLng"] == null) {
       return;
     }
+    GeoPoint tempLatLng = FirebaseFunctions.roomData["Final LatLng"];
+    finalLatLng = LatLng(tempLatLng.latitude, tempLatLng.longitude);
+    addFinalLocMarker();
+    setPolyLines();
+    calculateTravelTime();
     //Otherwise, we route the user to the final location
-    await Geolocator()
+    /*await Geolocator()
         .placemarkFromAddress(
             "${FirebaseFunctions.roomData["Final Location"]}, ${FirebaseFunctions.roomData["Final Location Address"]}")
         .then((value) async {
@@ -194,7 +199,7 @@ class GoogleMapsState extends State<GoogleMaps> {
       addFinalLocMarker();
       setPolyLines();
       calculateTravelTime();
-    });
+    });*/
   }
 
   void addFinalLocMarker() {
@@ -226,9 +231,16 @@ class GoogleMapsState extends State<GoogleMaps> {
     //Now, we will decode the json response
     if (response.statusCode == 200){
         var decoded = convert.jsonDecode(response.body);
-        print("Decode = $decoded");
-        print("decoded datatype = ${decoded.runtimeType}");
+        //print("Decode = $decoded");
+        //print("decoded datatype = ${decoded.runtimeType}");
         //var rows = decoded['rows'];
+        if (decoded['rows'][0]['elements'][0]['status'] != 'OK'){
+          print('Problem occurred getting travel time');
+          Global.hours = -1;
+          Global.minutes = -1;
+          Global.timeChanged.notifyListeners();
+          return;
+        }
         int timeTaken = decoded['rows'][0]["elements"][0]["duration"]["value"];
         print("Time taken is $timeTaken");
         Global.hours = (timeTaken / 3600).floor();
@@ -403,11 +415,11 @@ class GoogleMapsState extends State<GoogleMaps> {
           //Setting midpoint marker to blue so it's identifiable
           onTap: () {
             setState(() {
-              confirmDialogTrigger = true;
               finalLocName = Global.names[i];
               finalLocAddress = Global.locations[i];
               finalLatLng = LatLng(Global.resultCords[i].latitude,
                   Global.resultCords[i].longitude);
+              confirmDialogTrigger = true;
               //confirmFinalPosition();
             });
           }, //Want to add a stateless widget here,
@@ -458,10 +470,10 @@ class GoogleMapsState extends State<GoogleMaps> {
           icon: BitmapDescriptor.defaultMarkerWithHue(BitmapDescriptor.hueBlue),
           onTap: () {
             setState(() {
-              confirmDialogTrigger = true;
               finalLocName = "Midpoint";
               finalLocAddress = midAddress;
               finalLatLng = LatLng(currentMidLat, currentMidLon);
+              confirmDialogTrigger = true;
               //confirmFinalPosition();
             });
           } //Setting midpoint marker to blue so it's identifiable
@@ -579,7 +591,7 @@ class GoogleMapsState extends State<GoogleMaps> {
             onPressed: () {
               setState(() {
                 FirebaseFunctions.setFinalPosition(
-                    finalLocName, finalLocAddress);
+                    finalLocName, finalLocAddress, finalLatLng);
               });
               //setPolyLines();
             },

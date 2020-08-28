@@ -1,5 +1,6 @@
 import 'package:secure_random/secure_random.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:google_maps_flutter/google_maps_flutter.dart';
 
 class FirebaseFunctions {
   static String currentUID;
@@ -11,7 +12,8 @@ class FirebaseFunctions {
     "roomCode": null,
     "host": null,
     "Final Location": null,
-    "Final Location Address": null
+    "Final Location Address": null,
+    "Final LatLng": null
   };
 
   static refreshFirebaseRoomData() async {
@@ -27,6 +29,7 @@ class FirebaseFunctions {
             snapshot.data["Final Location"];
         FirebaseFunctions.roomData["Final Location Address"] =
             snapshot.data["Final Location Address"];
+        FirebaseFunctions.roomData["Final LatLng"] = snapshot.data["Final LatLng"];
       });
     }
   }
@@ -116,6 +119,7 @@ class FirebaseFunctions {
         roomData["Final Location"] = value.data["Final Location"];
         roomData["Final Location Address"] =
             value.data["Final Location Address"];
+        roomData["Final LatLng"] = value.data["Final LatLng"];
       });
       await Firestore.instance
           .collection("users")
@@ -147,12 +151,15 @@ class FirebaseFunctions {
           .delete()
           .then((value) {});
       //If there is more than 1 person in the room, we will change the host to the next user in the room
-      await changeHost();
+      if (membersLength > 1) {
+        await changeHost();
+      }
       FirebaseFunctions.roomData = {
         "roomCode": null,
         "host": null,
         "Final Location": null,
-        "Final Location Address": null
+        "Final Location Address": null,
+        "Final LatLng": null
       };
       FirebaseFunctions.currentUserData = {"roomCode": null};
       //If there is only 1 person in the room, we will delete the room
@@ -234,16 +241,18 @@ class FirebaseFunctions {
 
   //Creating a function that will set the final position
   static void setFinalPosition(
-      String finalLocName, String finalLocAddress) async {
+      String finalLocName, String finalLocAddress, LatLng finalLatLng) async {
     //In this function, I want to push the finalLocName and finalLocAddress to firebase
     await Firestore.instance
         .collection("rooms")
         .document(FirebaseFunctions.roomData["roomCode"])
         .updateData({
       "Final Location": finalLocName,
-      "Final Location Address": finalLocAddress
+      "Final Location Address": finalLocAddress,
+      "Final LatLng": GeoPoint(finalLatLng.latitude, finalLatLng.longitude)
     });
     FirebaseFunctions.roomData["Final Location"] = finalLocName;
     FirebaseFunctions.roomData["Final Location Address"] = finalLocAddress;
+    FirebaseFunctions.roomData["Final LatLng"]= GeoPoint(finalLatLng.latitude, finalLatLng.longitude);
   }
 }
