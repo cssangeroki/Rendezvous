@@ -92,6 +92,7 @@ class _MapRenderState extends State<MapRender>
   void listenToTime() {
     Global.timeChanged.addListener(() {
       setState(() {
+        //print("Time updated");
         hours = Global.hours;
         min = Global.minutes;
         if (hours == -1 || min == -1) {

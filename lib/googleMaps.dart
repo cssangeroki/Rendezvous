@@ -22,7 +22,7 @@ import 'dart:convert' as convert;
 //Here I'm creating a reference to our firebase
 final firebase = Firestore.instance;
 String _mapStyle;
-String mapsAPI_KEY = "AIzaSyBV961Ztopz9vyZrJq0AYAMJUTHmluu3FM";
+const String mapsAPI_KEY = "AIzaSyBV961Ztopz9vyZrJq0AYAMJUTHmluu3FM";
 GlobalKey<GoogleMapsState> mapsKey = GlobalKey<GoogleMapsState>();
 //Below is a function that gets the users current location, or last known location.
 //The function will return a Position variable
@@ -109,6 +109,8 @@ class GoogleMapsState extends State<GoogleMaps> {
 
   //Boolean that will let us know if the user dragged their marker or not
   bool userMarkerDragged = false;
+  //This will be used to reset the time every 60 seconds
+  Duration timeReset = Duration(seconds: 60);
 
   String finalLocName;
   String finalLocAddress;
@@ -146,7 +148,7 @@ class GoogleMapsState extends State<GoogleMaps> {
     _lastMapPosition = _center;
     await _onAddMarkerButtonPressed();
     await _initMarkers();
-    //await initialiseFinalRouteOnEnter();
+    updateTravelTime();
   }
 
   //This functions will listen to when the function addYelpMarkers is called outside and will add the yelpMarkers to the widget
@@ -240,6 +242,15 @@ class GoogleMapsState extends State<GoogleMaps> {
 
   }
 
+  //This function will be used to update the travel time every minute
+  void updateTravelTime() async{
+    Timer.periodic(timeReset, (timer) {
+      //print("Time will be updated");
+      if (currLocation != null && finalLatLng != null){
+        calculateTravelTime();
+      }
+    });
+  }
 //Function used to get users original position
   Future<void> _getUserLocation() async {
     currPosition = await currentLocation();
