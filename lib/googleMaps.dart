@@ -153,7 +153,6 @@ class GoogleMapsState extends State<GoogleMaps> {
   void addYelpMarkersWhenFindYPCalled() {
     Global.findYPCalled.addListener(() {
       setState(() {
-        print("entered YP listener");
         addYelpMarkers();
       });
     });
@@ -187,7 +186,6 @@ class GoogleMapsState extends State<GoogleMaps> {
     GeoPoint tempLatLng = FirebaseFunctions.roomData["Final LatLng"];
     finalLatLng = LatLng(tempLatLng.latitude, tempLatLng.longitude);
     addFinalLocMarker();
-    print("setPolyLines Called here");
     setPolyLines();
     calculateTravelTime();
     //Otherwise, we route the user to the final location
@@ -226,14 +224,13 @@ class GoogleMapsState extends State<GoogleMaps> {
         //print("decoded datatype = ${decoded.runtimeType}");
         //var rows = decoded['rows'];
         if (decoded['rows'][0]['elements'][0]['status'] != 'OK'){
-          print('Problem occurred getting travel time');
           Global.hours = -1;
           Global.minutes = -1;
           Global.timeChanged.notifyListeners();
           return;
         }
         int timeTaken = decoded['rows'][0]["elements"][0]["duration"]["value"];
-        print("Time taken is $timeTaken");
+        //print("Time taken is $timeTaken");
         Global.hours = (timeTaken / 3600).floor();
         Global.minutes = ((timeTaken % 3600)/ 60).ceil();
         //Notify other parts that the time changed
@@ -548,7 +545,6 @@ class GoogleMapsState extends State<GoogleMaps> {
   }
 
   void setPolyLines() async {
-    print("Entered setPolyLines");
     polylineCoordinates.clear();
     PointLatLng userLocation =
         PointLatLng(currLocation.latitude, currLocation.longitude);
