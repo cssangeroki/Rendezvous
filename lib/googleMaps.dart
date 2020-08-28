@@ -146,7 +146,7 @@ class GoogleMapsState extends State<GoogleMaps> {
     _lastMapPosition = _center;
     await _onAddMarkerButtonPressed();
     await _initMarkers();
-    await initialiseFinalRouteOnEnter();
+    //await initialiseFinalRouteOnEnter();
   }
 
   //This functions will listen to when the function addYelpMarkers is called outside and will add the yelpMarkers to the widget
@@ -171,12 +171,12 @@ class GoogleMapsState extends State<GoogleMaps> {
   }
 
   //This function will be used initialise the route to the final location when someone enters a room
-  Future<void> initialiseFinalRouteOnEnter() async {
+  /*Future<void> initialiseFinalRouteOnEnter() async {
     if (FirebaseFunctions.roomData["Final Location"] != null) {
       await routeToFinalLoc();
       calculateTravelTime();
     }
-  }
+  }*/
 
   //Helper function that just gets the LatLng of the Final Address, and then calls setPolyLines
   Future<void> routeToFinalLoc() async {
@@ -187,19 +187,10 @@ class GoogleMapsState extends State<GoogleMaps> {
     GeoPoint tempLatLng = FirebaseFunctions.roomData["Final LatLng"];
     finalLatLng = LatLng(tempLatLng.latitude, tempLatLng.longitude);
     addFinalLocMarker();
+    print("setPolyLines Called here");
     setPolyLines();
     calculateTravelTime();
     //Otherwise, we route the user to the final location
-    /*await Geolocator()
-        .placemarkFromAddress(
-            "${FirebaseFunctions.roomData["Final Location"]}, ${FirebaseFunctions.roomData["Final Location Address"]}")
-        .then((value) async {
-      finalLatLng =
-          LatLng(value[0].position.latitude, value[0].position.longitude);
-      addFinalLocMarker();
-      setPolyLines();
-      calculateTravelTime();
-    });*/
   }
 
   void addFinalLocMarker() {
@@ -557,6 +548,7 @@ class GoogleMapsState extends State<GoogleMaps> {
   }
 
   void setPolyLines() async {
+    print("Entered setPolyLines");
     polylineCoordinates.clear();
     PointLatLng userLocation =
         PointLatLng(currLocation.latitude, currLocation.longitude);
