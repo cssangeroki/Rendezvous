@@ -23,6 +23,8 @@ environment:
 dependencies:
   flutter:
     sdk: flutter
+  smooth_star_rating: 1.1.1
+
   bubble_tab_indicator: "^0.1.4"
   geolocator: ^5.3.2+2 #API for location services
   google_maps_flutter: ^0.5.28+1 #API for Maps services
@@ -82,6 +84,7 @@ flutter:
     - images/person.png
     - images/yelp_icon.png
     - images/Rendezvous_logo.png # added logo from images folder
+
 
   # An image asset can refer to one or more resolution-specific "variants", see
   # https://flutter.dev/assets-and-images/#resolution-aware.
