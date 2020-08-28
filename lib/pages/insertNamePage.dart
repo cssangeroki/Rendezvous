@@ -3,8 +3,10 @@
 import 'package:Rendezvous/pages/firebaseFunctions.dart';
 import 'package:flutter/material.dart';
 import 'package:shared_preferences/shared_preferences.dart';
+
 import '../appBar.dart';
 import 'createOrJoinPage.dart';
+import '../globalVar.dart';
 
 Future<void> saveNamePreference(String userName) async {
   SharedPreferences userNamePrefs = await SharedPreferences.getInstance();
@@ -51,59 +53,59 @@ class _Page1State extends State<Page1> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: appBarMain(context),
       body: SafeArea(
         child: SingleChildScrollView(
           child: Container(
-            child: Column(children: <Widget>[
-              Container(
-                padding: EdgeInsets.fromLTRB(0, 50, 0, 30),
-                child: Image(
-                  image: AssetImage('images/Rendezvous_logo.png'),
-                ),
-              ),
-              Container(
-                padding: EdgeInsets.fromLTRB(20.0, 20.0, 20.0, 0),
-                child: Text(
-                  "Enter a display name:",
-                  style: buttonTextSize30(),
-                ),
-              ),
-              Container(
-                margin: EdgeInsets.fromLTRB(0, 20.0, 0, 0),
-                width: 300.0,
-                child: Form(
-                  key: formKey,
-                  child: TextFormField(
-                    validator: (val) {
-                      return val.isEmpty ? "Please Enter a Name" : null;
-                    },
-                    controller: userNameController,
-                    onChanged: (text) {
-                      userName = text;
-                      FirebaseFunctions.currentUserData["userName"] = text;
-                    },
-                    decoration: InputDecoration(hintText: 'Enter text here'),
+            height: MediaQuery.of(context).size.height,
+            width: MediaQuery.of(context).size.width,
+            child: Center(
+              child: Column(children: <Widget>[
+                Container(
+                  margin: EdgeInsets.fromLTRB(
+                      0, MediaQuery.of(context).size.height * 0.4, 0, 0),
+                  width: 200.0,
+                  child: Form(
+                    key: formKey,
+                    child: TextFormField(
+                      decoration: InputDecoration(
+                        hintText: 'Enter your name',
+                        enabledBorder: UnderlineInputBorder(
+                          borderSide: BorderSide(color: Colors.grey),
+                        ),
+                        focusedBorder: UnderlineInputBorder(
+                          borderSide: BorderSide(color: Colors.grey),
+                        ),
+                      ),
+                      validator: (val) {
+                        return val.isEmpty ? "Please Enter a Name" : null;
+                      },
+                      controller: userNameController,
+                      onChanged: (text) {
+                        userName = text;
+                        FirebaseFunctions.currentUserData["userName"] = text;
+                      },
+                    ),
                   ),
                 ),
-              ),
-            ]),
+                SizedBox(
+                  height: 30,
+                ),
+                FloatingActionButton.extended(
+                  label: Text('Go'),
+                  heroTag: "btn1",
+                  // When the user presses the button, show an alert dialog containing
+                  // the text that the user has entered into the text field.
+                  onPressed: () {
+                    _signMeUp();
+                  },
+                  icon: Icon(Icons.check), // to show Go text in button
+                ),
+              ]),
+            ),
           ),
         ),
       ),
-      floatingActionButton: FloatingActionButton(
-        heroTag: "btn1",
-        backgroundColor: Color(0xffffccbb),
-        // When the user presses the button, show an alert dialog containing
-        // the text that the user has entered into the text field.
-        onPressed: () {
-          _signMeUp();
-        },
-        child: Text(
-          'Go',
-          style: TextStyle(color: Colors.black),
-        ), // to show Go text in button
-      ),
+      backgroundColor: Color(Global.backgroundColor),
     );
   }
 }
