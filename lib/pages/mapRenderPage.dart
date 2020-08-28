@@ -48,6 +48,7 @@ class _MapRenderState extends State<MapRender>
   StreamSubscription<DocumentSnapshot> roomListener;
   int hours;
   int min;
+  String timeDisplayText;
 
   var _isExpanded = new List<bool>.filled(50, false, growable: true);
 
@@ -92,6 +93,12 @@ class _MapRenderState extends State<MapRender>
       setState(() {
         hours = Global.hours;
         min = Global.minutes;
+        if (hours == -1 || min == -1){
+          timeDisplayText = "Sorry, a problem occurred retrieving the travel time";
+        }
+        else{
+          timeDisplayText = "Approximately ${hours}hrs ${min}min";
+        }
       });
       Global.timeChanged.value = false;
     });
@@ -636,7 +643,7 @@ class _MapRenderState extends State<MapRender>
             padding: EdgeInsets.fromLTRB(30, 0, 0, 10),
             child: SelectableText(
               hours != null
-                  ? "Approximately ${hours}hrs ${min}min"
+                  ? timeDisplayText
                   : "0hrs 0min",
               style: textSize20(),
               enableInteractiveSelection: true,
