@@ -49,12 +49,6 @@ Future<Position> currentLocation() async {
 }
 
 class GoogleMaps extends StatefulWidget {
-  //const GoogleMaps ({Key key}) : super(key: key);
-  //GlobalKey<_GoogleMapsState> myKey = GlobalKey();
-  //final _GoogleMapsState mapsState = new _GoogleMapsState();
-//  static of(BuildContext context, {bool root = false}) => root
-//      ? context.findRootAncestorStateOfType<_GoogleMapsState>()
-//      : context.findAncestorStateOfType<_GoogleMapsState>();
 
   @override
   GoogleMapsState createState() => GoogleMapsState(); //mapsState;
@@ -158,26 +152,15 @@ class GoogleMapsState extends State<GoogleMaps> {
         addYelpMarkers();
       });
     });
-    //Global.findYPCalled.value = false;
   }
 
   //This function will be used to listen to if the final location was set on the slide up bar
   void setFinalLocationWhenButtonPressedOnSlideBar() {
     Global.finalLocationChanged.addListener(() async {
-      //print(
-      //  "Location changed. Final Address = ${FirebaseFunctions.roomData["Final Location Address"]}");
+      //print("Location changed. Final Address = ${FirebaseFunctions.roomData["Final Location Address"]}");
       await routeToFinalLoc();
-      Global.finalLocationChanged.value = false;
     });
   }
-
-  //This function will be used initialise the route to the final location when someone enters a room
-  /*Future<void> initialiseFinalRouteOnEnter() async {
-    if (FirebaseFunctions.roomData["Final Location"] != null) {
-      await routeToFinalLoc();
-      calculateTravelTime();
-    }
-  }*/
 
   //Helper function that just gets the LatLng of the Final Address, and then calls setPolyLines
   Future<void> routeToFinalLoc() async {
@@ -224,11 +207,11 @@ class GoogleMapsState extends State<GoogleMaps> {
         var decoded = convert.jsonDecode(response.body);
         //print("Decode = $decoded");
         //print("decoded datatype = ${decoded.runtimeType}");
-        //var rows = decoded['rows'];
         if (decoded['rows'][0]['elements'][0]['status'] != 'OK'){
           Global.hours = -1;
           Global.minutes = -1;
-          Global.timeChanged.notifyListeners();
+          //Global.timeChanged.notifyListeners();
+          Global.timeChanged.value ^= true;
           return;
         }
         int timeTaken = decoded['rows'][0]["elements"][0]["duration"]["value"];
@@ -236,8 +219,8 @@ class GoogleMapsState extends State<GoogleMaps> {
         Global.hours = (timeTaken / 3600).floor();
         Global.minutes = ((timeTaken % 3600)/ 60).ceil();
         //Notify other parts that the time changed
-        Global.timeChanged.notifyListeners();
-
+        //Global.timeChanged.notifyListeners();
+        Global.timeChanged.value ^= true;
     }
 
   }
@@ -319,8 +302,8 @@ class GoogleMapsState extends State<GoogleMaps> {
     }
     changeNames(userNames, Global.nameList);
     print("nameList is ${Global.nameList}");
-    Global.mapRPnameListListener.notifyListeners();
-    Global.mapRPnameListListener.value = true;
+    //Global.mapRPnameListListener.notifyListeners();
+    Global.mapRPnameListListener.value ^= true;
   }
 
   //This function will be used to copy the user names from userNames to namesList
@@ -481,8 +464,8 @@ class GoogleMapsState extends State<GoogleMaps> {
     //Now I find places around the midpoint, and display all the Yelp markers
     Global.resultCords.clear();
     await YelpPlaces.findingPlaces();
-    Global.mapRPfindYPListener.notifyListeners();
-    Global.mapRPfindYPListener.value = true;
+    //Global.mapRPfindYPListener.notifyListeners();
+    Global.mapRPfindYPListener.value ^= true;
     addYelpMarkers();
   }
 

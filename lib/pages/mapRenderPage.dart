@@ -83,7 +83,8 @@ class _MapRenderState extends State<MapRender>
             event.data["Final Location Address"];
         FirebaseFunctions.roomData["Final LatLng"] = event.data["Final LatLng"];
         if (locChanged == true) {
-          Global.finalLocationChanged.notifyListeners();
+          //Global.finalLocationChanged.notifyListeners();
+          Global.finalLocationChanged.value ^= true;
         }
       });
     });
@@ -102,7 +103,6 @@ class _MapRenderState extends State<MapRender>
           timeDisplayText = "Approximately ${hours}hrs ${min}min";
         }
       });
-      Global.timeChanged.value = false;
     });
   }
 
@@ -110,7 +110,6 @@ class _MapRenderState extends State<MapRender>
   void newPlacesListener() {
     Global.mapRPfindYPListener.addListener(() {
       _updateYelpVenues();
-      Global.mapRPfindYPListener.value = false;
     });
   }
 
@@ -120,7 +119,6 @@ class _MapRenderState extends State<MapRender>
       setState(() {
         nameList = Global.nameList;
       });
-      Global.mapRPnameListListener.value = false;
     });
   }
 
@@ -129,8 +127,8 @@ class _MapRenderState extends State<MapRender>
     print("Entered searchingYelpCategory");
     await YelpPlaces.findingPlaces();
     print("Returned from findingPlaces");
-    Global.findYPCalled.notifyListeners();
-    Global.findYPCalled.value = true;
+    //Global.findYPCalled.notifyListeners();
+    Global.findYPCalled.value ^= true;
     _updateYelpVenues();
   }
 
@@ -190,7 +188,7 @@ class _MapRenderState extends State<MapRender>
             Container(
               padding: EdgeInsets.fromLTRB(15, 5, 0, 0),
               alignment: Alignment.centerLeft,
-              child: Text("Showing ${_arrLength} results for: ",
+              child: Text("Showing $_arrLength results for: ",
                   style: GoogleFonts.roboto(
                       fontSize: 20, fontWeight: FontWeight.w500)),
             ),
@@ -962,7 +960,10 @@ class _MapRenderState extends State<MapRender>
             contentPadding: EdgeInsets.only(left: 15.0, top: 15.0),
             suffixIcon: IconButton(
               icon: Icon(Icons.search),
-              onPressed: searchingYelpCategory,
+              onPressed: (){
+                searchingYelpCategory();
+                //Navigator.pop(context);
+                },
               iconSize: 20.0,
             )),
         onChanged: (val) {
@@ -1060,12 +1061,10 @@ class _MapRenderState extends State<MapRender>
         onPressed: () async {
           //Adding some code to turn off all listeners
           Global.mapRPnameListListener.removeListener(() {});
-          //Global.mapRPnameListListener.dispose();
           Global.mapRPfindYPListener.removeListener(() {});
-          //Global.mapRPfindYPListener.dispose();
           Global.findYPCalled.removeListener(() {});
-          //Global.findYPCalled.dispose();
           Global.finalLocationChanged.removeListener(() {});
+          Global.timeChanged.removeListener(() {});
 
           String roomCodeString = FirebaseFunctions.roomData["roomCode"];
 
