@@ -41,6 +41,9 @@ class Global {
 
   static ValueNotifier finalLocationChanged = ValueNotifier(false);
 
+  static ValueNotifier userLocChanged = ValueNotifier(false);
+
+  static String userAddress;
 
   //Variables used to display travel time
   static int hours;

@@ -132,6 +132,11 @@ class _MapRenderState extends State<MapRender>
     _updateYelpVenues();
   }
 
+  //This function will be used to notify the maps page when the user changes their address
+  void userAddressChanged(){
+    Global.userLocChanged.value ^= true;
+  }
+
   var _arrLength;
 
   void _updateYelpVenues() {
@@ -956,12 +961,12 @@ class _MapRenderState extends State<MapRender>
             enabledBorder: OutlineInputBorder(
               borderSide: BorderSide(color: Colors.black, width: 1.5),
             ),
-            hintText: "Enter category...",
+            hintText: "Enter your address...",
             contentPadding: EdgeInsets.only(left: 15.0, top: 15.0),
             suffixIcon: IconButton(
               icon: Icon(Icons.search),
               onPressed: (){
-                searchingYelpCategory();
+                userAddressChanged();
                 //Navigator.pop(context);
                 },
               iconSize: 20.0,
@@ -969,7 +974,8 @@ class _MapRenderState extends State<MapRender>
         onChanged: (val) {
           setState(() {
             category = val;
-            Global.finalCategory = category;
+            Global.userAddress = val;
+            //Global.finalCategory = category;
           });
         },
       ),

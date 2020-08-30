@@ -49,7 +49,6 @@ Future<Position> currentLocation() async {
 }
 
 class GoogleMaps extends StatefulWidget {
-
   @override
   GoogleMapsState createState() => GoogleMapsState(); //mapsState;
 
@@ -103,6 +102,7 @@ class GoogleMapsState extends State<GoogleMaps> {
 
   //Boolean that will let us know if the user dragged their marker or not
   bool userMarkerDragged = false;
+
   //This will be used to reset the time every 60 seconds
   Duration timeReset = Duration(seconds: 60);
 
@@ -137,6 +137,7 @@ class GoogleMapsState extends State<GoogleMaps> {
 
   void initFunctionCaller() async {
     addYelpMarkersWhenFindYPCalled();
+    changeUserLocationWhenNewAddressEntered();
     setFinalLocationWhenButtonPressedOnSlideBar();
     await _getUserLocation();
     _lastMapPosition = _center;
@@ -154,6 +155,12 @@ class GoogleMapsState extends State<GoogleMaps> {
     });
   }
 
+  void changeUserLocationWhenNewAddressEntered(){
+    Global.userLocChanged.addListener(() {
+      searchAddr = Global.userAddress;
+      searchAndNavigate();
+    });
+  }
   //This function will be used to listen to if the final location was set on the slide up bar
   void setFinalLocationWhenButtonPressedOnSlideBar() {
     Global.finalLocationChanged.addListener(() async {
@@ -200,40 +207,39 @@ class GoogleMapsState extends State<GoogleMaps> {
   void calculateTravelTime() async {
     //We send an http request to get to the google maps api, to get the travel time
     var response = await http.post(
-        "https://maps.googleapis.com/maps/api/distancematrix/json?units=imperial&origins=${currLocation.latitude},${currLocation
-        .longitude}&destinations=${finalLatLng.latitude},${finalLatLng.longitude}&departure_time=now&key=$mapsAPI_KEY");
+        "https://maps.googleapis.com/maps/api/distancematrix/json?units=imperial&origins=${currLocation.latitude},${currLocation.longitude}&destinations=${finalLatLng.latitude},${finalLatLng.longitude}&departure_time=now&key=$mapsAPI_KEY");
     //Now, we will decode the json response
-    if (response.statusCode == 200){
-        var decoded = convert.jsonDecode(response.body);
-        //print("Decode = $decoded");
-        //print("decoded datatype = ${decoded.runtimeType}");
-        if (decoded['rows'][0]['elements'][0]['status'] != 'OK'){
-          Global.hours = -1;
-          Global.minutes = -1;
-          //Global.timeChanged.notifyListeners();
-          Global.timeChanged.value ^= true;
-          return;
-        }
-        int timeTaken = decoded['rows'][0]["elements"][0]["duration"]["value"];
-        //print("Time taken is $timeTaken");
-        Global.hours = (timeTaken / 3600).floor();
-        Global.minutes = ((timeTaken % 3600)/ 60).ceil();
-        //Notify other parts that the time changed
+    if (response.statusCode == 200) {
+      var decoded = convert.jsonDecode(response.body);
+      //print("Decode = $decoded");
+      //print("decoded datatype = ${decoded.runtimeType}");
+      if (decoded['rows'][0]['elements'][0]['status'] != 'OK') {
+        Global.hours = -1;
+        Global.minutes = -1;
         //Global.timeChanged.notifyListeners();
         Global.timeChanged.value ^= true;
+        return;
+      }
+      int timeTaken = decoded['rows'][0]["elements"][0]["duration"]["value"];
+      //print("Time taken is $timeTaken");
+      Global.hours = (timeTaken / 3600).floor();
+      Global.minutes = ((timeTaken % 3600) / 60).ceil();
+      //Notify other parts that the time changed
+      //Global.timeChanged.notifyListeners();
+      Global.timeChanged.value ^= true;
     }
-
   }
 
   //This function will be used to update the travel time every minute
-  void updateTravelTime() async{
+  void updateTravelTime() async {
     Timer.periodic(timeReset, (timer) {
       //print("Time will be updated");
-      if (currLocation != null && finalLatLng != null){
+      if (currLocation != null && finalLatLng != null) {
         calculateTravelTime();
       }
     });
   }
+
 //Function used to get users original position
   Future<void> _getUserLocation() async {
     currPosition = await currentLocation();
@@ -654,17 +660,20 @@ class GoogleMapsState extends State<GoogleMaps> {
                     ),
                     child: TextField(
                       decoration: InputDecoration(
-                          hintText: "Enter address...",
+                          hintText: "Enter category (eg. restaurants, bars)...",
                           border: InputBorder.none,
                           contentPadding:
                               EdgeInsets.only(left: 15.0, top: 15.0),
                           suffixIcon: IconButton(
                             icon: Icon(Icons.search),
-                            onPressed: searchAndNavigate,
+                            onPressed: () async{
+                              await YelpPlaces.findingPlaces();
+                              addYelpMarkers();
+                            },
                             iconSize: 30.0,
                           )),
                       onChanged: (val) {
-                        searchAddr = val;
+                        Global.finalCategory = val;
                       },
                     ),
                   ),
