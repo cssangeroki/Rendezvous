@@ -736,14 +736,14 @@ class _MapRenderState extends State<MapRender>
             padding: EdgeInsets.fromLTRB(30, 0, 0, 10),
             child: SelectableText(
                 FirebaseFunctions.roomData["Final Location"] != null
-                    ? "${FirebaseFunctions.roomData["Final Location"]}"
+                    ? "${FirebaseFunctions.roomData["Final Location"]},\n${FirebaseFunctions.roomData["Final Location Address"]}"
                     : "No location set",
                 style: textSize20(),
                 enableInteractiveSelection: true, onTap: () {
-              Share.share("${FirebaseFunctions.roomData["Final Location"]}");
+              Share.share("${FirebaseFunctions.roomData["Final Location"]}, ${FirebaseFunctions.roomData["Final Location Address"]}");
             }),
           ),
-          Container(
+          /*Container(
             child: ListTile(
               title: Text(
                 'Final Location Address:',
@@ -765,7 +765,7 @@ class _MapRenderState extends State<MapRender>
                     "${FirebaseFunctions.roomData["Final Location Address"]}");
               },
             ),
-          ),
+          ),*/
           Container(
             child: ListTile(
               title: Text(
