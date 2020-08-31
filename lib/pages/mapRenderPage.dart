@@ -133,7 +133,7 @@ class _MapRenderState extends State<MapRender>
   }
 
   //This function will be used to notify the maps page when the user changes their address
-  void userAddressChanged(){
+  void userAddressChanged() {
     Global.userLocChanged.value ^= true;
   }
 
@@ -740,7 +740,8 @@ class _MapRenderState extends State<MapRender>
                     : "No location set",
                 style: textSize20(),
                 enableInteractiveSelection: true, onTap: () {
-              Share.share("${FirebaseFunctions.roomData["Final Location"]}, ${FirebaseFunctions.roomData["Final Location Address"]}");
+              Share.share(
+                  "${FirebaseFunctions.roomData["Final Location"]}, ${FirebaseFunctions.roomData["Final Location Address"]}");
             }),
           ),
           /*Container(
@@ -965,10 +966,10 @@ class _MapRenderState extends State<MapRender>
             contentPadding: EdgeInsets.only(left: 15.0, top: 15.0),
             suffixIcon: IconButton(
               icon: Icon(Icons.search),
-              onPressed: (){
+              onPressed: () {
                 userAddressChanged();
                 //Navigator.pop(context);
-                },
+              },
               iconSize: 20.0,
             )),
         onChanged: (val) {

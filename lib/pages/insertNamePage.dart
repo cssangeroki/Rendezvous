@@ -3,10 +3,11 @@
 import 'package:Rendezvous/pages/firebaseFunctions.dart';
 import 'package:flutter/material.dart';
 import 'package:shared_preferences/shared_preferences.dart';
-
+import 'package:google_fonts/google_fonts.dart';
 import '../appBar.dart';
 import 'createOrJoinPage.dart';
 import '../globalVar.dart';
+import 'package:flutter/services.dart';
 
 Future<void> saveNamePreference(String userName) async {
   SharedPreferences userNamePrefs = await SharedPreferences.getInstance();
@@ -30,6 +31,11 @@ class Page1 extends StatefulWidget {
 
 class _Page1State extends State<Page1> {
 //  bool isLoading = false;
+  bool _nameEntered = false;
+  @override
+  void initState() {
+    super.initState();
+  }
 
   final formKey = GlobalKey<FormState>();
 
@@ -41,14 +47,25 @@ class _Page1State extends State<Page1> {
 
   // checks if name is valid then saves name and sends to page2
   void _signMeUp() {
-    if (formKey.currentState.validate()) {
-      String userName = userNameController.text;
-      saveNamePreference(userName).then((_) {
-        Navigator.push(
-            context, MaterialPageRoute(builder: (context) => Page2()));
-      });
-    }
+    setState(() {
+      if (formKey.currentState.validate()) {
+        String userName = userNameController.text;
+        saveNamePreference(userName).then((_) {
+          Navigator.push(
+            context,
+            PageRouteBuilder(
+              pageBuilder: (context, animation1, animation2) => Page2(),
+              transitionsBuilder: (context, animation1, animation2, child) =>
+                  FadeTransition(opacity: animation1, child: child),
+              transitionDuration: Duration(milliseconds: 600),
+            ),
+          );
+        });
+      }
+    });
   }
+
+  bool _focus = false;
 
   @override
   Widget build(BuildContext context) {
@@ -63,42 +80,62 @@ class _Page1State extends State<Page1> {
                 Container(
                   margin: EdgeInsets.fromLTRB(
                       0, MediaQuery.of(context).size.height * 0.4, 0, 0),
-                  width: 200.0,
-                  child: Form(
-                    key: formKey,
-                    child: TextFormField(
-                      decoration: InputDecoration(
-                        hintText: 'Enter your name',
-                        enabledBorder: UnderlineInputBorder(
-                          borderSide: BorderSide(color: Colors.grey),
+                  width: 220.0,
+                  child: AnimatedOpacity(
+                    duration: Duration(milliseconds: 100),
+                    opacity: _nameEntered ? 0.0 : 1.0,
+                    child: Form(
+                      key: formKey,
+                      child: TextFormField(
+                        showCursor: _focus,
+                        textAlign: TextAlign.center,
+                        style: TextStyle(fontSize: 25),
+                        inputFormatters: [
+                          LengthLimitingTextInputFormatter(15),
+                        ],
+                        decoration: InputDecoration(
+                          hintText: 'Enter your name',
+                          hintStyle: TextStyle(fontSize: 18),
+                          enabledBorder: UnderlineInputBorder(
+                            borderSide: BorderSide(color: Colors.grey),
+                          ),
+                          focusedBorder: UnderlineInputBorder(
+                            borderSide: BorderSide(color: Colors.grey),
+                          ),
                         ),
-                        focusedBorder: UnderlineInputBorder(
-                          borderSide: BorderSide(color: Colors.grey),
-                        ),
+                        validator: (val) {
+                          val.isEmpty ? 'Please enter a name' : null;
+                        },
+                        controller: userNameController,
+                        onChanged: (text) {
+                          setState(() {
+                            _focus = !_focus;
+                          });
+                          userName = text;
+                          FirebaseFunctions.currentUserData["userName"] = text;
+                        },
                       ),
-                      validator: (val) {
-                        return val.isEmpty ? "Please Enter a Name" : null;
-                      },
-                      controller: userNameController,
-                      onChanged: (text) {
-                        userName = text;
-                        FirebaseFunctions.currentUserData["userName"] = text;
-                      },
                     ),
                   ),
                 ),
                 SizedBox(
                   height: 30,
                 ),
-                FloatingActionButton.extended(
-                  label: Text('Go'),
-                  heroTag: "btn1",
-                  // When the user presses the button, show an alert dialog containing
-                  // the text that the user has entered into the text field.
-                  onPressed: () {
-                    _signMeUp();
-                  },
-                  icon: Icon(Icons.check), // to show Go text in button
+                Container(
+                  height: 50,
+                  width: 100,
+                  child: RaisedButton(
+                      onPressed: () {
+                        _signMeUp();
+                      },
+                      color: Color(Global.backgroundColor),
+                      shape: RoundedRectangleBorder(
+                          borderRadius: BorderRadius.circular(30.0),
+                          side: BorderSide(color: Colors.grey)),
+                      child: Text(
+                        "Go",
+                        style: GoogleFonts.roboto(fontSize: 20),
+                      )),
                 ),
               ]),
             ),

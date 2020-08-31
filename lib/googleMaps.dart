@@ -155,12 +155,13 @@ class GoogleMapsState extends State<GoogleMaps> {
     });
   }
 
-  void changeUserLocationWhenNewAddressEntered(){
+  void changeUserLocationWhenNewAddressEntered() {
     Global.userLocChanged.addListener(() {
       searchAddr = Global.userAddress;
       searchAndNavigate();
     });
   }
+
   //This function will be used to listen to if the final location was set on the slide up bar
   void setFinalLocationWhenButtonPressedOnSlideBar() {
     Global.finalLocationChanged.addListener(() async {
@@ -609,7 +610,7 @@ class GoogleMapsState extends State<GoogleMaps> {
               child: Text(
                 'loading map..',
                 style: TextStyle(
-                  fontSize: 50,
+                  fontSize: 35,
                   fontFamily: 'Avenir-Medium',
                   color: Color(Global.blackColor),
                 ),
@@ -666,7 +667,7 @@ class GoogleMapsState extends State<GoogleMaps> {
                               EdgeInsets.only(left: 15.0, top: 15.0),
                           suffixIcon: IconButton(
                             icon: Icon(Icons.search),
-                            onPressed: () async{
+                            onPressed: () async {
                               await YelpPlaces.findingPlaces();
                               addYelpMarkers();
                             },

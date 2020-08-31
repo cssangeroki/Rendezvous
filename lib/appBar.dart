@@ -1,17 +1,15 @@
 import 'package:flutter/material.dart';
+import 'globalVar.dart';
 
 Widget appBarMain(BuildContext context) {
   return AppBar(
     elevation: 0,
+    toolbarHeight: 90,
     brightness: Brightness.light,
     iconTheme: IconThemeData(
       color: Colors.black,
     ),
-    title: Text(
-      'Rendezvous',
-      style: TextStyle(color: Colors.black, fontFamily: 'Goldplay'),
-    ),
-    backgroundColor: Color(0xfffae6d4),
+    backgroundColor: Color(Global.backgroundColor),
   );
 }
 
