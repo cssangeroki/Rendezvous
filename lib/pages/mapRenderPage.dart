@@ -487,6 +487,7 @@ class _MapRenderState extends State<MapRender>
                         margin: EdgeInsets.fromLTRB(40, 5, 0, 0),
                         child: FittedBox(
                           child: FloatingActionButton(
+                              heroTag: null,
                               backgroundColor: Color(0xfff2f2f2),
                               child: Container(
                                 height: 30,
@@ -509,6 +510,7 @@ class _MapRenderState extends State<MapRender>
                         width: 70,
                         child: FittedBox(
                           child: FloatingActionButton(
+                            heroTag: null,
                             backgroundColor: Color(Global.backgroundColor),
                             child: Icon(
                               Icons.directions_car,
@@ -717,7 +719,7 @@ class _MapRenderState extends State<MapRender>
     );
   }
 
-  Widget _tab1Contents() {
+  Widget _tab2Contents() {
     return new Container(
       height: MediaQuery.of(context).size.height,
       width: double.infinity,
@@ -789,7 +791,7 @@ class _MapRenderState extends State<MapRender>
     );
   }
 
-  Widget _tab2Contents() {
+  Widget _tab1Contents() {
     return Container(
       height: MediaQuery.of(context).size.height,
       width: double.infinity,
@@ -874,10 +876,7 @@ class _MapRenderState extends State<MapRender>
               onTap: null,
             ),
           ),
-          Container(
-              padding: EdgeInsets.fromLTRB(20.0, 20.0, 20.0, 15.0),
-              width: 50,
-              child: _leaveRoomButton()),
+          _leaveRoomButton(),
         ],
       ),
     );
@@ -924,8 +923,8 @@ class _MapRenderState extends State<MapRender>
                         indicatorHeight: 2,
                       ),
                       tabs: [
-                        Tab(text: "Venue"),
                         Tab(text: "Info"),
+                        Tab(text: "Venue"),
                         Tab(text: "Chat"),
                       ]),
                 ),
@@ -1057,14 +1056,18 @@ class _MapRenderState extends State<MapRender>
   }*/
 
   Widget _leaveRoomButton() {
-    return ButtonTheme(
-      minWidth: double.infinity,
-      height: 60.0,
-      padding: EdgeInsets.all(10.0),
-      buttonColor: Colors.white,
+    return Container(
+      height: 60,
+      width: 100,
+      padding: EdgeInsets.fromLTRB(60, 0, 60, 0),
+      margin: EdgeInsets.fromLTRB(0, 20, 0, 0),
       child: RaisedButton(
+        color: Colors.black54,
+        shape: RoundedRectangleBorder(
+          borderRadius: BorderRadius.circular(30.0),
+        ),
         child: Text("Leave Room",
-            style: new TextStyle(fontSize: 20.0, color: Colors.black)),
+            style: new TextStyle(fontSize: 20.0, color: Colors.white)),
         onPressed: () async {
           //Adding some code to turn off all listeners
           Global.mapRPnameListListener.removeListener(() {});

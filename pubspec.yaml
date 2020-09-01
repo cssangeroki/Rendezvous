@@ -27,7 +27,7 @@ dependencies:
   smooth_star_rating: ^1.1.1
   scroll_snap_list: ^0.4.1
   flutter_fadein: ^1.1.1
-
+  flutter_spinkit: "^4.1.2"
   bubble_tab_indicator: "^0.1.4"
   geolocator: ^5.3.2+2 #API for location services
   google_maps_flutter: ^0.5.28+1 #API for Maps services

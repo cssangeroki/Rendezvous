@@ -29,8 +29,6 @@ class Global {
 
   static var arrLength;
 
-  static var tabValue = 1;
-
   static List<String> nameList = [];
 
   static ValueNotifier findYPCalled = ValueNotifier(false);
@@ -51,5 +49,4 @@ class Global {
 
   //
   static ValueNotifier timeChanged = ValueNotifier(false);
-
 }

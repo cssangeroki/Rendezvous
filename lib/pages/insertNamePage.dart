@@ -7,7 +7,6 @@ import 'package:google_fonts/google_fonts.dart';
 import '../appBar.dart';
 import 'createOrJoinPage.dart';
 import '../globalVar.dart';
-import 'package:flutter/services.dart';
 
 Future<void> saveNamePreference(String userName) async {
   SharedPreferences userNamePrefs = await SharedPreferences.getInstance();
@@ -37,6 +36,11 @@ class _Page1State extends State<Page1> {
     super.initState();
   }
 
+  @override
+  void dispose() {
+    super.dispose();
+  }
+
   final formKey = GlobalKey<FormState>();
 
   //_Page1State(this.userName);
@@ -57,7 +61,7 @@ class _Page1State extends State<Page1> {
               pageBuilder: (context, animation1, animation2) => Page2(),
               transitionsBuilder: (context, animation1, animation2, child) =>
                   FadeTransition(opacity: animation1, child: child),
-              transitionDuration: Duration(milliseconds: 600),
+              transitionDuration: Duration(milliseconds: 300),
             ),
           );
         });
@@ -70,11 +74,9 @@ class _Page1State extends State<Page1> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      body: SafeArea(
-        child: SingleChildScrollView(
+      body: SingleChildScrollView(
+        child: SafeArea(
           child: Container(
-            height: MediaQuery.of(context).size.height,
-            width: MediaQuery.of(context).size.width,
             child: Center(
               child: Column(children: <Widget>[
                 Container(
@@ -90,12 +92,10 @@ class _Page1State extends State<Page1> {
                         showCursor: _focus,
                         textAlign: TextAlign.center,
                         style: TextStyle(fontSize: 25),
-                        inputFormatters: [
-                          LengthLimitingTextInputFormatter(15),
-                        ],
+                        maxLength: 15,
                         decoration: InputDecoration(
                           hintText: 'Enter your name',
-                          hintStyle: TextStyle(fontSize: 18),
+                          hintStyle: GoogleFonts.roboto(fontSize: 18),
                           enabledBorder: UnderlineInputBorder(
                             borderSide: BorderSide(color: Colors.grey),
                           ),
@@ -104,13 +104,17 @@ class _Page1State extends State<Page1> {
                           ),
                         ),
                         validator: (val) {
-                          val.isEmpty ? 'Please enter a name' : null;
+                          if (val == "") {
+                            return "Please enter a name";
+                          }
+                          return null;
                         },
                         controller: userNameController,
                         onChanged: (text) {
                           setState(() {
                             _focus = !_focus;
                           });
+
                           userName = text;
                           FirebaseFunctions.currentUserData["userName"] = text;
                         },
@@ -128,13 +132,15 @@ class _Page1State extends State<Page1> {
                       onPressed: () {
                         _signMeUp();
                       },
-                      color: Color(Global.backgroundColor),
+                      color: Colors.black54,
                       shape: RoundedRectangleBorder(
-                          borderRadius: BorderRadius.circular(30.0),
-                          side: BorderSide(color: Colors.grey)),
+                        borderRadius: BorderRadius.circular(30.0),
+                        //side: BorderSide(color: Colors.grey),
+                      ),
                       child: Text(
                         "Go",
-                        style: GoogleFonts.roboto(fontSize: 20),
+                        style: GoogleFonts.roboto(
+                            fontSize: 20, color: Colors.white),
                       )),
                 ),
               ]),

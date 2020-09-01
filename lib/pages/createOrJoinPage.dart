@@ -66,27 +66,41 @@ class _Page2State extends State<Page2> {
     print("roomCode is: " + roomCode);
     saveRoomCodePreference(roomCode).then((_) {
       Navigator.push(
-          context, MaterialPageRoute(builder: (context) => MapRender()));
+        context,
+        PageRouteBuilder(
+          pageBuilder: (context, animation1, animation2) => MapRender(),
+          transitionsBuilder: (context, animation1, animation2, child) =>
+              FadeTransition(opacity: animation1, child: child),
+          transitionDuration: Duration(milliseconds: 300),
+        ),
+      );
     });
   }
 
   final nameController = FadeInController();
   final button1Controller = FadeInController();
   final button2Controller = FadeInController();
+  bool _absorb = true;
   Future<bool> _fadeInFunc() {
-    Future.delayed(const Duration(milliseconds: 500), () {
+    Future.delayed(const Duration(milliseconds: 300), () {
       setState(() {
         nameController.fadeIn();
       });
     });
-    Future.delayed(const Duration(milliseconds: 1500), () {
+    Future.delayed(const Duration(milliseconds: 500), () {
       setState(() {
         button1Controller.fadeIn();
       });
     });
-    Future.delayed(const Duration(milliseconds: 2000), () {
+    Future.delayed(const Duration(milliseconds: 800), () {
       setState(() {
         button2Controller.fadeIn();
+      });
+    });
+
+    Future.delayed(const Duration(milliseconds: 1000), () {
+      setState(() {
+        _absorb = false;
       });
     });
   }
@@ -97,81 +111,97 @@ class _Page2State extends State<Page2> {
       appBar: appBarMain(context),
       backgroundColor: Color(Global.backgroundColor),
       body: SafeArea(
-        child: SingleChildScrollView(
-          child: Container(
-            width: MediaQuery.of(context).size.width,
-            height: MediaQuery.of(context).size.height,
-            child: Center(
-              child: Column(children: <Widget>[
-                Container(
-                  alignment: Alignment.centerLeft,
-                ),
-                FadeIn(
-                  controller: nameController,
-                  duration: Duration(milliseconds: 800),
-                  curve: Curves.easeIn,
-                  child: Container(
-                    padding: EdgeInsets.fromLTRB(
-                        10, MediaQuery.of(context).size.height * 0.27, 10, 20),
-                    child: Text(
-                      "Hello, $_name" ?? "Name is Null",
-                      style: GoogleFonts.roboto(fontSize: 28),
-                      overflow: TextOverflow.fade,
-                      softWrap: true,
+        child: AbsorbPointer(
+          absorbing: _absorb,
+          child: SingleChildScrollView(
+            child: Container(
+              height: MediaQuery.of(context).size.height * 0.7,
+              child: Center(
+                child: Column(children: <Widget>[
+                  FadeIn(
+                    controller: nameController,
+                    duration: Duration(milliseconds: 800),
+                    curve: Curves.easeIn,
+                    child: Container(
+                      padding: EdgeInsets.fromLTRB(10,
+                          MediaQuery.of(context).size.height * 0.29, 10, 20),
+                      child: Text(
+                        "Hello, $_name" ?? "Name is Null",
+                        style: GoogleFonts.roboto(fontSize: 28),
+                        overflow: TextOverflow.fade,
+                        softWrap: true,
+                      ),
                     ),
                   ),
-                ),
-                FadeIn(
-                  controller: button1Controller,
-                  // Optional paramaters
-                  duration: Duration(milliseconds: 800),
-                  curve: Curves.easeIn,
-                  child: Container(
-                    margin: EdgeInsets.fromLTRB(20, 0, 20, 0),
+                  FadeIn(
+                    controller: button1Controller,
+                    // Optional paramaters
+                    duration: Duration(milliseconds: 800),
+                    curve: Curves.easeIn,
+                    child: Container(
+                      margin: EdgeInsets.fromLTRB(20, 20, 20, 0),
+                      child: Container(
+                        height: 50,
+                        width: 160,
+                        child: RaisedButton(
+                            elevation: 3,
+                            onPressed: () {
+                              _createRoomCode();
+                            },
+                            color: Colors.black54,
+                            shape: RoundedRectangleBorder(
+                              borderRadius: BorderRadius.circular(30.0),
+                              //side: BorderSide(color: Colors.grey),
+                            ),
+                            child: Text(
+                              "Create Room",
+                              style: GoogleFonts.roboto(
+                                  fontSize: 20, color: Colors.white),
+                            )),
+                      ),
+                    ),
+                  ),
+                  SizedBox(height: 15),
+                  FadeIn(
+                    controller: button2Controller,
+                    duration: Duration(milliseconds: 1000),
+                    curve: Curves.easeIn,
                     child: Container(
                       height: 50,
                       width: 160,
+                      margin: EdgeInsets.fromLTRB(0, 20, 0, 0),
                       child: RaisedButton(
                           elevation: 3,
                           onPressed: () {
-                            _createRoomCode();
+                            Navigator.push(
+                              context,
+                              PageRouteBuilder(
+                                pageBuilder:
+                                    (context, animation1, animation2) =>
+                                        Page4(),
+                                transitionsBuilder:
+                                    (context, animation1, animation2, child) =>
+                                        FadeTransition(
+                                            opacity: animation1, child: child),
+                                transitionDuration: Duration(milliseconds: 300),
+                              ),
+                            );
                           },
-                          color: Color(Global.backgroundColor),
+                          color: Colors.black54,
                           shape: RoundedRectangleBorder(
                               borderRadius: BorderRadius.circular(30.0),
                               side: BorderSide(color: Colors.grey)),
                           child: Text(
-                            "Create Room",
-                            style: GoogleFonts.roboto(fontSize: 20),
+                            "Join Room",
+                            style: GoogleFonts.roboto(
+                              fontSize: 20,
+                              color: Colors.white,
+                            ),
                           )),
                     ),
                   ),
-                ),
-                SizedBox(height: 15),
-                FadeIn(
-                  controller: button2Controller,
-                  duration: Duration(milliseconds: 1000),
-                  curve: Curves.easeIn,
-                  child: Container(
-                    height: 50,
-                    width: 160,
-                    child: RaisedButton(
-                        elevation: 3,
-                        onPressed: () {
-                          Navigator.push(context,
-                              MaterialPageRoute(builder: (context) => Page4()));
-                        },
-                        color: Color(Global.backgroundColor),
-                        shape: RoundedRectangleBorder(
-                            borderRadius: BorderRadius.circular(30.0),
-                            side: BorderSide(color: Colors.grey)),
-                        child: Text(
-                          "Join Room",
-                          style: GoogleFonts.roboto(fontSize: 20),
-                        )),
-                  ),
-                ),
-                /*ButtonTheme(
+
+                  /*ButtonTheme(
                   minWidth: 200.0,
                   height: 30.0,
                   padding: EdgeInsets.all(10.0),
@@ -185,7 +215,8 @@ class _Page2State extends State<Page2> {
                     },
                   ),
                 ),*/
-              ]),
+                ]),
+              ),
             ),
           ),
         ),
