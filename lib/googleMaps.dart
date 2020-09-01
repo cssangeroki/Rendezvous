@@ -517,7 +517,7 @@ class GoogleMapsState extends State<GoogleMaps> {
           mapController.animateCamera(CameraUpdate.newCameraPosition(
               CameraPosition(
                   target: LatLng(newLatLng.latitude, newLatLng.longitude),
-                  zoom: 11.0)));
+                  zoom: 13.0)));
           await _onAddMarkerButtonPressed();
         },
       ));

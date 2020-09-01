@@ -19,6 +19,13 @@ import "../globalVar.dart";
 import "../findYelpPlaces.dart";
 import 'package:share/share.dart';
 
+//Will use these import for autocompleting text
+import 'package:http/http.dart' as http;
+import 'dart:convert' as convert;
+
+import 'package:autocomplete_textfield/autocomplete_textfield.dart';
+
+const String mapsAPI_KEY = "AIzaSyBV961Ztopz9vyZrJq0AYAMJUTHmluu3FM";
 //Below are variables we will use for the sliders
 double midSliderVal = 5;
 double userSliderVal = 5;
@@ -49,6 +56,10 @@ class _MapRenderState extends State<MapRender>
   int hours;
   int min;
   String timeDisplayText;
+
+  List<String> suggestedAddresses = [];
+  AutoCompleteTextField addressSearchField;
+  GlobalKey<AutoCompleteTextFieldState> key = new GlobalKey();
 
   var _isExpanded = new List<bool>.filled(50, false, growable: true);
 
@@ -144,6 +155,36 @@ class _MapRenderState extends State<MapRender>
     setState(() {
       _arrLength = Global.arrLength;
     });
+  }
+
+  //This function will be used to suggest address when the user searches
+  Future<void> autoCompleteSuggestions(String searchString) async {
+    print("Entered");
+    //First thing we will do is clear suggestedAddresses List
+    suggestedAddresses.clear();
+    if (searchString == "" || searchString == null) {
+      return;
+    }
+    var response = await http.post(
+        "https://maps.googleapis.com/maps/api/place/queryautocomplete/json?key=${mapsAPI_KEY}&input=${searchString}");
+    if (response.statusCode == 200) {
+      var decoded = convert.jsonDecode(response.body);
+      //If the we the http request fails, let the user know we are unable to find any suggestions
+      if (decoded['status'] != 'OK') {
+        suggestedAddresses.add("Unable to find any suggestions");
+        return;
+      }
+      //Otherwise, I will set a variable as the predictions category for the user
+      var predictions = decoded['predictions'];
+      //Add the top ten suggestions to our List of suggestedAddresses
+      setState(() {
+        for (int i = 0; i < 10; i++) {
+          suggestedAddresses.add(predictions[0]["description"]);
+        }
+      });
+      print("Done");
+      //might have to add a setState here
+    }
   }
 
   void _toggleExpand(var index) {
@@ -837,7 +878,7 @@ class _MapRenderState extends State<MapRender>
             ),
           ),
           //Search bar
-          _categoryBar(),
+          _addressBar(),
 
           Container(
             child: ListTile(
@@ -946,7 +987,7 @@ class _MapRenderState extends State<MapRender>
     );
   }
 
-  Widget _categoryBar() {
+  Widget _addressBar() {
     return Container(
       margin: EdgeInsets.all(15),
       width: double.infinity,
@@ -954,7 +995,27 @@ class _MapRenderState extends State<MapRender>
         borderRadius: BorderRadius.circular(10.0),
         color: Colors.white,
       ),
-      child: TextField(
+      child: addressSearchField = AutoCompleteTextField(
+        key: key,
+        //Suggestions that will be shown
+        suggestions: suggestedAddresses,
+        //Filters results suggested
+        itemFilter: (item, query){
+          return item.toString().toLowerCase().startsWith(query.toLowerCase());
+        },
+        //Sorts suggestions
+        itemSorter: (a, b){
+          return a.toString().compareTo(b.toString());
+        },
+        itemSubmitted: (item){
+          setState(() {
+            addressSearchField.textField.controller.text = item;
+          });
+        },
+        //UI for each row of suggestions
+        itemBuilder: (context, item){
+          return suggestedHints(item);
+        },
         decoration: InputDecoration(
             focusedBorder: OutlineInputBorder(
               borderSide: BorderSide(color: Colors.black, width: 1.5),
@@ -972,14 +1033,56 @@ class _MapRenderState extends State<MapRender>
               },
               iconSize: 20.0,
             )),
-        onChanged: (val) {
+        textChanged: (val) {
           setState(() {
             category = val;
             Global.userAddress = val;
+            autoCompleteSuggestions(val);
             //Global.finalCategory = category;
           });
         },
       ),
+    );
+  }
+
+  /*Widget searchBar() {
+    return TextField(
+      decoration: InputDecoration(
+          focusedBorder: OutlineInputBorder(
+            borderSide: BorderSide(color: Colors.black, width: 1.5),
+          ),
+          enabledBorder: OutlineInputBorder(
+            borderSide: BorderSide(color: Colors.black, width: 1.5),
+          ),
+          hintText: "Enter your address...",
+          contentPadding: EdgeInsets.only(left: 15.0, top: 15.0),
+          suffixIcon: IconButton(
+            icon: Icon(Icons.search),
+            onPressed: () {
+              userAddressChanged();
+              //Navigator.pop(context);
+            },
+            iconSize: 20.0,
+          )),
+      onChanged: (val) {
+        setState(() {
+          category = val;
+          Global.userAddress = val;
+          autoCompleteSuggestions(val);
+          //Global.finalCategory = category;
+        });
+      },
+      autofillHints: suggestedAddresses,
+    );
+  }*/
+
+  //This widget will be used to display the hints
+  Widget suggestedHints(String hint) {
+    return Row(
+      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+      children: <Widget>[
+        Text(hint, style: TextStyle(fontSize: 16.0, color: Colors.lightBlue), softWrap: true,),
+      ],
     );
   }
 
