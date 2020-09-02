@@ -18,7 +18,7 @@ class DynamicLinkService {
     });
   }
 
-  Future<String> createAppLink(String title) async {
+  static Future<String> createAppLink(String title) async {
     final DynamicLinkParameters parameters = DynamicLinkParameters(
       uriPrefix: 'https://rendezvous.page.link',
       link: Uri.parse('https://rendezvous.page.link'),

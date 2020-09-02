@@ -18,7 +18,7 @@ import "../googleMaps.dart";
 import "../globalVar.dart";
 import "../findYelpPlaces.dart";
 import 'package:share/share.dart';
-
+import "../dynamicLinks.dart";
 //Will use these import for autocompleting text
 import 'package:http/http.dart' as http;
 import 'dart:convert' as convert;
@@ -922,8 +922,9 @@ class _MapRenderState extends State<MapRender>
                     "roomCode is Null",
                 style: textSize35(),
                 enableInteractiveSelection: true,
-                onTap: () {
-                  Share.share("${FirebaseFunctions.roomData["roomCode"]}",
+                onTap: () async{
+                  String link = await DynamicLinkService.createAppLink("Join my room!");
+                  Share.share("${FirebaseFunctions.roomData["roomCode"]}\n$link",
                       subject: "Let's Rendezvous! Join my room!");
                 },
               ),
