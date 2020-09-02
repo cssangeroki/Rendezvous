@@ -81,6 +81,9 @@ class _MapRenderState extends State<MapRender>
         .document(roomDocID)
         .snapshots()
         .listen((event) {
+      if (!mounted) {
+        return;
+      }
       setState(() {
         FirebaseFunctions.roomData["host"] = event.data["host"];
         //If the final location changed, we will alert the listener so that the route can be changed
@@ -103,6 +106,9 @@ class _MapRenderState extends State<MapRender>
 
   void listenToTime() {
     Global.timeChanged.addListener(() {
+      if (!mounted) {
+        return;
+      }
       setState(() {
         //print("Time updated");
         hours = Global.hours;
@@ -120,6 +126,9 @@ class _MapRenderState extends State<MapRender>
   //This function will be used to set a listener for whenever findingYelpPlaces is called in other widgets
   void newPlacesListener() {
     Global.mapRPfindYPListener.addListener(() {
+      if (!mounted) {
+        return;
+      }
       _updateYelpVenues();
     });
   }
@@ -127,6 +136,9 @@ class _MapRenderState extends State<MapRender>
   //This function just lets the app reset to show the users names whenever the users change
   void nameListListener() {
     Global.mapRPnameListListener.addListener(() {
+      if (!mounted) {
+        return;
+      }
       setState(() {
         nameList = Global.nameList;
       });
@@ -151,6 +163,9 @@ class _MapRenderState extends State<MapRender>
   var _arrLength;
 
   void _updateYelpVenues() {
+    if (!mounted) {
+      return;
+    }
     YelpPlaces.updateYelpVenues();
     setState(() {
       _arrLength = Global.arrLength;
@@ -1182,6 +1197,7 @@ class _MapRenderState extends State<MapRender>
           Global.findYPCalled.removeListener(() {});
           Global.finalLocationChanged.removeListener(() {});
           Global.timeChanged.removeListener(() {});
+          Global.userLocChanged.removeListener(() {});
 
           String roomCodeString = FirebaseFunctions.roomData["roomCode"];
 

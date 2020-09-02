@@ -158,6 +158,9 @@ class GoogleMapsState extends State<GoogleMaps> {
 
   void changeUserLocationWhenNewAddressEntered() {
     Global.userLocChanged.addListener(() {
+      if (!mounted){
+        return;
+      }
       searchAddr = Global.userAddress;
       searchAndNavigate();
     });
@@ -166,6 +169,9 @@ class GoogleMapsState extends State<GoogleMaps> {
   //This function will be used to listen to if the final location was set on the slide up bar
   void setFinalLocationWhenButtonPressedOnSlideBar() {
     Global.finalLocationChanged.addListener(() async {
+      if (!mounted){
+        return;
+      }
       //print("Location changed. Final Address = ${FirebaseFunctions.roomData["Final Location Address"]}");
       await routeToFinalLoc();
     });
