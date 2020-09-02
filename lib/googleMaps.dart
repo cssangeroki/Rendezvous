@@ -212,7 +212,7 @@ class GoogleMapsState extends State<GoogleMaps> {
         "https://maps.googleapis.com/maps/api/distancematrix/json?units=imperial&origins=${currLocation.latitude},${currLocation.longitude}&destinations=${finalLatLng.latitude},${finalLatLng.longitude}&departure_time=now&key=$mapsAPI_KEY");
     //Now, we will decode the json response
     if (response.statusCode == 200) {
-      var decoded = convert.jsonDecode(response.body);
+      var decoded = await convert.jsonDecode(response.body);
       //print("Decode = $decoded");
       //print("decoded datatype = ${decoded.runtimeType}");
       if (decoded['rows'][0]['elements'][0]['status'] != 'OK') {

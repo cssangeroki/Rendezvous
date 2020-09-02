@@ -168,7 +168,7 @@ class _MapRenderState extends State<MapRender>
     var response = await http.post(
         "https://maps.googleapis.com/maps/api/place/queryautocomplete/json?key=${mapsAPI_KEY}&input=${searchString}");
     if (response.statusCode == 200) {
-      var decoded = convert.jsonDecode(response.body);
+      var decoded = await convert.jsonDecode(response.body);
       //If the we the http request fails, let the user know we are unable to find any suggestions
       if (decoded['status'] != 'OK') {
         suggestedAddresses.add("Unable to find any suggestions");
@@ -178,12 +178,11 @@ class _MapRenderState extends State<MapRender>
       var predictions = decoded['predictions'];
       //Add the top ten suggestions to our List of suggestedAddresses
       setState(() {
-        for (int i = 0; i < 10; i++) {
-          suggestedAddresses.add(predictions[0]["description"]);
+        for (int i = 0; i < 5; i++) {
+          suggestedAddresses.add(predictions[i]["description"]);
+          print(suggestedAddresses[i]);
         }
       });
-      print("Done");
-      //might have to add a setState here
     }
   }
 
@@ -996,23 +995,25 @@ class _MapRenderState extends State<MapRender>
       ),
       child: addressSearchField = AutoCompleteTextField(
         key: key,
+        clearOnSubmit: false,
         //Suggestions that will be shown
         suggestions: suggestedAddresses,
         //Filters results suggested
-        itemFilter: (item, query){
+        itemFilter: (item, query) {
           return item.toString().toLowerCase().startsWith(query.toLowerCase());
         },
         //Sorts suggestions
-        itemSorter: (a, b){
+        itemSorter: (a, b) {
           return a.toString().compareTo(b.toString());
         },
-        itemSubmitted: (item){
+        itemSubmitted: (item) {
           setState(() {
-            addressSearchField.textField.controller.text = item;
+            print("Selected address = $item");
+            addressSearchField.textField.controller.text = item.toString();
           });
         },
         //UI for each row of suggestions
-        itemBuilder: (context, item){
+        itemBuilder: (context, item) {
           return suggestedHints(item);
         },
         decoration: InputDecoration(
@@ -1034,6 +1035,7 @@ class _MapRenderState extends State<MapRender>
             )),
         textChanged: (val) {
           setState(() {
+            print(val);
             category = val;
             Global.userAddress = val;
             autoCompleteSuggestions(val);
@@ -1080,7 +1082,12 @@ class _MapRenderState extends State<MapRender>
     return Row(
       mainAxisAlignment: MainAxisAlignment.spaceBetween,
       children: <Widget>[
-        Text(hint, style: TextStyle(fontSize: 16.0, color: Colors.lightBlue), softWrap: true,),
+        Expanded(
+            child: Text(
+          hint,
+          style: TextStyle(fontSize: 16.0, color: Colors.lightBlue),
+          softWrap: true,
+        )),
       ],
     );
   }
