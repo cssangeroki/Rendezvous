@@ -14,6 +14,13 @@ class Global {
   static List isOpen = [];
   static List phoneNums = [];
   static List prices = [];
+  static List addresses = [];
+  static List cities = [];
+  static List states = [];
+  static List zipCodes = [];
+
+
+
 
   static double finalLon;
   static double finalLat;
