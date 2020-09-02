@@ -14,6 +14,13 @@ class Global {
   static List isOpen = [];
   static List phoneNums = [];
   static List prices = [];
+  static List addresses = [];
+  static List cities = [];
+  static List states = [];
+  static List zipCodes = [];
+
+
+
 
   static double finalLon;
   static double finalLat;
@@ -28,8 +35,6 @@ class Global {
   static var yellowColor = 0xffffcd3c;
 
   static var arrLength;
-
-  static var tabValue = 1;
 
   static List<String> nameList = [];
 
@@ -52,4 +57,5 @@ class Global {
   //
   static ValueNotifier timeChanged = ValueNotifier(false);
 
+  static LatLng userPos;
 }

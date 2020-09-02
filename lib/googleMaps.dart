@@ -6,6 +6,7 @@ import 'pages/firebaseFunctions.dart';
 import 'package:flutter/services.dart';
 import 'dart:async';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
+import 'package:flutter_spinkit/flutter_spinkit.dart';
 
 //import 'pages/mapRenderPage.dart';
 import 'package:geolocator/geolocator.dart';
@@ -157,6 +158,9 @@ class GoogleMapsState extends State<GoogleMaps> {
 
   void changeUserLocationWhenNewAddressEntered() {
     Global.userLocChanged.addListener(() {
+      if (!mounted) {
+        return;
+      }
       searchAddr = Global.userAddress;
       searchAndNavigate();
     });
@@ -165,6 +169,9 @@ class GoogleMapsState extends State<GoogleMaps> {
   //This function will be used to listen to if the final location was set on the slide up bar
   void setFinalLocationWhenButtonPressedOnSlideBar() {
     Global.finalLocationChanged.addListener(() async {
+      if (!mounted) {
+        return;
+      }
       //print("Location changed. Final Address = ${FirebaseFunctions.roomData["Final Location Address"]}");
       await routeToFinalLoc();
     });
@@ -211,7 +218,7 @@ class GoogleMapsState extends State<GoogleMaps> {
         "https://maps.googleapis.com/maps/api/distancematrix/json?units=imperial&origins=${currLocation.latitude},${currLocation.longitude}&destinations=${finalLatLng.latitude},${finalLatLng.longitude}&departure_time=now&key=$mapsAPI_KEY");
     //Now, we will decode the json response
     if (response.statusCode == 200) {
-      var decoded = convert.jsonDecode(response.body);
+      var decoded = await convert.jsonDecode(response.body);
       //print("Decode = $decoded");
       //print("decoded datatype = ${decoded.runtimeType}");
       if (decoded['rows'][0]['elements'][0]['status'] != 'OK') {
@@ -517,11 +524,12 @@ class GoogleMapsState extends State<GoogleMaps> {
           mapController.animateCamera(CameraUpdate.newCameraPosition(
               CameraPosition(
                   target: LatLng(newLatLng.latitude, newLatLng.longitude),
-                  zoom: 11.0)));
+                  zoom: 13.0)));
           await _onAddMarkerButtonPressed();
         },
       ));
     });
+    Global.userPos = currLocation;
     updateUserLocation();
     //Reroute to the final location from the users new position
     await routeToFinalLoc();
@@ -577,6 +585,7 @@ class GoogleMapsState extends State<GoogleMaps> {
       return Padding(
           padding: const EdgeInsets.fromLTRB(0.0, 10.0, 0.0, 0.0),
           child: FloatingActionButton(
+            heroTag: 'mapsFinalTag',
             onPressed: () {
               setState(() {
                 FirebaseFunctions.setFinalPosition(
@@ -606,14 +615,15 @@ class GoogleMapsState extends State<GoogleMaps> {
   Widget build(BuildContext context) {
     return _center == null
         ? Container(
+            decoration: BoxDecoration(
+              image: DecorationImage(
+                image: AssetImage("images/Map_loading.png"), fit: BoxFit.cover,
+              ),
+            ),
             child: Center(
-              child: Text(
-                'loading map..',
-                style: TextStyle(
-                  fontSize: 35,
-                  fontFamily: 'Avenir-Medium',
-                  color: Color(Global.blackColor),
-                ),
+              child: SpinKitPulse(
+                size: 280,
+                color: Colors.black38,
               ),
             ),
           )
@@ -640,6 +650,7 @@ class GoogleMapsState extends State<GoogleMaps> {
                 Container(
                     padding: EdgeInsets.fromLTRB(10, 63, 0, 0),
                     child: FloatingActionButton(
+                      heroTag: 'hamburgerTag',
                       backgroundColor: Color(Global.backgroundColor),
                       child: Icon(
                         Icons.menu,
@@ -687,6 +698,7 @@ class GoogleMapsState extends State<GoogleMaps> {
                       children: <Widget>[
 //Adding another floating button to mark locations
                         FloatingActionButton(
+                          heroTag: 'setLocationTag',
                           onPressed: _onAddMarkerButtonPressed,
                           materialTapTargetSize: MaterialTapTargetSize.padded,
                           backgroundColor: Colors.redAccent,

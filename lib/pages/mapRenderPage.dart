@@ -19,6 +19,13 @@ import "../globalVar.dart";
 import "../findYelpPlaces.dart";
 import 'package:share/share.dart';
 
+//Will use these import for autocompleting text
+import 'package:http/http.dart' as http;
+import 'dart:convert' as convert;
+
+import 'package:autocomplete_textfield/autocomplete_textfield.dart';
+
+const String mapsAPI_KEY = "AIzaSyBV961Ztopz9vyZrJq0AYAMJUTHmluu3FM";
 //Below are variables we will use for the sliders
 double midSliderVal = 5;
 double userSliderVal = 5;
@@ -50,6 +57,10 @@ class _MapRenderState extends State<MapRender>
   int min;
   String timeDisplayText;
 
+  List<String> suggestedAddresses = [];
+  AutoCompleteTextField addressSearchField;
+  GlobalKey<AutoCompleteTextFieldState> key = new GlobalKey();
+
   var _isExpanded = new List<bool>.filled(50, false, growable: true);
 
   @override
@@ -70,6 +81,9 @@ class _MapRenderState extends State<MapRender>
         .document(roomDocID)
         .snapshots()
         .listen((event) {
+      if (!mounted) {
+        return;
+      }
       setState(() {
         FirebaseFunctions.roomData["host"] = event.data["host"];
         //If the final location changed, we will alert the listener so that the route can be changed
@@ -92,6 +106,9 @@ class _MapRenderState extends State<MapRender>
 
   void listenToTime() {
     Global.timeChanged.addListener(() {
+      if (!mounted) {
+        return;
+      }
       setState(() {
         //print("Time updated");
         hours = Global.hours;
@@ -109,6 +126,9 @@ class _MapRenderState extends State<MapRender>
   //This function will be used to set a listener for whenever findingYelpPlaces is called in other widgets
   void newPlacesListener() {
     Global.mapRPfindYPListener.addListener(() {
+      if (!mounted) {
+        return;
+      }
       _updateYelpVenues();
     });
   }
@@ -116,6 +136,9 @@ class _MapRenderState extends State<MapRender>
   //This function just lets the app reset to show the users names whenever the users change
   void nameListListener() {
     Global.mapRPnameListListener.addListener(() {
+      if (!mounted) {
+        return;
+      }
       setState(() {
         nameList = Global.nameList;
       });
@@ -140,10 +163,41 @@ class _MapRenderState extends State<MapRender>
   var _arrLength;
 
   void _updateYelpVenues() {
+    if (!mounted) {
+      return;
+    }
     YelpPlaces.updateYelpVenues();
     setState(() {
       _arrLength = Global.arrLength;
     });
+  }
+
+  //This function will be used to suggest address when the user searches
+  Future<void> autoCompleteSuggestions(String searchString) async {
+    //First thing we will do is clear suggestedAddresses List
+    suggestedAddresses.clear();
+    if (searchString == "" || searchString == null) {
+      return;
+    }
+    //Searching for places similar to the location being searched. Biased to 100km radius of the user current location
+    var response = await http.post(
+        "https://maps.googleapis.com/maps/api/place/queryautocomplete/json?key=${mapsAPI_KEY}&location=${Global.userPos.latitude},${Global.userPos.longitude}&radius=100000&input=${searchString}");
+    if (response.statusCode == 200) {
+      var decoded = await convert.jsonDecode(response.body);
+      //If the we the http request fails, let the user know we are unable to find any suggestions
+      if (decoded['status'] != 'OK') {
+        suggestedAddresses.add("Unable to find any suggestions");
+        return;
+      }
+      //Otherwise, I will set a variable as the predictions category for the user
+      var predictions = decoded['predictions'];
+      //Add the top ten suggestions to our List of suggestedAddresses
+      setState(() {
+        for (int i = 0; i < 5; i++) {
+          suggestedAddresses.add(predictions[i]["description"]);
+        }
+      });
+    }
   }
 
   void _toggleExpand(var index) {
@@ -487,6 +541,7 @@ class _MapRenderState extends State<MapRender>
                         margin: EdgeInsets.fromLTRB(40, 5, 0, 0),
                         child: FittedBox(
                           child: FloatingActionButton(
+                              heroTag: null,
                               backgroundColor: Color(0xfff2f2f2),
                               child: Container(
                                 height: 30,
@@ -509,6 +564,7 @@ class _MapRenderState extends State<MapRender>
                         width: 70,
                         child: FittedBox(
                           child: FloatingActionButton(
+                            heroTag: null,
                             backgroundColor: Color(Global.backgroundColor),
                             child: Icon(
                               Icons.directions_car,
@@ -717,7 +773,7 @@ class _MapRenderState extends State<MapRender>
     );
   }
 
-  Widget _tab1Contents() {
+  Widget _tab2Contents() {
     return new Container(
       height: MediaQuery.of(context).size.height,
       width: double.infinity,
@@ -789,7 +845,7 @@ class _MapRenderState extends State<MapRender>
     );
   }
 
-  Widget _tab2Contents() {
+  Widget _tab1Contents() {
     return Container(
       height: MediaQuery.of(context).size.height,
       width: double.infinity,
@@ -837,7 +893,7 @@ class _MapRenderState extends State<MapRender>
             ),
           ),
           //Search bar
-          _categoryBar(),
+          _addressBar(),
 
           Container(
             child: ListTile(
@@ -874,10 +930,7 @@ class _MapRenderState extends State<MapRender>
               onTap: null,
             ),
           ),
-          Container(
-              padding: EdgeInsets.fromLTRB(20.0, 20.0, 20.0, 15.0),
-              width: 50,
-              child: _leaveRoomButton()),
+          _leaveRoomButton(),
         ],
       ),
     );
@@ -924,8 +977,8 @@ class _MapRenderState extends State<MapRender>
                         indicatorHeight: 2,
                       ),
                       tabs: [
-                        Tab(text: "Venue"),
                         Tab(text: "Info"),
+                        Tab(text: "Venue"),
                         Tab(text: "Chat"),
                       ]),
                 ),
@@ -946,7 +999,7 @@ class _MapRenderState extends State<MapRender>
     );
   }
 
-  Widget _categoryBar() {
+  Widget _addressBar() {
     return Container(
       margin: EdgeInsets.all(15),
       width: double.infinity,
@@ -954,7 +1007,28 @@ class _MapRenderState extends State<MapRender>
         borderRadius: BorderRadius.circular(10.0),
         color: Colors.white,
       ),
-      child: TextField(
+      child: addressSearchField = AutoCompleteTextField(
+        key: key,
+        clearOnSubmit: false,
+        //Suggestions that will be shown
+        suggestions: suggestedAddresses,
+        //Filters results suggested
+        itemFilter: (item, query) {
+          return item.toString().toLowerCase().startsWith(query.toLowerCase());
+        },
+        //Sorts suggestions
+        itemSorter: (a, b) {
+          return a.toString().compareTo(b.toString());
+        },
+        itemSubmitted: (item) {
+          setState(() {
+            addressSearchField.textField.controller.text = item.toString();
+          });
+        },
+        //UI for each row of suggestions
+        itemBuilder: (context, item) {
+          return suggestedHints(item);
+        },
         decoration: InputDecoration(
             focusedBorder: OutlineInputBorder(
               borderSide: BorderSide(color: Colors.black, width: 1.5),
@@ -972,14 +1046,61 @@ class _MapRenderState extends State<MapRender>
               },
               iconSize: 20.0,
             )),
-        onChanged: (val) {
+        textChanged: (val) {
           setState(() {
             category = val;
             Global.userAddress = val;
+            autoCompleteSuggestions(val);
             //Global.finalCategory = category;
           });
         },
       ),
+    );
+  }
+
+  /*Widget searchBar() {
+    return TextField(
+      decoration: InputDecoration(
+          focusedBorder: OutlineInputBorder(
+            borderSide: BorderSide(color: Colors.black, width: 1.5),
+          ),
+          enabledBorder: OutlineInputBorder(
+            borderSide: BorderSide(color: Colors.black, width: 1.5),
+          ),
+          hintText: "Enter your address...",
+          contentPadding: EdgeInsets.only(left: 15.0, top: 15.0),
+          suffixIcon: IconButton(
+            icon: Icon(Icons.search),
+            onPressed: () {
+              userAddressChanged();
+              //Navigator.pop(context);
+            },
+            iconSize: 20.0,
+          )),
+      onChanged: (val) {
+        setState(() {
+          category = val;
+          Global.userAddress = val;
+          autoCompleteSuggestions(val);
+          //Global.finalCategory = category;
+        });
+      },
+      autofillHints: suggestedAddresses,
+    );
+  }*/
+
+  //This widget will be used to display the hints
+  Widget suggestedHints(String hint) {
+    return Row(
+      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+      children: <Widget>[
+        Expanded(
+            child: Text(
+          hint,
+          style: TextStyle(fontSize: 16.0, color: Colors.lightBlue),
+          softWrap: true,
+        )),
+      ],
     );
   }
 
@@ -1057,14 +1178,18 @@ class _MapRenderState extends State<MapRender>
   }*/
 
   Widget _leaveRoomButton() {
-    return ButtonTheme(
-      minWidth: double.infinity,
-      height: 60.0,
-      padding: EdgeInsets.all(10.0),
-      buttonColor: Colors.white,
+    return Container(
+      height: 60,
+      width: 100,
+      padding: EdgeInsets.fromLTRB(60, 0, 60, 0),
+      margin: EdgeInsets.fromLTRB(0, 20, 0, 0),
       child: RaisedButton(
+        color: Colors.black54,
+        shape: RoundedRectangleBorder(
+          borderRadius: BorderRadius.circular(30.0),
+        ),
         child: Text("Leave Room",
-            style: new TextStyle(fontSize: 20.0, color: Colors.black)),
+            style: new TextStyle(fontSize: 20.0, color: Colors.white)),
         onPressed: () async {
           //Adding some code to turn off all listeners
           Global.mapRPnameListListener.removeListener(() {});
@@ -1072,6 +1197,7 @@ class _MapRenderState extends State<MapRender>
           Global.findYPCalled.removeListener(() {});
           Global.finalLocationChanged.removeListener(() {});
           Global.timeChanged.removeListener(() {});
+          Global.userLocChanged.removeListener(() {});
 
           String roomCodeString = FirebaseFunctions.roomData["roomCode"];
 
