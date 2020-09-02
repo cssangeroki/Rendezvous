@@ -87,6 +87,7 @@ flutter:
     - assets/map_style.txt
     - images/person.png
     - images/yelp_icon.png
+    - images/Map_loading.png
     - images/Rendezvous_logo.png # added logo from images folder
 
 
