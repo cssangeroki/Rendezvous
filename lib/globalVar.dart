@@ -20,11 +20,9 @@ class Global {
   static List zipCodes = [];
 
 
-
-
   static double finalLon;
   static double finalLat;
-  static String finalCategory;
+  static String finalCategory = "All";
   static double finalRad;
   static double finalTime;
 
@@ -58,4 +56,9 @@ class Global {
   static ValueNotifier timeChanged = ValueNotifier(false);
 
   static LatLng userPos;
+
+  //Creating a ValueNotifier to let the slideUpBar know when we are searching for places
+  static ValueNotifier searchingPlaces = ValueNotifier(false);
+
+  static bool searchingCategory = false;
 }

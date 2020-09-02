@@ -679,8 +679,12 @@ class GoogleMapsState extends State<GoogleMaps> {
                           suffixIcon: IconButton(
                             icon: Icon(Icons.search),
                             onPressed: () async {
+                              Global.searchingPlaces.value ^= true;
+                              Global.searchingCategory = true;
                               await YelpPlaces.findingPlaces();
                               addYelpMarkers();
+                              Global.searchingCategory = false;
+                              Global.searchingPlaces.value ^= true;
                             },
                             iconSize: 30.0,
                           )),
