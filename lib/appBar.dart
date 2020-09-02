@@ -4,7 +4,7 @@ import 'globalVar.dart';
 Widget appBarMain(BuildContext context) {
   return AppBar(
     elevation: 0,
-    toolbarHeight: 90,
+    //toolbarHeight: 90,
     brightness: Brightness.light,
     iconTheme: IconThemeData(
       color: Colors.black,
