@@ -1224,15 +1224,18 @@ class _MapRenderState extends State<MapRender>
 
   @override
   Widget build(BuildContext context) {
-    return MaterialApp(
-      debugShowCheckedModeBanner: false,
-      home: Scaffold(
-        //appBar: appBarMain(context),
-        body: Container(
-          color: Color(Global.backgroundColor),
-          child: ClipRRect(borderRadius: onlyTop10(), child: _slideUpPanel()),
+    return new WillPopScope(
+      onWillPop: () async => false,
+      child: MaterialApp(
+        debugShowCheckedModeBanner: false,
+        home: Scaffold(
+          //appBar: appBarMain(context),
+          body: Container(
+            color: Color(Global.backgroundColor),
+            child: ClipRRect(borderRadius: onlyTop10(), child: _slideUpPanel()),
+          ),
+          drawer: _viewDrawer(),
         ),
-        drawer: _viewDrawer(),
       ),
     );
 //);
