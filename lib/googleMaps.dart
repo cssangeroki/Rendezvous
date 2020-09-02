@@ -523,6 +523,7 @@ class GoogleMapsState extends State<GoogleMaps> {
         },
       ));
     });
+    Global.userPos = currLocation;
     updateUserLocation();
     //Reroute to the final location from the users new position
     await routeToFinalLoc();

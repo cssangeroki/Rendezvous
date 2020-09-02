@@ -49,4 +49,6 @@ class Global {
 
   //
   static ValueNotifier timeChanged = ValueNotifier(false);
+
+  static LatLng userPos;
 }

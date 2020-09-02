@@ -159,14 +159,14 @@ class _MapRenderState extends State<MapRender>
 
   //This function will be used to suggest address when the user searches
   Future<void> autoCompleteSuggestions(String searchString) async {
-    print("Entered");
     //First thing we will do is clear suggestedAddresses List
     suggestedAddresses.clear();
     if (searchString == "" || searchString == null) {
       return;
     }
+    //Searching for places similar to the location being searched. Biased to 100km radius of the user current location
     var response = await http.post(
-        "https://maps.googleapis.com/maps/api/place/queryautocomplete/json?key=${mapsAPI_KEY}&input=${searchString}");
+        "https://maps.googleapis.com/maps/api/place/queryautocomplete/json?key=${mapsAPI_KEY}&location=${Global.userPos.latitude},${Global.userPos.longitude}&radius=100000&input=${searchString}");
     if (response.statusCode == 200) {
       var decoded = await convert.jsonDecode(response.body);
       //If the we the http request fails, let the user know we are unable to find any suggestions
@@ -180,7 +180,6 @@ class _MapRenderState extends State<MapRender>
       setState(() {
         for (int i = 0; i < 5; i++) {
           suggestedAddresses.add(predictions[i]["description"]);
-          print(suggestedAddresses[i]);
         }
       });
     }
@@ -1008,7 +1007,6 @@ class _MapRenderState extends State<MapRender>
         },
         itemSubmitted: (item) {
           setState(() {
-            print("Selected address = $item");
             addressSearchField.textField.controller.text = item.toString();
           });
         },
@@ -1035,7 +1033,6 @@ class _MapRenderState extends State<MapRender>
             )),
         textChanged: (val) {
           setState(() {
-            print(val);
             category = val;
             Global.userAddress = val;
             autoCompleteSuggestions(val);
