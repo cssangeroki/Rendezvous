@@ -648,7 +648,7 @@ class GoogleMapsState extends State<GoogleMaps> {
                     ),
                     child: TextField(
                       decoration: InputDecoration(
-                          hintText: "Enter category (eg. restaurants, bars)...",
+                          hintText: "e.g. Restaurants, Bars, Hotels...",
                           border: InputBorder.none,
                           contentPadding:
                               EdgeInsets.only(left: 15.0, top: 15.0),

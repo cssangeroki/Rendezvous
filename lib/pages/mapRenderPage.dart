@@ -97,9 +97,9 @@ class _MapRenderState extends State<MapRender>
           locChanged = true;
         }
         FirebaseFunctions.roomData["Final Location"] =
-        event.data["Final Location"];
+            event.data["Final Location"];
         FirebaseFunctions.roomData["Final Location Address"] =
-        event.data["Final Location Address"];
+            event.data["Final Location Address"];
         FirebaseFunctions.roomData["Final LatLng"] = event.data["Final LatLng"];
         if (locChanged == true) {
           //Global.finalLocationChanged.notifyListeners();
@@ -119,7 +119,7 @@ class _MapRenderState extends State<MapRender>
         min = Global.minutes;
         if (hours == -1 || min == -1) {
           timeDisplayText =
-          "Sorry, a problem occurred retrieving the travel time";
+              "Sorry, a problem occurred retrieving the travel time";
         } else {
           timeDisplayText = "Approximately ${hours}hrs ${min}min";
         }
@@ -201,9 +201,7 @@ class _MapRenderState extends State<MapRender>
     }
     //Searching for places similar to the location being searched. Biased to 100km radius of the user current location
     var response = await http.post(
-        "https://maps.googleapis.com/maps/api/place/queryautocomplete/json?key=${mapsAPI_KEY}&location=${Global
-            .userPos.latitude},${Global.userPos
-            .longitude}&radius=100000&input=${searchString}");
+        "https://maps.googleapis.com/maps/api/place/queryautocomplete/json?key=${mapsAPI_KEY}&location=${Global.userPos.latitude},${Global.userPos.longitude}&radius=100000&input=${searchString}");
     if (response.statusCode == 200) {
       var decoded = await convert.jsonDecode(response.body);
       //If the we the http request fails, let the user know we are unable to find any suggestions
@@ -303,10 +301,7 @@ class _MapRenderState extends State<MapRender>
         ),
         Expanded(
           child: Container(
-            width: MediaQuery
-                .of(context)
-                .size
-                .width * 0.88,
+            width: MediaQuery.of(context).size.width * 0.88,
             child: ListView.builder(
               itemCount: _arrLength,
               itemBuilder: (BuildContext context, int index) {
@@ -338,10 +333,7 @@ class _MapRenderState extends State<MapRender>
                             /*Center(
                             child: */
                             Container(
-                              width: MediaQuery
-                                  .of(context)
-                                  .size
-                                  .width * 0.88,
+                              width: MediaQuery.of(context).size.width * 0.88,
                               child: Column(
                                 mainAxisSize: MainAxisSize.min,
                                 children: <Widget>[
@@ -384,36 +376,33 @@ class _MapRenderState extends State<MapRender>
                     height: !_isExpanded[index] ? 90 : 160,
                     width: !_isExpanded[index]
                         ? 90
-                        : MediaQuery
-                        .of(context)
-                        .size
-                        .width * 0.88,
+                        : MediaQuery.of(context).size.width * 0.88,
                     duration: Duration(milliseconds: 950),
                     curve: Curves.fastLinearToSlowEaseIn,
                     padding: !_isExpanded[index] ? EdgeInsets.all(8) : null,
                     child: !_isExpanded[index]
                         ? ClipRRect(
-                      borderRadius: BorderRadius.all(Radius.circular(10)),
-                      child: Image.network(
-                        Global.images[index] == ''
-                            ? 'https://firebasestorage.googleapis.com/v0/b/rendezvous-b51b4.appspot.com/o/photo-1550747545-c896b5f89ff7.jpeg?alt=media&token=eb3eb883-86da-4b89-87e1-7490fd518910'
-                            : '${Global.images[index]}',
-                        // 'https://firebasestorage.googleapis.com/v0/b/rendezvous-b51b4.appspot.com/o/photo-1550747545-c896b5f89ff7.jpeg?alt=media&token=eb3eb883-86da-4b89-87e1-7490fd518910',
-                        fit: BoxFit.cover,
-                      ),
-                    )
+                            borderRadius: BorderRadius.all(Radius.circular(10)),
+                            child: Image.network(
+                              Global.images[index] == ''
+                                  ? 'https://firebasestorage.googleapis.com/v0/b/rendezvous-b51b4.appspot.com/o/photo-1550747545-c896b5f89ff7.jpeg?alt=media&token=eb3eb883-86da-4b89-87e1-7490fd518910'
+                                  : '${Global.images[index]}',
+                              // 'https://firebasestorage.googleapis.com/v0/b/rendezvous-b51b4.appspot.com/o/photo-1550747545-c896b5f89ff7.jpeg?alt=media&token=eb3eb883-86da-4b89-87e1-7490fd518910',
+                              fit: BoxFit.cover,
+                            ),
+                          )
                         : ClipRRect(
-                      borderRadius: BorderRadius.only(
-                          topLeft: Radius.circular(10),
-                          topRight: Radius.circular(10)),
-                      child: Image.network(
-                        Global.images[index] == ''
-                            ? 'https://firebasestorage.googleapis.com/v0/b/rendezvous-b51b4.appspot.com/o/photo-1550747545-c896b5f89ff7.jpeg?alt=media&token=eb3eb883-86da-4b89-87e1-7490fd518910'
-                            : '${Global.images[index]}',
-                        // 'https://firebasestorage.googleapis.com/v0/b/rendezvous-b51b4.appspot.com/o/photo-1550747545-c896b5f89ff7.jpeg?alt=media&token=eb3eb883-86da-4b89-87e1-7490fd518910',
-                        fit: BoxFit.cover,
-                      ),
-                    ),
+                            borderRadius: BorderRadius.only(
+                                topLeft: Radius.circular(10),
+                                topRight: Radius.circular(10)),
+                            child: Image.network(
+                              Global.images[index] == ''
+                                  ? 'https://firebasestorage.googleapis.com/v0/b/rendezvous-b51b4.appspot.com/o/photo-1550747545-c896b5f89ff7.jpeg?alt=media&token=eb3eb883-86da-4b89-87e1-7490fd518910'
+                                  : '${Global.images[index]}',
+                              // 'https://firebasestorage.googleapis.com/v0/b/rendezvous-b51b4.appspot.com/o/photo-1550747545-c896b5f89ff7.jpeg?alt=media&token=eb3eb883-86da-4b89-87e1-7490fd518910',
+                              fit: BoxFit.cover,
+                            ),
+                          ),
                   ),
                 ),
                 AnimatedContainer(
@@ -422,56 +411,56 @@ class _MapRenderState extends State<MapRender>
                 ),
                 !_isExpanded[index]
                     ? Flexible(
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: <Widget>[
-                      MergeSemantics(
-                        child: Row(
+                        child: Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
                           children: <Widget>[
-                            Flexible(
-                              child: Container(
-                                width: !_isExpanded[index]
-                                    ? double.infinity
-                                    : 0,
-                                padding: EdgeInsets.fromLTRB(0, 0, 0, 0),
-                                child: Text(
-                                  "${Global.names[index]} ",
-                                  overflow: !_isExpanded[index]
-                                      ? TextOverflow.ellipsis
-                                      : null,
-                                  softWrap: true,
-                                  style: GoogleFonts.roboto(
-                                      fontWeight: FontWeight.w700,
-                                      fontSize: 18),
-                                  /*textAlign:
+                            MergeSemantics(
+                              child: Row(
+                                children: <Widget>[
+                                  Flexible(
+                                    child: Container(
+                                      width: !_isExpanded[index]
+                                          ? double.infinity
+                                          : 0,
+                                      padding: EdgeInsets.fromLTRB(0, 0, 0, 0),
+                                      child: Text(
+                                        "${Global.names[index]} ",
+                                        overflow: !_isExpanded[index]
+                                            ? TextOverflow.ellipsis
+                                            : null,
+                                        softWrap: true,
+                                        style: GoogleFonts.roboto(
+                                            fontWeight: FontWeight.w700,
+                                            fontSize: 18),
+                                        /*textAlign:
                                                                   TextAlign
                                                                       .left,*/
-                                ),
+                                      ),
+                                    ),
+                                    //textAlign: TextAlign.right,
+                                  ),
+                                ],
                               ),
-                              //textAlign: TextAlign.right,
                             ),
+                            SizedBox(height: 5),
+                            AnimatedContainer(
+                              // If the widget is visible, animate to 0.0 (invisible).
+                              // If the widget is hidden, animate to 1.0 (fully visible).
+                              width: !_isExpanded[index] ? double.infinity : 0,
+                              duration: Duration(milliseconds: 500),
+                              child: Text(
+                                'Click to see more information',
+                                maxLines: 1,
+                                style: textSize12Grey(),
+                              ),
+                            ),
+                            SizedBox(height: 5),
                           ],
                         ),
-                      ),
-                      SizedBox(height: 5),
-                      AnimatedContainer(
-                        // If the widget is visible, animate to 0.0 (invisible).
-                        // If the widget is hidden, animate to 1.0 (fully visible).
-                        width: !_isExpanded[index] ? double.infinity : 0,
-                        duration: Duration(milliseconds: 500),
-                        child: Text(
-                          'Click to see more information',
-                          maxLines: 1,
-                          style: textSize12Grey(),
-                        ),
-                      ),
-                      SizedBox(height: 5),
-                    ],
-                  ),
-                )
+                      )
                     : Container(
-                  color: Colors.transparent,
-                ),
+                        color: Colors.transparent,
+                      ),
               ],
             ),
           ),
@@ -526,10 +515,7 @@ class _MapRenderState extends State<MapRender>
                       ),
                     ]),
                     Container(
-                      width: MediaQuery
-                          .of(context)
-                          .size
-                          .width * 0.5,
+                      width: MediaQuery.of(context).size.width * 0.5,
                       padding: EdgeInsets.fromLTRB(0, 10, 0, 0),
                       child: Text(
                         '${Global.names[index]}',
@@ -541,10 +527,7 @@ class _MapRenderState extends State<MapRender>
                     ),
                     Container(
                       padding: EdgeInsets.fromLTRB(0, 10, 0, 0),
-                      width: MediaQuery
-                          .of(context)
-                          .size
-                          .width * 0.5,
+                      width: MediaQuery.of(context).size.width * 0.5,
                       child: Text(
                         "${Global.locations[index]} ",
                         softWrap: true,
@@ -554,10 +537,7 @@ class _MapRenderState extends State<MapRender>
                     ),
                     Container(
                       padding: EdgeInsets.fromLTRB(0, 10, 0, 0),
-                      width: MediaQuery
-                          .of(context)
-                          .size
-                          .width * 0.5,
+                      width: MediaQuery.of(context).size.width * 0.5,
                       child: Text(
                         Global.phoneNums[index] == ''
                             ? ''
@@ -624,110 +604,6 @@ class _MapRenderState extends State<MapRender>
                     ],
                   ),
                 ),
-                /*
-              Container(
-                padding: EdgeInsets.fromLTRB(60, 0, 0, 5),
-                width: double.infinity,
-                child: Text(
-                  "Address: ${Global.locations[index]} ",
-                  overflow: TextOverflow.ellipsis,
-                  softWrap: true,
-                  style: textSize15Black45(),
-                  textAlign: TextAlign.left,
-                ),
-              ),
-              Container(
-                padding: EdgeInsets.fromLTRB(60, 0, 0, 5),
-                width: double.infinity,
-                child: Text(
-                  "Rating: ${Global.ratings[index]} ",
-                  overflow: TextOverflow.ellipsis,
-                  softWrap: true,
-                  style: textSize15Black45(),
-                  textAlign: TextAlign.left,
-                ),
-              ),
-              Container(
-                padding: EdgeInsets.fromLTRB(60, 0, 0, 5),
-                width: double.infinity,
-                child: Text(
-                  Global.phoneNums[index] == ''
-                      ? 'Phone number is unavailable'
-                      : 'Phone Number: ${Global.phoneNums[index]}',
-                  overflow: TextOverflow.ellipsis,
-                  softWrap: true,
-                  style: textSize15Black45(),
-                  textAlign: TextAlign.left,
-                ),
-              ),
-              Container(
-                padding: EdgeInsets.fromLTRB(60, 0, 0, 5),
-                width: double.infinity,
-                child: Text(
-                  Global.prices[index] == null
-                      ? 'Price is unavailable'
-                      : 'Price: ${Global.prices[index]}',
-                  overflow: TextOverflow.ellipsis,
-                  softWrap: true,
-                  style: textSize15Black45(),
-                  textAlign: TextAlign.left,
-                ),
-              ),
-              Container(
-                width: double.infinity,
-                height: 95,
-                child: Row(children: <Widget>[
-                  //Final Position Button
-
-                  Container(
-                    margin: EdgeInsets.fromLTRB(20, 0, 0, 0),
-                    height: 70,
-                    width: 70,
-                    child: FittedBox(
-                      child: FloatingActionButton(
-                        backgroundColor: Color(0xff21bf73),
-                        child: Icon(
-                          Icons.check_circle,
-                          size: 40,
-                        ),
-                        elevation: 2,
-                        onPressed: () {
-                          FirebaseFunctions.setFinalPosition(
-                              Global.names[index],
-                              Global.locations[index],
-                              Global.resultCords[index]);
-                        },
-                      ),
-                    ),
-                  ),
-
-                  //Yelp Button
-                  Container(
-                      height: 70,
-                      width: 70,
-                      margin: EdgeInsets.fromLTRB(
-                          MediaQuery.of(context).size.width * 0.44, 0, 0, 0),
-                      child: FittedBox(
-                        child: FloatingActionButton(
-                            backgroundColor: Color(0xffaa1802),
-                            child: Container(
-                              height: 50,
-                              width: 50,
-                              child: Image.asset(
-                                'images/yelp_icon.png',
-                              ),
-                            ),
-                            elevation: 2,
-                            onPressed: () {
-                              launch(Global.urls[index]);
-                            }),
-                      )),
-
-                  SizedBox(
-                    height: 20,
-                  )
-                ]),
-              ),*/
               ],
             ),
           ),
@@ -765,10 +641,7 @@ class _MapRenderState extends State<MapRender>
 
         collapsed: _collapsedSlideUpPanel(),
         minHeight: 135,
-        maxHeight: MediaQuery
-            .of(context)
-            .size
-            .height * 0.85,
+        maxHeight: MediaQuery.of(context).size.height * 0.85,
         body: GoogleMaps(),
       ),
     );
@@ -830,20 +703,20 @@ class _MapRenderState extends State<MapRender>
               children: <Widget>[
                 Container(
                     child: Text(
-                      "Searching for: ${Global.finalCategory}",
-                      softWrap: true,
-                    )),
+                  "Searching for: ${Global.finalCategory}",
+                  softWrap: true,
+                )),
                 Padding(
                   padding: EdgeInsets.fromLTRB(5, 0, 0, 0),
                   child: Center(
-                  child: Container(
-                    height: 15,
-                    width: 15,
-                    child: CircularProgressIndicator(
-                      strokeWidth: 3.0,
+                    child: Container(
+                      height: 15,
+                      width: 15,
+                      child: CircularProgressIndicator(
+                        strokeWidth: 3.0,
+                      ),
                     ),
                   ),
-                ),
                 ),
               ],
             ),
@@ -855,10 +728,7 @@ class _MapRenderState extends State<MapRender>
 
   Widget _tab2Contents() {
     return new Container(
-      height: MediaQuery
-          .of(context)
-          .size
-          .height,
+      height: MediaQuery.of(context).size.height,
       width: double.infinity,
       child: ListView(
         children: <Widget>[
@@ -875,16 +745,12 @@ class _MapRenderState extends State<MapRender>
             padding: EdgeInsets.fromLTRB(30, 0, 0, 10),
             child: SelectableText(
                 FirebaseFunctions.roomData["Final Location"] != null
-                    ? "${FirebaseFunctions
-                    .roomData["Final Location"]},\n${FirebaseFunctions
-                    .roomData["Final Location Address"]}"
+                    ? "${FirebaseFunctions.roomData["Final Location"]},\n${FirebaseFunctions.roomData["Final Location Address"]}"
                     : "No location set",
                 style: textSize20(),
                 enableInteractiveSelection: true, onTap: () {
               Share.share(
-                  "${FirebaseFunctions
-                      .roomData["Final Location"]}, ${FirebaseFunctions
-                      .roomData["Final Location Address"]}");
+                  "${FirebaseFunctions.roomData["Final Location"]}, ${FirebaseFunctions.roomData["Final Location Address"]}");
             }),
           ),
           Container(
@@ -911,10 +777,7 @@ class _MapRenderState extends State<MapRender>
 
   Widget _tab1Contents() {
     return Container(
-      height: MediaQuery
-          .of(context)
-          .size
-          .height,
+      height: MediaQuery.of(context).size.height,
       width: double.infinity,
       child: ListView(
         children: <Widget>[
@@ -991,7 +854,7 @@ class _MapRenderState extends State<MapRender>
                 enableInteractiveSelection: true,
                 onTap: () async {
                   String link =
-                  await DynamicLinkService.createAppLink("Join my room!");
+                      await DynamicLinkService.createAppLink("Join my room!");
                   Share.share(
                       "${FirebaseFunctions.roomData["roomCode"]}\n$link",
                       subject: "Let's Rendezvous! Join my room!");
@@ -1008,10 +871,7 @@ class _MapRenderState extends State<MapRender>
 
   Widget _tab3Contents() {
     return new Container(
-      height: MediaQuery
-          .of(context)
-          .size
-          .height,
+      height: MediaQuery.of(context).size.height,
       width: double.infinity,
       child: Container(),
     );
@@ -1033,10 +893,7 @@ class _MapRenderState extends State<MapRender>
               mainAxisSize: MainAxisSize.max,
               children: <Widget>[
                 Container(
-                  height: MediaQuery
-                      .of(context)
-                      .size
-                      .height * 0.08,
+                  height: MediaQuery.of(context).size.height * 0.08,
                 ),
                 Container(
                   height: 50,
@@ -1046,7 +903,7 @@ class _MapRenderState extends State<MapRender>
                       unselectedLabelColor: Colors.black38,
                       labelStyle: TextStyle(fontSize: 20, fontFamily: 'Roboto'),
                       unselectedLabelStyle:
-                      TextStyle(fontSize: 15, fontFamily: 'Roboto'),
+                          TextStyle(fontSize: 15, fontFamily: 'Roboto'),
                       indicator: BubbleTabIndicator(
                         indicatorColor: Color(Global.yellowColor),
                         padding: EdgeInsets.fromLTRB(-24, -12, -24, 16),
@@ -1141,10 +998,10 @@ class _MapRenderState extends State<MapRender>
       children: <Widget>[
         Expanded(
             child: Text(
-              hint,
-              style: TextStyle(fontSize: 16.0, color: Colors.lightBlue),
-              softWrap: true,
-            )),
+          hint,
+          style: TextStyle(fontSize: 16.0, color: Colors.lightBlue),
+          softWrap: true,
+        )),
       ],
     );
   }
