@@ -18,6 +18,7 @@ import "../googleMaps.dart";
 import "../globalVar.dart";
 import "../findYelpPlaces.dart";
 import 'package:share/share.dart';
+import "../dynamicLinks.dart";
 
 //Will use these import for autocompleting text
 import 'package:http/http.dart' as http;
@@ -71,6 +72,7 @@ class _MapRenderState extends State<MapRender>
     newPlacesListener();
     nameListListener();
     listenToRoom();
+    searchingForCategory();
   }
 
   //Another function that creates a listener for the roomData (Not the users, but other room data)
@@ -81,6 +83,9 @@ class _MapRenderState extends State<MapRender>
         .document(roomDocID)
         .snapshots()
         .listen((event) {
+      if (!mounted) {
+        return;
+      }
       setState(() {
         FirebaseFunctions.roomData["host"] = event.data["host"];
         //If the final location changed, we will alert the listener so that the route can be changed
@@ -103,6 +108,9 @@ class _MapRenderState extends State<MapRender>
 
   void listenToTime() {
     Global.timeChanged.addListener(() {
+      if (!mounted) {
+        return;
+      }
       setState(() {
         //print("Time updated");
         hours = Global.hours;
@@ -117,9 +125,20 @@ class _MapRenderState extends State<MapRender>
     });
   }
 
+  //This is called whenever we search for a category on the googleMaps page.
+  //We simply call setState to update the app to show whether it is searching for places or not
+  void searchingForCategory() {
+    Global.searchingPlaces.addListener(() {
+      setState(() {});
+    });
+  }
+
   //This function will be used to set a listener for whenever findingYelpPlaces is called in other widgets
   void newPlacesListener() {
     Global.mapRPfindYPListener.addListener(() {
+      if (!mounted) {
+        return;
+      }
       _updateYelpVenues();
     });
   }
@@ -127,6 +146,9 @@ class _MapRenderState extends State<MapRender>
   //This function just lets the app reset to show the users names whenever the users change
   void nameListListener() {
     Global.mapRPnameListListener.addListener(() {
+      if (!mounted) {
+        return;
+      }
       setState(() {
         nameList = Global.nameList;
       });
@@ -151,6 +173,9 @@ class _MapRenderState extends State<MapRender>
   var _arrLength;
 
   void _updateYelpVenues() {
+    if (!mounted) {
+      return;
+    }
     YelpPlaces.updateYelpVenues();
     setState(() {
       _arrLength = Global.arrLength;
@@ -569,110 +594,6 @@ class _MapRenderState extends State<MapRender>
                     ],
                   ),
                 ),
-                /*
-              Container(
-                padding: EdgeInsets.fromLTRB(60, 0, 0, 5),
-                width: double.infinity,
-                child: Text(
-                  "Address: ${Global.locations[index]} ",
-                  overflow: TextOverflow.ellipsis,
-                  softWrap: true,
-                  style: textSize15Black45(),
-                  textAlign: TextAlign.left,
-                ),
-              ),
-              Container(
-                padding: EdgeInsets.fromLTRB(60, 0, 0, 5),
-                width: double.infinity,
-                child: Text(
-                  "Rating: ${Global.ratings[index]} ",
-                  overflow: TextOverflow.ellipsis,
-                  softWrap: true,
-                  style: textSize15Black45(),
-                  textAlign: TextAlign.left,
-                ),
-              ),
-              Container(
-                padding: EdgeInsets.fromLTRB(60, 0, 0, 5),
-                width: double.infinity,
-                child: Text(
-                  Global.phoneNums[index] == ''
-                      ? 'Phone number is unavailable'
-                      : 'Phone Number: ${Global.phoneNums[index]}',
-                  overflow: TextOverflow.ellipsis,
-                  softWrap: true,
-                  style: textSize15Black45(),
-                  textAlign: TextAlign.left,
-                ),
-              ),
-              Container(
-                padding: EdgeInsets.fromLTRB(60, 0, 0, 5),
-                width: double.infinity,
-                child: Text(
-                  Global.prices[index] == null
-                      ? 'Price is unavailable'
-                      : 'Price: ${Global.prices[index]}',
-                  overflow: TextOverflow.ellipsis,
-                  softWrap: true,
-                  style: textSize15Black45(),
-                  textAlign: TextAlign.left,
-                ),
-              ),
-              Container(
-                width: double.infinity,
-                height: 95,
-                child: Row(children: <Widget>[
-                  //Final Position Button
-
-                  Container(
-                    margin: EdgeInsets.fromLTRB(20, 0, 0, 0),
-                    height: 70,
-                    width: 70,
-                    child: FittedBox(
-                      child: FloatingActionButton(
-                        backgroundColor: Color(0xff21bf73),
-                        child: Icon(
-                          Icons.check_circle,
-                          size: 40,
-                        ),
-                        elevation: 2,
-                        onPressed: () {
-                          FirebaseFunctions.setFinalPosition(
-                              Global.names[index],
-                              Global.locations[index],
-                              Global.resultCords[index]);
-                        },
-                      ),
-                    ),
-                  ),
-
-                  //Yelp Button
-                  Container(
-                      height: 70,
-                      width: 70,
-                      margin: EdgeInsets.fromLTRB(
-                          MediaQuery.of(context).size.width * 0.44, 0, 0, 0),
-                      child: FittedBox(
-                        child: FloatingActionButton(
-                            backgroundColor: Color(0xffaa1802),
-                            child: Container(
-                              height: 50,
-                              width: 50,
-                              child: Image.asset(
-                                'images/yelp_icon.png',
-                              ),
-                            ),
-                            elevation: 2,
-                            onPressed: () {
-                              launch(Global.urls[index]);
-                            }),
-                      )),
-
-                  SizedBox(
-                    height: 20,
-                  )
-                ]),
-              ),*/
               ],
             ),
           ),
@@ -749,19 +670,50 @@ class _MapRenderState extends State<MapRender>
             color: Colors.white,
             borderRadius: onlyTop20(),
           ),
-          child: Center(
-              child: Column(
-            children: <Widget>[
-              Container(
-                padding: EdgeInsets.fromLTRB(10, 20, 0, 0),
-                child: Text('Swipe up to see ${_arrLength} results',
-                    style: GoogleFonts.roboto(fontSize: 20)),
-              ),
-            ],
-          )),
+          child: slideUpPanelDisplayText(),
         ),
       ],
     );
+  }
+
+  Widget slideUpPanelDisplayText() {
+    if (Global.searchingCategory == false) {
+      return Container(
+        padding: EdgeInsets.fromLTRB(10, 10, 0, 0),
+        child: Text(
+            'Showing ${Global.arrLength} results for: ${Global.finalCategory}'),
+      );
+    } else {
+      return Container(
+        padding: EdgeInsets.fromLTRB(10, 10, 0, 0),
+        child: Column(
+          children: <Widget>[
+            Row(
+              mainAxisAlignment: MainAxisAlignment.start,
+              children: <Widget>[
+                Container(
+                    child: Text(
+                  "Searching for: ${Global.finalCategory}",
+                  softWrap: true,
+                )),
+                Padding(
+                  padding: EdgeInsets.fromLTRB(5, 0, 0, 0),
+                  child: Center(
+                    child: Container(
+                      height: 15,
+                      width: 15,
+                      child: CircularProgressIndicator(
+                        strokeWidth: 3.0,
+                      ),
+                    ),
+                  ),
+                ),
+              ],
+            ),
+          ],
+        ),
+      );
+    }
   }
 
   Widget _tab2Contents() {
@@ -791,29 +743,6 @@ class _MapRenderState extends State<MapRender>
                   "${FirebaseFunctions.roomData["Final Location"]}, ${FirebaseFunctions.roomData["Final Location Address"]}");
             }),
           ),
-          /*Container(
-            child: ListTile(
-              title: Text(
-                'Final Location Address:',
-                style: textSize20(),
-              ),
-              onTap: null,
-            ),
-          ),
-          Container(
-            padding: EdgeInsets.fromLTRB(30, 0, 0, 10),
-            child: SelectableText(
-              FirebaseFunctions.roomData["Final Location"] != null
-                  ? "${FirebaseFunctions.roomData["Final Location Address"]}"
-                  : "No address set",
-              style: textSize20(),
-              enableInteractiveSelection: true,
-              onTap: () {
-                Share.share(
-                    "${FirebaseFunctions.roomData["Final Location Address"]}");
-              },
-            ),
-          ),*/
           Container(
             child: ListTile(
               title: Text(
@@ -913,8 +842,11 @@ class _MapRenderState extends State<MapRender>
                     "roomCode is Null",
                 style: textSize35(),
                 enableInteractiveSelection: true,
-                onTap: () {
-                  Share.share("${FirebaseFunctions.roomData["roomCode"]}",
+                onTap: () async {
+                  String link =
+                      await DynamicLinkService.createAppLink("Join my room!");
+                  Share.share(
+                      "${FirebaseFunctions.roomData["roomCode"]}\n$link",
                       subject: "Let's Rendezvous! Join my room!");
                 },
               ),
@@ -1049,37 +981,6 @@ class _MapRenderState extends State<MapRender>
     );
   }
 
-  /*Widget searchBar() {
-    return TextField(
-      decoration: InputDecoration(
-          focusedBorder: OutlineInputBorder(
-            borderSide: BorderSide(color: Colors.black, width: 1.5),
-          ),
-          enabledBorder: OutlineInputBorder(
-            borderSide: BorderSide(color: Colors.black, width: 1.5),
-          ),
-          hintText: "Enter your address...",
-          contentPadding: EdgeInsets.only(left: 15.0, top: 15.0),
-          suffixIcon: IconButton(
-            icon: Icon(Icons.search),
-            onPressed: () {
-              userAddressChanged();
-              //Navigator.pop(context);
-            },
-            iconSize: 20.0,
-          )),
-      onChanged: (val) {
-        setState(() {
-          category = val;
-          Global.userAddress = val;
-          autoCompleteSuggestions(val);
-          //Global.finalCategory = category;
-        });
-      },
-      autofillHints: suggestedAddresses,
-    );
-  }*/
-
   //This widget will be used to display the hints
   Widget suggestedHints(String hint) {
     return Row(
@@ -1188,6 +1089,7 @@ class _MapRenderState extends State<MapRender>
           Global.findYPCalled.removeListener(() {});
           Global.finalLocationChanged.removeListener(() {});
           Global.timeChanged.removeListener(() {});
+          Global.userLocChanged.removeListener(() {});
 
           String roomCodeString = FirebaseFunctions.roomData["roomCode"];
 
@@ -1214,15 +1116,18 @@ class _MapRenderState extends State<MapRender>
 
   @override
   Widget build(BuildContext context) {
-    return MaterialApp(
-      debugShowCheckedModeBanner: false,
-      home: Scaffold(
-        //appBar: appBarMain(context),
-        body: Container(
-          color: Color(Global.backgroundColor),
-          child: ClipRRect(borderRadius: onlyTop10(), child: _slideUpPanel()),
+    return new WillPopScope(
+      onWillPop: () async => false,
+      child: MaterialApp(
+        debugShowCheckedModeBanner: false,
+        home: Scaffold(
+          //appBar: appBarMain(context),
+          body: Container(
+            color: Color(Global.backgroundColor),
+            child: ClipRRect(borderRadius: onlyTop10(), child: _slideUpPanel()),
+          ),
+          drawer: _viewDrawer(),
         ),
-        drawer: _viewDrawer(),
       ),
     );
 //);

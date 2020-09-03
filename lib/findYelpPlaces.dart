@@ -32,6 +32,10 @@ class YelpPlaces {
     var open;
     var phone;
     var price;
+    var addr;
+    var city;
+    var state;
+    var zip;
 
     for (var place in jsonDecode(businesses)) {
       lat = place['coordinates']['latitude'];
@@ -42,8 +46,8 @@ class YelpPlaces {
       name = place['name'];
       Global.names.add(name);
 
-      address = place['location'];
-      Global.locations.add(address);
+      addr = place['location'];
+      Global.locations.add(addr);
 
       url = place['url'];
       Global.urls.add(url);
@@ -65,9 +69,24 @@ class YelpPlaces {
       price=place['price'];
       Global.prices.add(price);
 
+      address=place['address'];
+      Global.addresses.add(address);
+
+      city=place['city'];
+      Global.cities.add(city);
+
+      state=place['state'];
+      Global.states.add(state);
+      
+      zip=place['zip_code'];
+      Global.zipCodes.add(zip);
+
+
+
+
 
     }
-    print(Global.phoneNums);
+    print(Global.zipCodes);
     // print("Locations: ${Global.resultCords}");
     // print("testing if I got a response:");
   }

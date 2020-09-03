@@ -111,6 +111,7 @@ class GoogleMapsState extends State<GoogleMaps> {
   String finalLocAddress;
   LatLng finalLatLng;
 
+  String tempCategory;
 //Marker _markers;
 //Function initState initialises the state of variables
 //It returns a reference to the listener, so that we may turn off the listener at a later time
@@ -158,6 +159,9 @@ class GoogleMapsState extends State<GoogleMaps> {
 
   void changeUserLocationWhenNewAddressEntered() {
     Global.userLocChanged.addListener(() {
+      if (!mounted) {
+        return;
+      }
       searchAddr = Global.userAddress;
       searchAndNavigate();
     });
@@ -166,6 +170,9 @@ class GoogleMapsState extends State<GoogleMaps> {
   //This function will be used to listen to if the final location was set on the slide up bar
   void setFinalLocationWhenButtonPressedOnSlideBar() {
     Global.finalLocationChanged.addListener(() async {
+      if (!mounted) {
+        return;
+      }
       //print("Location changed. Final Address = ${FirebaseFunctions.roomData["Final Location Address"]}");
       await routeToFinalLoc();
     });
@@ -609,6 +616,11 @@ class GoogleMapsState extends State<GoogleMaps> {
   Widget build(BuildContext context) {
     return _center == null
         ? Container(
+            decoration: BoxDecoration(
+              image: DecorationImage(
+                image: AssetImage("images/Map_loading.png"), fit: BoxFit.cover,
+              ),
+            ),
             child: Center(
               child: SpinKitPulse(
                 size: 280,
@@ -668,13 +680,18 @@ class GoogleMapsState extends State<GoogleMaps> {
                           suffixIcon: IconButton(
                             icon: Icon(Icons.search),
                             onPressed: () async {
+                              Global.finalCategory = tempCategory;
+                              Global.searchingCategory = true;
+                              Global.searchingPlaces.value ^= true;
                               await YelpPlaces.findingPlaces();
                               addYelpMarkers();
+                              Global.searchingCategory = false;
+                              Global.searchingPlaces.value ^= true;
                             },
                             iconSize: 30.0,
                           )),
                       onChanged: (val) {
-                        Global.finalCategory = val;
+                        tempCategory = val;
                       },
                     ),
                   ),

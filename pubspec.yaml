@@ -52,6 +52,10 @@ dependencies:
   #Adding the dependency for sharing
   share: ^0.6.4+5
 
+  # Google Dynamic Links for Firebase API
+  firebase_dynamic_links: ^0.5.3
+
+
   # The following adds the Cupertino Icons font to your application.
   # Use with the CupertinoIcons class for iOS style icons.
   cupertino_icons: ^0.1.3
@@ -87,6 +91,7 @@ flutter:
     - assets/map_style.txt
     - images/person.png
     - images/yelp_icon.png
+    - images/Map_loading.png
     - images/Rendezvous_logo.png # added logo from images folder
 
 
