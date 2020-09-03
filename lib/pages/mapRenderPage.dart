@@ -21,11 +21,14 @@ import "../findYelpPlaces.dart";
 import 'package:share/share.dart';
 import "../dynamicLinks.dart";
 
-//Will use these import for autocompleting text
+
 import 'package:http/http.dart' as http;
 import 'dart:convert' as convert;
-
+//Will use these import for autocompleting text
 import 'package:autocomplete_textfield/autocomplete_textfield.dart';
+
+//import for the route button on the info page
+import '../routes.dart';
 
 const String mapsAPI_KEY = "AIzaSyBV961Ztopz9vyZrJq0AYAMJUTHmluu3FM";
 //Below are variables we will use for the sliders
@@ -201,7 +204,7 @@ class _MapRenderState extends State<MapRender>
     }
     //Searching for places similar to the location being searched. Biased to 100km radius of the user current location
     var response = await http.post(
-        "https://maps.googleapis.com/maps/api/place/queryautocomplete/json?key=${mapsAPI_KEY}&location=${Global.userPos.latitude},${Global.userPos.longitude}&radius=100000&input=${searchString}");
+        "https://maps.googleapis.com/maps/api/place/queryautocomplete/json?key=$mapsAPI_KEY&location=${Global.userPos.latitude},${Global.userPos.longitude}&radius=100000&input=${searchString}");
     if (response.statusCode == 200) {
       var decoded = await convert.jsonDecode(response.body);
       //If the we the http request fails, let the user know we are unable to find any suggestions
@@ -769,7 +772,8 @@ class _MapRenderState extends State<MapRender>
               style: textSize20(),
               enableInteractiveSelection: true,
             ),
-          )
+          ),
+          Routes(),
         ],
       ),
     );

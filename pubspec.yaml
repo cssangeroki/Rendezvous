@@ -65,6 +65,9 @@ dependencies:
   #This is needed for the fonts
   google_fonts: ^1.1.0
 
+  #This is used to launch the native maps app on the phone
+  url_launcher: ^5.5.2
+
 dev_dependencies:
   flutter_test:
     sdk: flutter
