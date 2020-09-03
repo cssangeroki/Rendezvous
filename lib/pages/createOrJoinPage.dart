@@ -187,7 +187,7 @@ class _Page2State extends State<Page2> {
                               ),
                             );
                           },
-                          color: Colors.black54,
+                          color: Colors.white,
                           shape: RoundedRectangleBorder(
                               borderRadius: BorderRadius.circular(30.0),
                               side: BorderSide(color: Colors.grey)),
@@ -195,7 +195,7 @@ class _Page2State extends State<Page2> {
                             "Join Room",
                             style: GoogleFonts.roboto(
                               fontSize: 20,
-                              color: Colors.white,
+                              color: Colors.black,
                             ),
                           )),
                     ),

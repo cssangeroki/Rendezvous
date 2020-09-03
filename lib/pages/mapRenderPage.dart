@@ -749,10 +749,16 @@ class _MapRenderState extends State<MapRender>
             color: Colors.white,
             borderRadius: onlyTop20(),
           ),
-          child: Container(
-            padding: EdgeInsets.fromLTRB(10, 10, 0, 0),
-            child: Text('TBD things'),
-          ),
+          child: Center(
+              child: Column(
+            children: <Widget>[
+              Container(
+                padding: EdgeInsets.fromLTRB(10, 20, 0, 0),
+                child: Text('Swipe up to see ${_arrLength} results',
+                    style: GoogleFonts.roboto(fontSize: 20)),
+              ),
+            ],
+          )),
         ),
       ],
     );

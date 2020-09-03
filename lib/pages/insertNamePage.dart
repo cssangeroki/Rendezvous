@@ -89,8 +89,6 @@ class _Page1State extends State<Page1> {
                     child: Form(
                       key: formKey,
                       child: TextFormField(
-                        showCursor: _focus,
-                        textAlign: TextAlign.center,
                         style: TextStyle(fontSize: 25),
                         maxLength: 15,
                         decoration: InputDecoration(
@@ -111,10 +109,6 @@ class _Page1State extends State<Page1> {
                         },
                         controller: userNameController,
                         onChanged: (text) {
-                          setState(() {
-                            _focus = !_focus;
-                          });
-
                           userName = text;
                           FirebaseFunctions.currentUserData["userName"] = text;
                         },
