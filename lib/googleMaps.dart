@@ -111,6 +111,7 @@ class GoogleMapsState extends State<GoogleMaps> {
   String finalLocAddress;
   LatLng finalLatLng;
 
+  String tempCategory;
 //Marker _markers;
 //Function initState initialises the state of variables
 //It returns a reference to the listener, so that we may turn off the listener at a later time
@@ -679,8 +680,9 @@ class GoogleMapsState extends State<GoogleMaps> {
                           suffixIcon: IconButton(
                             icon: Icon(Icons.search),
                             onPressed: () async {
-                              Global.searchingPlaces.value ^= true;
+                              Global.finalCategory = tempCategory;
                               Global.searchingCategory = true;
+                              Global.searchingPlaces.value ^= true;
                               await YelpPlaces.findingPlaces();
                               addYelpMarkers();
                               Global.searchingCategory = false;
@@ -689,7 +691,7 @@ class GoogleMapsState extends State<GoogleMaps> {
                             iconSize: 30.0,
                           )),
                       onChanged: (val) {
-                        Global.finalCategory = val;
+                        tempCategory = val;
                       },
                     ),
                   ),
