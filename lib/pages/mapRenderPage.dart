@@ -1,6 +1,7 @@
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'dart:async';
+import 'package:async/async.dart';
 
 import 'package:bubble_tab_indicator/bubble_tab_indicator.dart';
 import '../appBar.dart';
@@ -62,6 +63,8 @@ class _MapRenderState extends State<MapRender>
   AutoCompleteTextField addressSearchField;
   GlobalKey<AutoCompleteTextFieldState> key = new GlobalKey();
 
+  CancelableOperation futureToCancel;
+
   var _isExpanded = new List<bool>.filled(50, false, growable: true);
 
   @override
@@ -112,7 +115,6 @@ class _MapRenderState extends State<MapRender>
         return;
       }
       setState(() {
-        //print("Time updated");
         hours = Global.hours;
         min = Global.minutes;
         if (hours == -1 || min == -1) {
@@ -157,10 +159,18 @@ class _MapRenderState extends State<MapRender>
 
   //This functions is used when we search a category for yelp
   void searchingYelpCategory() async {
-    print("Entered searchingYelpCategory");
-    await YelpPlaces.findingPlaces();
-    print("Returned from findingPlaces");
-    //Global.findYPCalled.notifyListeners();
+    if (futureToCancel != null){
+      futureToCancel.cancel();
+    }
+    //print("Future is Canceled: ${futureToCancel.isCanceled}");
+    futureToCancel = CancelableOperation.fromFuture(YelpPlaces.findingPlaces(), onCancel: (){
+      print("findingPlaces canceled");
+    });
+    await futureToCancel.value;
+    if (futureToCancel.isCanceled){
+      return;
+    }
+    //await YelpPlaces.findingPlaces();
     Global.findYPCalled.value ^= true;
     _updateYelpVenues();
   }
@@ -808,7 +818,7 @@ class _MapRenderState extends State<MapRender>
       return Container(
         padding: EdgeInsets.fromLTRB(10, 10, 0, 0),
         child: Text(
-            'Showing ${Global.arrLength} results for: ${Global.finalCategory}'),
+            'Showing ${Global.arrLength} results for: ${Global.finalCategory} within ${Global.finalRad}mi'),
       );
     } else {
       return Container(
@@ -1160,12 +1170,16 @@ class _MapRenderState extends State<MapRender>
                 midSliderVal = val;
               });
             },
-            onChangeEnd: (double val) async {
+            onChangeStart: (val){
+            },
+            onChangeEnd: (double val){
               setState(() {
                 //can I do this
+                print("Entered onChangeEnd");
                 Global.finalRad = val;
+                searchingYelpCategory();
               });
-              searchingYelpCategory();
+
             },
             min: 1,
             max: 25,
@@ -1242,8 +1256,8 @@ class _MapRenderState extends State<MapRender>
               .collection("users")
               .getDocuments()
               .then((data) {
-            print("I'm running");
-            print(data.documents.length);
+            //print("I'm running");
+            //print(data.documents.length);
             Global.memberListener.cancel();
             roomListener.cancel();
             FirebaseFunctions.removeCurrentUserFromRoom(

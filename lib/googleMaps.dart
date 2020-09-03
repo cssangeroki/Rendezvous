@@ -173,7 +173,6 @@ class GoogleMapsState extends State<GoogleMaps> {
       if (!mounted) {
         return;
       }
-      //print("Location changed. Final Address = ${FirebaseFunctions.roomData["Final Location Address"]}");
       await routeToFinalLoc();
     });
   }
@@ -220,8 +219,6 @@ class GoogleMapsState extends State<GoogleMaps> {
     //Now, we will decode the json response
     if (response.statusCode == 200) {
       var decoded = await convert.jsonDecode(response.body);
-      //print("Decode = $decoded");
-      //print("decoded datatype = ${decoded.runtimeType}");
       if (decoded['rows'][0]['elements'][0]['status'] != 'OK') {
         Global.hours = -1;
         Global.minutes = -1;
@@ -230,11 +227,9 @@ class GoogleMapsState extends State<GoogleMaps> {
         return;
       }
       int timeTaken = decoded['rows'][0]["elements"][0]["duration"]["value"];
-      //print("Time taken is $timeTaken");
       Global.hours = (timeTaken / 3600).floor();
       Global.minutes = ((timeTaken % 3600) / 60).ceil();
       //Notify other parts that the time changed
-      //Global.timeChanged.notifyListeners();
       Global.timeChanged.value ^= true;
     }
   }
@@ -242,7 +237,6 @@ class GoogleMapsState extends State<GoogleMaps> {
   //This function will be used to update the travel time every minute
   void updateTravelTime() async {
     Timer.periodic(timeReset, (timer) {
-      //print("Time will be updated");
       if (currLocation != null && finalLatLng != null) {
         calculateTravelTime();
       }
@@ -262,7 +256,7 @@ class GoogleMapsState extends State<GoogleMaps> {
     try {
       List<Placemark> p = await Geolocator()
           .placemarkFromCoordinates(_center.latitude, _center.longitude);
-      print(_center);
+      //print(_center);
       Placemark place = p[0];
 
       setState(() {
@@ -276,7 +270,6 @@ class GoogleMapsState extends State<GoogleMaps> {
 
   //This function will be used to initialise my markers, by accessing the user data from firebase
   Future<void> _initMarkers() async {
-    //print("initMarkers called");
     Global.memberListener = firebase
         .collection("rooms")
         .document(roomDocID)
@@ -287,7 +280,6 @@ class GoogleMapsState extends State<GoogleMaps> {
       await callAddOtherUserMarkers(snapshot);
       await findMidpoint(_markers);
     });
-    //print("Markers = $_markers");
   }
 
   //This function clears all other markers other than the current users and the midpoint
@@ -306,18 +298,14 @@ class GoogleMapsState extends State<GoogleMaps> {
     List<String> userNames = [];
     //userNames.clear();
     for (var user in snapshot.documents) {
-      //print("Here. Number of markers = ${_markers.length}");
       String newUserName = user.data["userName"];
       userNames.add(newUserName);
       //If the user is not equal to the current user, then we need to add that users location to markers
       if (user.documentID != userDocID) {
-        print("Found other users");
         await addOtherUserMarkers(user);
       }
     }
     changeNames(userNames, Global.nameList);
-    print("nameList is ${Global.nameList}");
-    //Global.mapRPnameListListener.notifyListeners();
     Global.mapRPnameListListener.value ^= true;
   }
 
@@ -354,14 +342,12 @@ class GoogleMapsState extends State<GoogleMaps> {
             });
           }));
     });
-    //print("Finished adding users location");
   }
 
   void _onCameraMove(CameraPosition position) {
     if (userMarkerDragged == true) {
       return;
     }
-    //print("Camera Moved");
     _center = position.target;
     _lastMapPosition = position.target;
   }
@@ -386,12 +372,10 @@ class GoogleMapsState extends State<GoogleMaps> {
       midAddress =
           "${place.name}, ${place.subLocality}, ${place.locality}, ${place.postalCode}, ${place.country}";
     });
-    //print("MidAddress updated to $midAddress");
   }
 
   //This function will be used to add the yelp markers
   void addYelpMarkers() {
-    //print("Entered Yelp markers. resultCords = ${Global.resultCords.length}");
     //First, remove all the current yelp markers
     _markers.removeWhere((element) =>
         (element.infoWindow.snippet != 'Your Location' &&
@@ -423,12 +407,9 @@ class GoogleMapsState extends State<GoogleMaps> {
         ));
       }
     });
-    //print(_markers.length);
-    //print(_markers);
   }
 
   Future<void> findMidpoint(Set<Marker> userPositions) async {
-    //print("Entered findMidpoint");
     double currentMidLat = 0;
     double currentMidLon = 0;
     //Start off by removing the midpoint marker
@@ -447,18 +428,13 @@ class GoogleMapsState extends State<GoogleMaps> {
       currentMidLon = (userPosition.position.longitude + currentMidLon);
       length += 1;
     }
-    //print("Number of markers = ${userPositions.length})");
     currentMidLat = currentMidLat / (length);
     currentMidLon = currentMidLon / (length);
 
     Global.finalLat = currentMidLat;
     Global.finalLon = currentMidLon;
 
-    //print("Lat = $currentMidLat, and Long = $currentMidLon");
     await placefromLatLng(LatLng(currentMidLat, currentMidLon));
-//      currentMidLat = currentMidLat / (locations.length);
-//      currentMidLon = currentMidLon / (locations.length);
-//      placefromLatLng(LatLng(currentMidLat, currentMidLon));
     setState(() {
       _markers.add(Marker(
           markerId: MarkerId('Midpoint'),
@@ -494,7 +470,6 @@ class GoogleMapsState extends State<GoogleMaps> {
         .document(userDocID)
         .updateData(
             {"location": GeoPoint(_center.latitude, _center.longitude)});
-    //print("Updated users location");
   }
 
   //This function will change the marker of the current user, so that a user can only edit their own marker
@@ -684,6 +659,7 @@ class GoogleMapsState extends State<GoogleMaps> {
                               Global.searchingCategory = true;
                               Global.searchingPlaces.value ^= true;
                               await YelpPlaces.findingPlaces();
+                              Global.findYPCalled.value ^= true;
                               addYelpMarkers();
                               Global.searchingCategory = false;
                               Global.searchingPlaces.value ^= true;
