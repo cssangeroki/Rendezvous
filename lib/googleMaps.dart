@@ -59,6 +59,8 @@ class GoogleMaps extends StatefulWidget {
 }
 
 class GoogleMapsState extends State<GoogleMaps> {
+  bool mapLoaded = false;
+
   //Creating a global key to access class state outside of the class
 
   final String userDocID = FirebaseFunctions.currentUID;
@@ -112,7 +114,6 @@ class GoogleMapsState extends State<GoogleMaps> {
   LatLng finalLatLng;
 
   String tempCategory;
-
 //Marker _markers;
 //Function initState initialises the state of variables
 //It returns a reference to the listener, so that we may turn off the listener at a later time
@@ -122,6 +123,12 @@ class GoogleMapsState extends State<GoogleMaps> {
     setBitmapIcon();
     setMapStyle();
     initFunctionCaller();
+    mapLoaded = true;
+  }
+
+  @override
+  void dispose(){
+    super.dispose();
   }
 
   void setMapStyle() {
@@ -515,8 +522,10 @@ class GoogleMapsState extends State<GoogleMaps> {
 
   void searchAndNavigate() async {
     try {
+      print("Entered here");
       //Get the placemark from the search address, and then store the center and userAddress
       await Geolocator().placemarkFromAddress(searchAddr).then((value) async {
+        print("Got placemark from Address");
         //Set our _center location to the new position
         _center =
             LatLng(value[0].position.latitude, value[0].position.longitude);
@@ -532,7 +541,7 @@ class GoogleMapsState extends State<GoogleMaps> {
                 zoom: 15.0)));
       });
     } catch (e) {
-      print(e);
+      print("Error in searchAndNavigate in googleMaps.dart: $e");
     }
   }
 
@@ -596,7 +605,7 @@ class GoogleMapsState extends State<GoogleMaps> {
 
   @override
   Widget build(BuildContext context) {
-    return _center == null
+    return mapLoaded == false
         ? Container(
             decoration: BoxDecoration(
               image: DecorationImage(
@@ -663,6 +672,8 @@ class GoogleMapsState extends State<GoogleMaps> {
                           suffixIcon: IconButton(
                             icon: Icon(Icons.search),
                             onPressed: () async {
+                              //This line is used to remove the keyboard whenever the search button is pressed
+                              FocusManager.instance.primaryFocus.unfocus();
                               if (tempCategory == null) {
                                 //tempCategory = "All";
                                 return;

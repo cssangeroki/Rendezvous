@@ -968,6 +968,8 @@ class _MapRenderState extends State<MapRender>
           setState(() {
             addressSearchField.textField.controller.text = item;
             newAddress = item;
+            Global.userAddress = newAddress;
+            userAddressChanged();
           });
         },
         //UI for each row of suggestions
@@ -986,6 +988,8 @@ class _MapRenderState extends State<MapRender>
             suffixIcon: IconButton(
               icon: Icon(Icons.search),
               onPressed: () {
+                //This line is used to remove the keyboard whenever the search button is pressed
+                FocusManager.instance.primaryFocus.unfocus();
                 //Needs this check in case user hits search without entering anything
                 if (newAddress == null) {
                   return;
