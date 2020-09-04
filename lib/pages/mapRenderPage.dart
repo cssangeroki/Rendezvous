@@ -1,6 +1,7 @@
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'dart:async';
+import 'package:async/async.dart';
 
 import 'package:bubble_tab_indicator/bubble_tab_indicator.dart';
 import '../appBar.dart';
@@ -20,11 +21,14 @@ import "../findYelpPlaces.dart";
 import 'package:share/share.dart';
 import "../dynamicLinks.dart";
 
-//Will use these import for autocompleting text
 import 'package:http/http.dart' as http;
 import 'dart:convert' as convert;
 
+//Will use these import for autocompleting text
 import 'package:autocomplete_textfield/autocomplete_textfield.dart';
+
+//import for the route button on the info page
+import '../routes.dart';
 
 const String mapsAPI_KEY = "AIzaSyBV961Ztopz9vyZrJq0AYAMJUTHmluu3FM";
 //Below are variables we will use for the sliders
@@ -32,7 +36,7 @@ double midSliderVal = 5;
 double userSliderVal = 5;
 
 bool slideUpPanelCollapsed = true;
-String category;
+String newAddress;
 
 //Here I'm creating a reference to our firebase
 final firebase = Firestore.instance;
@@ -59,8 +63,11 @@ class _MapRenderState extends State<MapRender>
   String timeDisplayText;
 
   List<String> suggestedAddresses = [];
+
   AutoCompleteTextField addressSearchField;
   GlobalKey<AutoCompleteTextFieldState> key = new GlobalKey();
+
+  CancelableOperation futureToCancel;
 
   var _isExpanded = new List<bool>.filled(50, false, growable: true);
 
@@ -112,7 +119,6 @@ class _MapRenderState extends State<MapRender>
         return;
       }
       setState(() {
-        //print("Time updated");
         hours = Global.hours;
         min = Global.minutes;
         if (hours == -1 || min == -1) {
@@ -157,10 +163,19 @@ class _MapRenderState extends State<MapRender>
 
   //This functions is used when we search a category for yelp
   void searchingYelpCategory() async {
-    print("Entered searchingYelpCategory");
-    await YelpPlaces.findingPlaces();
-    print("Returned from findingPlaces");
-    //Global.findYPCalled.notifyListeners();
+    if (futureToCancel != null) {
+      futureToCancel.cancel();
+    }
+    //print("Future is Canceled: ${futureToCancel.isCanceled}");
+    futureToCancel = CancelableOperation.fromFuture(YelpPlaces.findingPlaces(),
+        onCancel: () {
+      print("findingPlaces canceled");
+    });
+    await futureToCancel.value;
+    if (futureToCancel.isCanceled) {
+      return;
+    }
+    //await YelpPlaces.findingPlaces();
     Global.findYPCalled.value ^= true;
     _updateYelpVenues();
   }
@@ -191,7 +206,7 @@ class _MapRenderState extends State<MapRender>
     }
     //Searching for places similar to the location being searched. Biased to 100km radius of the user current location
     var response = await http.post(
-        "https://maps.googleapis.com/maps/api/place/queryautocomplete/json?key=${mapsAPI_KEY}&location=${Global.userPos.latitude},${Global.userPos.longitude}&radius=100000&input=${searchString}");
+        "https://maps.googleapis.com/maps/api/place/queryautocomplete/json?key=$mapsAPI_KEY&location=${Global.userPos.latitude},${Global.userPos.longitude}&radius=100000&input=$searchString");
     if (response.statusCode == 200) {
       var decoded = await convert.jsonDecode(response.body);
       //If the we the http request fails, let the user know we are unable to find any suggestions
@@ -681,7 +696,7 @@ class _MapRenderState extends State<MapRender>
       return Container(
         padding: EdgeInsets.fromLTRB(10, 10, 0, 0),
         child: Text(
-            'Showing ${Global.arrLength} results for: ${Global.finalCategory}'),
+            'Showing ${Global.arrLength} results for: ${Global.finalCategory} within ${Global.finalRad}mi'),
       );
     } else {
       return Container(
@@ -759,7 +774,8 @@ class _MapRenderState extends State<MapRender>
               style: textSize20(),
               enableInteractiveSelection: true,
             ),
-          )
+          ),
+          Routes(),
         ],
       ),
     );
@@ -806,7 +822,7 @@ class _MapRenderState extends State<MapRender>
           Container(
             child: ListTile(
               title: Text(
-                'Searching for:',
+                'Change your location to:',
                 style: textSize20(),
               ),
               onTap: null,
@@ -846,14 +862,18 @@ class _MapRenderState extends State<MapRender>
                   String link =
                       await DynamicLinkService.createAppLink("Join my room!");
                   Share.share(
-                      "${FirebaseFunctions.roomData["roomCode"]}\n$link",
-                      subject: "Let's Rendezvous! Join my room!");
+                    "${FirebaseFunctions.roomData["roomCode"]}\n$link",
+                    subject: "Let's Rendezvous! Join my room!",
+                  );
                 },
               ),
               onTap: null,
             ),
           ),
           _leaveRoomButton(),
+          Container(
+            height: 120.0,
+          ),
         ],
       ),
     );
@@ -924,7 +944,8 @@ class _MapRenderState extends State<MapRender>
 
   Widget _addressBar() {
     return Container(
-      margin: EdgeInsets.all(15),
+      margin: EdgeInsets.fromLTRB(15.0, 15.0, 15.0, 50.0),
+      height: 50.0,
       width: double.infinity,
       decoration: BoxDecoration(
         borderRadius: BorderRadius.circular(10.0),
@@ -945,7 +966,8 @@ class _MapRenderState extends State<MapRender>
         },
         itemSubmitted: (item) {
           setState(() {
-            addressSearchField.textField.controller.text = item.toString();
+            addressSearchField.textField.controller.text = item;
+            newAddress = item;
           });
         },
         //UI for each row of suggestions
@@ -964,15 +986,20 @@ class _MapRenderState extends State<MapRender>
             suffixIcon: IconButton(
               icon: Icon(Icons.search),
               onPressed: () {
+                //Needs this check in case user hits search without entering anything
+                if (newAddress == null) {
+                  return;
+                }
+                Global.userAddress = newAddress;
                 userAddressChanged();
                 //Navigator.pop(context);
               },
-              iconSize: 20.0,
+              iconSize: 30.0,
             )),
         textChanged: (val) {
           setState(() {
-            category = val;
-            Global.userAddress = val;
+            newAddress = val;
+            //Global.userAddress = val;
             autoCompleteSuggestions(val);
             //Global.finalCategory = category;
           });
@@ -1017,12 +1044,14 @@ class _MapRenderState extends State<MapRender>
                 midSliderVal = val;
               });
             },
-            onChangeEnd: (double val) async {
+            onChangeStart: (val) {},
+            onChangeEnd: (double val) {
               setState(() {
                 //can I do this
+                print("Entered onChangeEnd");
                 Global.finalRad = val;
+                searchingYelpCategory();
               });
-              searchingYelpCategory();
             },
             min: 1,
             max: 25,
@@ -1099,8 +1128,8 @@ class _MapRenderState extends State<MapRender>
               .collection("users")
               .getDocuments()
               .then((data) {
-            print("I'm running");
-            print(data.documents.length);
+            //print("I'm running");
+            //print(data.documents.length);
             Global.memberListener.cancel();
             roomListener.cancel();
             FirebaseFunctions.removeCurrentUserFromRoom(
