@@ -22,7 +22,7 @@ class YelpPlaces {
     Global.phoneNums.clear();
     Global.prices.clear();
     double finalRadMiles = Global.finalRad * 1609.344;
-    var businesses = "";
+    var businesses;
     //businesses = await BackendMethods.getLocations(Global.finalLon,
     //  Global.finalLat, Global.finalCategory, finalRadMiles.toInt());
     if (futureToCancel != null){
@@ -34,6 +34,7 @@ class YelpPlaces {
       print("Backend Call Cancelled");
     });
     businesses = await futureToCancel.value;
+    print(businesses);
     if (futureToCancel.isCanceled == true) {
       return;
     }
