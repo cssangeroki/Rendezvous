@@ -63,6 +63,7 @@ class _MapRenderState extends State<MapRender>
   String timeDisplayText;
 
   List<String> suggestedAddresses = [];
+
   AutoCompleteTextField addressSearchField;
   GlobalKey<AutoCompleteTextFieldState> key = new GlobalKey();
 
@@ -861,14 +862,18 @@ class _MapRenderState extends State<MapRender>
                   String link =
                       await DynamicLinkService.createAppLink("Join my room!");
                   Share.share(
-                      "${FirebaseFunctions.roomData["roomCode"]}\n$link",
-                      subject: "Let's Rendezvous! Join my room!",);
+                    "${FirebaseFunctions.roomData["roomCode"]}\n$link",
+                    subject: "Let's Rendezvous! Join my room!",
+                  );
                 },
               ),
               onTap: null,
             ),
           ),
           _leaveRoomButton(),
+          Container(
+            height: 120.0,
+          ),
         ],
       ),
     );
@@ -939,7 +944,7 @@ class _MapRenderState extends State<MapRender>
 
   Widget _addressBar() {
     return Container(
-      margin: EdgeInsets.all(15),
+      margin: EdgeInsets.fromLTRB(15.0, 15.0, 15.0, 50.0),
       height: 50.0,
       width: double.infinity,
       decoration: BoxDecoration(
@@ -961,7 +966,8 @@ class _MapRenderState extends State<MapRender>
         },
         itemSubmitted: (item) {
           setState(() {
-            addressSearchField.textField.controller.text = item.toString();
+            addressSearchField.textField.controller.text = item;
+            newAddress = item;
           });
         },
         //UI for each row of suggestions

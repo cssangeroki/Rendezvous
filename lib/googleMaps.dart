@@ -112,6 +112,7 @@ class GoogleMapsState extends State<GoogleMaps> {
   LatLng finalLatLng;
 
   String tempCategory;
+
 //Marker _markers;
 //Function initState initialises the state of variables
 //It returns a reference to the listener, so that we may turn off the listener at a later time
@@ -513,20 +514,26 @@ class GoogleMapsState extends State<GoogleMaps> {
   }
 
   void searchAndNavigate() async {
-//Get the placemark from the search address, and then store the center and userAddress
-    await Geolocator().placemarkFromAddress(searchAddr).then((value) async {
-      //Set our _center location to the new position
-      _center = LatLng(value[0].position.latitude, value[0].position.longitude);
+    try {
+      //Get the placemark from the search address, and then store the center and userAddress
+      await Geolocator().placemarkFromAddress(searchAddr).then((value) async {
+        //Set our _center location to the new position
+        _center =
+            LatLng(value[0].position.latitude, value[0].position.longitude);
 //Set our _lastMapPosition also to the new position
-      _lastMapPosition = _center;
-      //Now I replace the users current position marker with the new marker
-      await _onAddMarkerButtonPressed();
+        _lastMapPosition = _center;
+        //Now I replace the users current position marker with the new marker
+        await _onAddMarkerButtonPressed();
 //With the placemark that will be stored in 'value', we move our camera to that position.
-      mapController.animateCamera(CameraUpdate.newCameraPosition(CameraPosition(
-          target:
-              LatLng(value[0].position.latitude, value[0].position.longitude),
-          zoom: 15.0)));
-    });
+        mapController.animateCamera(CameraUpdate.newCameraPosition(
+            CameraPosition(
+                target: LatLng(
+                    value[0].position.latitude, value[0].position.longitude),
+                zoom: 15.0)));
+      });
+    } catch (e) {
+      print(e);
+    }
   }
 
   void setPolyLines() async {
@@ -593,7 +600,8 @@ class GoogleMapsState extends State<GoogleMaps> {
         ? Container(
             decoration: BoxDecoration(
               image: DecorationImage(
-                image: AssetImage("images/Map_loading.png"), fit: BoxFit.cover,
+                image: AssetImage("images/Map_loading.png"),
+                fit: BoxFit.cover,
               ),
             ),
             child: Center(
@@ -655,6 +663,10 @@ class GoogleMapsState extends State<GoogleMaps> {
                           suffixIcon: IconButton(
                             icon: Icon(Icons.search),
                             onPressed: () async {
+                              if (tempCategory == null) {
+                                //tempCategory = "All";
+                                return;
+                              }
                               Global.finalCategory = tempCategory;
                               Global.searchingCategory = true;
                               Global.searchingPlaces.value ^= true;
