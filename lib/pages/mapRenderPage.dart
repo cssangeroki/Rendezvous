@@ -21,9 +21,9 @@ import "../findYelpPlaces.dart";
 import 'package:share/share.dart';
 import "../dynamicLinks.dart";
 
-
 import 'package:http/http.dart' as http;
 import 'dart:convert' as convert;
+
 //Will use these import for autocompleting text
 import 'package:autocomplete_textfield/autocomplete_textfield.dart';
 
@@ -36,7 +36,7 @@ double midSliderVal = 5;
 double userSliderVal = 5;
 
 bool slideUpPanelCollapsed = true;
-String category;
+String newAddress;
 
 //Here I'm creating a reference to our firebase
 final firebase = Firestore.instance;
@@ -162,15 +162,16 @@ class _MapRenderState extends State<MapRender>
 
   //This functions is used when we search a category for yelp
   void searchingYelpCategory() async {
-    if (futureToCancel != null){
+    if (futureToCancel != null) {
       futureToCancel.cancel();
     }
     //print("Future is Canceled: ${futureToCancel.isCanceled}");
-    futureToCancel = CancelableOperation.fromFuture(YelpPlaces.findingPlaces(), onCancel: (){
+    futureToCancel = CancelableOperation.fromFuture(YelpPlaces.findingPlaces(),
+        onCancel: () {
       print("findingPlaces canceled");
     });
     await futureToCancel.value;
-    if (futureToCancel.isCanceled){
+    if (futureToCancel.isCanceled) {
       return;
     }
     //await YelpPlaces.findingPlaces();
@@ -204,7 +205,7 @@ class _MapRenderState extends State<MapRender>
     }
     //Searching for places similar to the location being searched. Biased to 100km radius of the user current location
     var response = await http.post(
-        "https://maps.googleapis.com/maps/api/place/queryautocomplete/json?key=$mapsAPI_KEY&location=${Global.userPos.latitude},${Global.userPos.longitude}&radius=100000&input=${searchString}");
+        "https://maps.googleapis.com/maps/api/place/queryautocomplete/json?key=$mapsAPI_KEY&location=${Global.userPos.latitude},${Global.userPos.longitude}&radius=100000&input=$searchString");
     if (response.statusCode == 200) {
       var decoded = await convert.jsonDecode(response.body);
       //If the we the http request fails, let the user know we are unable to find any suggestions
@@ -820,7 +821,7 @@ class _MapRenderState extends State<MapRender>
           Container(
             child: ListTile(
               title: Text(
-                'Searching for:',
+                'Change your location to:',
                 style: textSize20(),
               ),
               onTap: null,
@@ -861,7 +862,7 @@ class _MapRenderState extends State<MapRender>
                       await DynamicLinkService.createAppLink("Join my room!");
                   Share.share(
                       "${FirebaseFunctions.roomData["roomCode"]}\n$link",
-                      subject: "Let's Rendezvous! Join my room!");
+                      subject: "Let's Rendezvous! Join my room!",);
                 },
               ),
               onTap: null,
@@ -939,6 +940,7 @@ class _MapRenderState extends State<MapRender>
   Widget _addressBar() {
     return Container(
       margin: EdgeInsets.all(15),
+      height: 50.0,
       width: double.infinity,
       decoration: BoxDecoration(
         borderRadius: BorderRadius.circular(10.0),
@@ -978,15 +980,20 @@ class _MapRenderState extends State<MapRender>
             suffixIcon: IconButton(
               icon: Icon(Icons.search),
               onPressed: () {
+                //Needs this check in case user hits search without entering anything
+                if (newAddress == null) {
+                  return;
+                }
+                Global.userAddress = newAddress;
                 userAddressChanged();
                 //Navigator.pop(context);
               },
-              iconSize: 20.0,
+              iconSize: 30.0,
             )),
         textChanged: (val) {
           setState(() {
-            category = val;
-            Global.userAddress = val;
+            newAddress = val;
+            //Global.userAddress = val;
             autoCompleteSuggestions(val);
             //Global.finalCategory = category;
           });
@@ -1031,16 +1038,14 @@ class _MapRenderState extends State<MapRender>
                 midSliderVal = val;
               });
             },
-            onChangeStart: (val){
-            },
-            onChangeEnd: (double val){
+            onChangeStart: (val) {},
+            onChangeEnd: (double val) {
               setState(() {
                 //can I do this
                 print("Entered onChangeEnd");
                 Global.finalRad = val;
                 searchingYelpCategory();
               });
-
             },
             min: 1,
             max: 25,
