@@ -146,6 +146,9 @@ class GoogleMapsState extends State<GoogleMaps> {
   }
 
   void initFunctionCaller() async {
+    //Resetting the time
+    Global.hours = -1;
+    Global.minutes = -1;
     addYelpMarkersWhenFindYPCalled();
     changeUserLocationWhenNewAddressEntered();
     setFinalLocationWhenButtonPressedOnSlideBar();
@@ -605,7 +608,7 @@ class GoogleMapsState extends State<GoogleMaps> {
 
   @override
   Widget build(BuildContext context) {
-    return mapLoaded == false
+    return _center == null || mapLoaded == false
         ? Container(
             decoration: BoxDecoration(
               image: DecorationImage(
