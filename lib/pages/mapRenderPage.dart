@@ -30,6 +30,9 @@ import 'package:autocomplete_textfield/autocomplete_textfield.dart';
 //import for the route button on the info page
 import '../routes.dart';
 
+//import for error checking
+import '../errorChecking.dart';
+
 const String mapsAPI_KEY = "AIzaSyBV961Ztopz9vyZrJq0AYAMJUTHmluu3FM";
 //Below are variables we will use for the sliders
 double midSliderVal = 5;
@@ -219,7 +222,12 @@ class _MapRenderState extends State<MapRender>
       //Add the top ten suggestions to our List of suggestedAddresses
       setState(() {
         for (int i = 0; i < 5; i++) {
-          suggestedAddresses.add(predictions[i]["description"]);
+          try {
+            suggestedAddresses.add(predictions[i]["description"]);
+          } catch (e) {
+            //If there is an error adding a prediction, simply break and only display the predictions added so far
+            break;
+          }
         }
       });
     }
@@ -830,7 +838,7 @@ class _MapRenderState extends State<MapRender>
           ),
           //Search bar
           _addressBar(),
-
+          AddressSearchBarError(),
           Container(
             child: ListTile(
               title: Text(
@@ -873,7 +881,7 @@ class _MapRenderState extends State<MapRender>
           _leaveRoomButton(),
           Container(
             height: 120.0,
-          ),
+          )
         ],
       ),
     );
@@ -944,7 +952,7 @@ class _MapRenderState extends State<MapRender>
 
   Widget _addressBar() {
     return Container(
-      margin: EdgeInsets.fromLTRB(15.0, 15.0, 15.0, 50.0),
+      margin: EdgeInsets.fromLTRB(15.0, 15.0, 15.0, 15.0),
       height: 50.0,
       width: double.infinity,
       decoration: BoxDecoration(

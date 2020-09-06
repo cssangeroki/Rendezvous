@@ -61,4 +61,9 @@ class Global {
   static ValueNotifier searchingPlaces = ValueNotifier(false);
 
   static bool searchingCategory = false;
+
+  //Below are going to be variables that will be used for error checking
+  static bool errorFindingUserAddress = false;
+  static ValueNotifier errorFindingUserAddressListener = ValueNotifier(false);
+
 }

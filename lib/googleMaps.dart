@@ -114,6 +114,7 @@ class GoogleMapsState extends State<GoogleMaps> {
   LatLng finalLatLng;
 
   String tempCategory;
+
 //Marker _markers;
 //Function initState initialises the state of variables
 //It returns a reference to the listener, so that we may turn off the listener at a later time
@@ -127,7 +128,7 @@ class GoogleMapsState extends State<GoogleMaps> {
   }
 
   @override
-  void dispose(){
+  void dispose() {
     super.dispose();
   }
 
@@ -543,7 +544,11 @@ class GoogleMapsState extends State<GoogleMaps> {
                     value[0].position.latitude, value[0].position.longitude),
                 zoom: 15.0)));
       });
+      Global.errorFindingUserAddress = false;
+      Global.errorFindingUserAddressListener.value ^= true;
     } catch (e) {
+      Global.errorFindingUserAddress = true;
+      Global.errorFindingUserAddressListener.value ^= true;
       print("Error in searchAndNavigate in googleMaps.dart: $e");
     }
   }
@@ -608,7 +613,7 @@ class GoogleMapsState extends State<GoogleMaps> {
 
   @override
   Widget build(BuildContext context) {
-    return _center == null || mapLoaded == false
+    return (_center == null || mapLoaded == false)
         ? Container(
             decoration: BoxDecoration(
               image: DecorationImage(
