@@ -700,11 +700,22 @@ class _MapRenderState extends State<MapRender>
   }
 
   Widget slideUpPanelDisplayText() {
-    if (Global.searchingCategory == false) {
+    //If the backend returned an error for the findingYelpPlaces call, we print an error
+    if (Global.errorFindingYelpPlaces == true) {
       return Container(
         padding: EdgeInsets.fromLTRB(10, 10, 0, 0),
         child: Text(
-            'Showing ${Global.arrLength} results for: ${Global.finalCategory} within ${Global.finalRad}mi'),
+          'Sorry, but there seems to be a problem with retrieving the yelp Places. Please try searching again',
+          style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
+        ),
+      );
+    } else if (Global.searchingCategory == false) {
+      return Container(
+        padding: EdgeInsets.fromLTRB(10, 10, 0, 0),
+        child: Text(
+          'Showing ${Global.arrLength} results for: ${Global.finalCategory} within ${Global.finalRad}mi',
+          style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
+        ),
       );
     } else {
       return Container(
@@ -718,6 +729,7 @@ class _MapRenderState extends State<MapRender>
                     child: Text(
                   "Searching for: ${Global.finalCategory}",
                   softWrap: true,
+                  style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
                 )),
                 Padding(
                   padding: EdgeInsets.fromLTRB(5, 0, 0, 0),

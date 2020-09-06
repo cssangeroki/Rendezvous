@@ -66,4 +66,7 @@ class Global {
   static bool errorFindingUserAddress = false;
   static ValueNotifier errorFindingUserAddressListener = ValueNotifier(false);
 
+  //Error checker for failure to get yelp places
+static bool errorFindingYelpPlaces = false;
+
 }
