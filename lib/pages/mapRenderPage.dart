@@ -30,6 +30,9 @@ import 'package:autocomplete_textfield/autocomplete_textfield.dart';
 //import for the route button on the info page
 import '../routes.dart';
 
+//import for error checking
+import '../errorChecking.dart';
+
 const String mapsAPI_KEY = "AIzaSyBV961Ztopz9vyZrJq0AYAMJUTHmluu3FM";
 //Below are variables we will use for the sliders
 double midSliderVal = 5;
@@ -219,7 +222,12 @@ class _MapRenderState extends State<MapRender>
       //Add the top ten suggestions to our List of suggestedAddresses
       setState(() {
         for (int i = 0; i < 5; i++) {
-          suggestedAddresses.add(predictions[i]["description"]);
+          try {
+            suggestedAddresses.add(predictions[i]["description"]);
+          } catch (e) {
+            //If there is an error adding a prediction, simply break and only display the predictions added so far
+            break;
+          }
         }
       });
     }
@@ -692,11 +700,22 @@ class _MapRenderState extends State<MapRender>
   }
 
   Widget slideUpPanelDisplayText() {
-    if (Global.searchingCategory == false) {
+    //If the backend returned an error for the findingYelpPlaces call, we print an error
+    if (Global.errorFindingYelpPlaces == true) {
       return Container(
         padding: EdgeInsets.fromLTRB(10, 10, 0, 0),
         child: Text(
-            'Showing ${Global.arrLength} results for: ${Global.finalCategory} within ${Global.finalRad}mi'),
+          'Sorry, but there seems to be a problem with retrieving the yelp Places. Please try searching again',
+          style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
+        ),
+      );
+    } else if (Global.searchingCategory == false) {
+      return Container(
+        padding: EdgeInsets.fromLTRB(10, 10, 0, 0),
+        child: Text(
+          'Showing ${Global.arrLength} results for: ${Global.finalCategory} within ${Global.finalRad}mi',
+          style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
+        ),
       );
     } else {
       return Container(
@@ -710,6 +729,7 @@ class _MapRenderState extends State<MapRender>
                     child: Text(
                   "Searching for: ${Global.finalCategory}",
                   softWrap: true,
+                  style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
                 )),
                 Padding(
                   padding: EdgeInsets.fromLTRB(5, 0, 0, 0),
@@ -830,7 +850,7 @@ class _MapRenderState extends State<MapRender>
           ),
           //Search bar
           _addressBar(),
-
+          AddressSearchBarError(),
           Container(
             child: ListTile(
               title: Text(
@@ -873,7 +893,7 @@ class _MapRenderState extends State<MapRender>
           _leaveRoomButton(),
           Container(
             height: 120.0,
-          ),
+          )
         ],
       ),
     );
@@ -944,7 +964,7 @@ class _MapRenderState extends State<MapRender>
 
   Widget _addressBar() {
     return Container(
-      margin: EdgeInsets.fromLTRB(15.0, 15.0, 15.0, 50.0),
+      margin: EdgeInsets.fromLTRB(15.0, 15.0, 15.0, 15.0),
       height: 50.0,
       width: double.infinity,
       decoration: BoxDecoration(
@@ -968,6 +988,8 @@ class _MapRenderState extends State<MapRender>
           setState(() {
             addressSearchField.textField.controller.text = item;
             newAddress = item;
+            Global.userAddress = newAddress;
+            userAddressChanged();
           });
         },
         //UI for each row of suggestions
@@ -986,6 +1008,8 @@ class _MapRenderState extends State<MapRender>
             suffixIcon: IconButton(
               icon: Icon(Icons.search),
               onPressed: () {
+                //This line is used to remove the keyboard whenever the search button is pressed
+                FocusManager.instance.primaryFocus.unfocus();
                 //Needs this check in case user hits search without entering anything
                 if (newAddress == null) {
                   return;

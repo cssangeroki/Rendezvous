@@ -25,7 +25,7 @@ class YelpPlaces {
     var businesses;
     //businesses = await BackendMethods.getLocations(Global.finalLon,
     //  Global.finalLat, Global.finalCategory, finalRadMiles.toInt());
-    if (futureToCancel != null){
+    if (futureToCancel != null) {
       futureToCancel.cancel();
     }
     futureToCancel = CancelableOperation.fromFuture(
@@ -33,7 +33,14 @@ class YelpPlaces {
             Global.finalCategory, finalRadMiles.toInt()), onCancel: () {
       print("Backend Call Cancelled");
     });
-    businesses = await futureToCancel.value;
+    try {
+      businesses = await futureToCancel.value;
+      Global.errorFindingYelpPlaces = false;
+    } catch (e) {
+      //If there is an error, we set an error checker to a value
+      Global.errorFindingYelpPlaces = true;
+      return;
+    }
     print(businesses);
     if (futureToCancel.isCanceled == true) {
       return;
