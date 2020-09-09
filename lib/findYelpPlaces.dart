@@ -43,7 +43,7 @@ class YelpPlaces {
     }
     print(businesses);
     //This if statement is in case there is an error propo
-    if (businesses["error"] != null){
+    if (Global.errorFindingYelpPlaces == true){
       Global.errorFindingYelpPlaces = true;
       return;
     }

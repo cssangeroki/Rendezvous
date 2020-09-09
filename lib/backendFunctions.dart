@@ -1,5 +1,6 @@
 import 'package:http/http.dart' as http;
 import 'dart:convert';
+import "globalVar.dart";
 
 class BackendMethods {
   static const String rootURL = 'https://rendezvousbackend.herokuapp.com';
@@ -43,6 +44,7 @@ class BackendMethods {
 
       return res.body;
     } else {
+      Global.errorFindingYelpPlaces = true;
       return {"error": 1};
     }
   }

@@ -162,6 +162,7 @@ class GoogleMapsState extends State<GoogleMaps> {
     });
   }
 
+
   void initFunctionCaller() async {
     //Resetting the time
     Global.hours = -1;
@@ -420,7 +421,7 @@ class GoogleMapsState extends State<GoogleMaps> {
           infoWindow:
               InfoWindow(title: Global.names[i], snippet: Global.locations[i]),
           icon:
-              BitmapDescriptor.defaultMarkerWithHue(BitmapDescriptor.hueGreen),
+              BitmapDescriptor.defaultMarker,
           //Setting midpoint marker to blue so it's identifiable
           onTap: () {
             setState(() {
@@ -435,6 +436,8 @@ class GoogleMapsState extends State<GoogleMaps> {
         ));
       }
     });
+    // set the radius around the midpoint
+    setCircle(LatLng(Global.finalMidLat, Global.finalMidLon));
   }
 
   Future<void> findMidpoint(Set<Marker> userPositions) async {
@@ -480,8 +483,6 @@ class GoogleMapsState extends State<GoogleMaps> {
           } //Setting midpoint marker to blue so it's identifiable
           ));
     });
-    // set the radius around the midpoint
-    setCircle(LatLng(currentMidLat, currentMidLon));
     //Now I find places around the midpoint, and display all the Yelp markers
     Global.resultCords.clear();
     await YelpPlaces.findingPlaces();
