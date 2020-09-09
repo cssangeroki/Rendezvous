@@ -42,6 +42,11 @@ class YelpPlaces {
       return;
     }
     print(businesses);
+    //This if statement is in case there is an error propo
+    if (businesses["error"] != null){
+      Global.errorFindingYelpPlaces = true;
+      return;
+    }
     if (futureToCancel.isCanceled == true) {
       return;
     }
