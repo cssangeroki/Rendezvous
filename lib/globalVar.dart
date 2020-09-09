@@ -19,9 +19,8 @@ class Global {
   static List states = [];
   static List zipCodes = [];
 
-
-  static double finalLon;
-  static double finalLat;
+  static double finalMidLon;
+  static double finalMidLat;
   static String finalCategory = "All";
   static double finalRad;
   static double finalTime;
@@ -67,6 +66,5 @@ class Global {
   static ValueNotifier errorFindingUserAddressListener = ValueNotifier(false);
 
   //Error checker for failure to get yelp places
-static bool errorFindingYelpPlaces = false;
-
+  static bool errorFindingYelpPlaces = false;
 }

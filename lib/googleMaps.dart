@@ -115,6 +115,8 @@ class GoogleMapsState extends State<GoogleMaps> {
 
   String tempCategory;
 
+  Set<Circle> circles = {};
+
 //Marker _markers;
 //Function initState initialises the state of variables
 //It returns a reference to the listener, so that we may turn off the listener at a later time
@@ -130,6 +132,20 @@ class GoogleMapsState extends State<GoogleMaps> {
   @override
   void dispose() {
     super.dispose();
+  }
+
+  void setCircle(LatLng point) {
+    circles.clear();
+    setState(() {
+      circles.add(Circle(
+        circleId: CircleId('midPointRadius'),
+        center: LatLng(Global.finalMidLat, Global.finalMidLon),
+        radius: (Global.finalRad * 1609.34), //convert miles to meters
+        fillColor: Color.fromARGB(80, 173, 216, 230),
+        strokeWidth: 2,
+        strokeColor: Color.fromARGB(60, 0, 0, 255),
+      ));
+    });
   }
 
   void setMapStyle() {
@@ -443,8 +459,8 @@ class GoogleMapsState extends State<GoogleMaps> {
     currentMidLat = currentMidLat / (length);
     currentMidLon = currentMidLon / (length);
 
-    Global.finalLat = currentMidLat;
-    Global.finalLon = currentMidLon;
+    Global.finalMidLat = currentMidLat;
+    Global.finalMidLon = currentMidLon;
 
     await placefromLatLng(LatLng(currentMidLat, currentMidLon));
     setState(() {
@@ -464,6 +480,8 @@ class GoogleMapsState extends State<GoogleMaps> {
           } //Setting midpoint marker to blue so it's identifiable
           ));
     });
+    // set the radius around the midpoint
+    setCircle(LatLng(currentMidLat, currentMidLon));
     //Now I find places around the midpoint, and display all the Yelp markers
     Global.resultCords.clear();
     await YelpPlaces.findingPlaces();
@@ -641,6 +659,7 @@ class GoogleMapsState extends State<GoogleMaps> {
                     ),
                     zoomControlsEnabled: false,
                     myLocationButtonEnabled: false,
+                    circles: circles,
                     markers: _markers,
 //Adding the marker property to Google Maps Widget
                     onCameraMove: _onCameraMove,

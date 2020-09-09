@@ -1,6 +1,32 @@
 import 'package:firebase_dynamic_links/firebase_dynamic_links.dart';
 
 class DynamicLinkService {
+  static Future<String> createAppLink(String title) async {
+    final DynamicLinkParameters parameters = DynamicLinkParameters(
+      uriPrefix: 'https://rendezvous.page.link',
+      link: Uri.parse('https://rendezvous.page.link'),
+      androidParameters: AndroidParameters(
+          packageName: 'com.Rendezous.Rendezvous', minimumVersion: 9),
+      iosParameters: IosParameters(
+        bundleId: 'com.Rendezvous.Rendezvous',
+        minimumVersion: '10', // ios version needs to be updated
+        appStoreId: '1435066055', // fake store id need real when when created.
+      ),
+      dynamicLinkParametersOptions: DynamicLinkParametersOptions(
+        shortDynamicLinkPathLength: ShortDynamicLinkPathLength.unguessable,
+      ),
+      socialMetaTagParameters: SocialMetaTagParameters(
+        title: 'Connect to a rendezvous group',
+        description:
+            'Rendezvous allows users to connect with each other and find convenient place to meet up in between one another',
+      ),
+    );
+
+    final Uri dynamicUrl = await parameters.buildUrl();
+
+    return dynamicUrl.toString();
+  }
+
   Future handleDynamicLinks() async {
     // startup from dynamic link logic
     // get initial dynamic link if app is started using link
@@ -16,31 +42,6 @@ class DynamicLinkService {
     }, onError: (OnLinkErrorException e) async {
       print('Dynamic link failed: ${e.message}');
     });
-  }
-
-  static Future<String> createAppLink(String title) async {
-    final DynamicLinkParameters parameters = DynamicLinkParameters(
-      uriPrefix: 'https://rendezvous.page.link',
-      link: Uri.parse('https://rendezvous.page.link'),
-      androidParameters: AndroidParameters(
-          packageName: 'com.Rendezous.Rendezvous', minimumVersion: 0),
-      iosParameters: IosParameters(
-        bundleId: 'com.Rendezvous.Rendezvous',
-        minimumVersion: '0',
-        appStoreId: '1435066055', // fake store id need real when when created.
-      ),
-      dynamicLinkParametersOptions: DynamicLinkParametersOptions(
-        shortDynamicLinkPathLength: ShortDynamicLinkPathLength.short,
-      ),
-      socialMetaTagParameters: SocialMetaTagParameters(
-        title: 'the title of this dynamic link is rendezvous',
-        description: 'this is description of rendezvous',
-      ),
-    );
-
-    final Uri dynamicUrl = await parameters.buildUrl();
-
-    return dynamicUrl.toString();
   }
 
   void _handleDeepLink(PendingDynamicLinkData data) {

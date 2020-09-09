@@ -29,7 +29,7 @@ class YelpPlaces {
       futureToCancel.cancel();
     }
     futureToCancel = CancelableOperation.fromFuture(
-        BackendMethods.getLocations(Global.finalLon, Global.finalLat,
+        BackendMethods.getLocations(Global.finalMidLon, Global.finalMidLat,
             Global.finalCategory, finalRadMiles.toInt()), onCancel: () {
       print("Backend Call Cancelled");
     });
