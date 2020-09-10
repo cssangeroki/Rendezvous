@@ -1,5 +1,7 @@
 //This file will hold the MapRenderState class
 
+import 'dart:io';
+
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'pages/firebaseFunctions.dart';
@@ -140,7 +142,8 @@ class GoogleMapsState extends State<GoogleMaps> {
       circles.add(Circle(
         circleId: CircleId('midPointRadius'),
         center: LatLng(Global.finalMidLat, Global.finalMidLon),
-        radius: (Global.finalRad * 1609.34), //convert miles to meters
+        radius: (Global.finalRad * 1609.34),
+        //convert miles to meters
         fillColor: Color.fromARGB(80, 173, 216, 230),
         strokeWidth: 2,
         strokeColor: Color.fromARGB(60, 0, 0, 255),
@@ -155,13 +158,23 @@ class GoogleMapsState extends State<GoogleMaps> {
   }
 
   void setBitmapIcon() {
-    BitmapDescriptor.fromAssetImage(
-            ImageConfiguration(size: Size(2, 2)), 'images/person.png')
-        .then((onValue) {
-      myIcon = onValue;
-    });
+    //If the platform is android, we use a slightly bigger picture as the marker strangely is smaller on android than ios
+    if (Platform.isAndroid) {
+      BitmapDescriptor.fromAssetImage(
+              ImageConfiguration(size: Size(2, 2)), 'images/person_android.png')
+          .then((onValue) {
+        myIcon = onValue;
+      });
+    }
+    //Otherwise, we use the ios version
+    else {
+      BitmapDescriptor.fromAssetImage(
+              ImageConfiguration(size: Size(2, 2)), 'images/person_ios.png')
+          .then((onValue) {
+        myIcon = onValue;
+      });
+    }
   }
-
 
   void initFunctionCaller() async {
     //Resetting the time
@@ -288,9 +301,18 @@ class GoogleMapsState extends State<GoogleMaps> {
       //print(_center);
       Placemark place = p[0];
 
+      //We check the platform as GeoCoding changes between iOS and Android
       setState(() {
-        searchAddr =
-            "${place.name}, ${place.subLocality}, ${place.locality}, ${place.postalCode}, ${place.country}";
+        //If platform is iOS
+        if (Platform.isIOS) {
+          searchAddr =
+              "${place.name}, ${place.subLocality}, ${place.locality}, ${place.postalCode}, ${place.country}";
+        }
+        //If platform is Android
+        else{
+          searchAddr =
+          "${place.name}, ${place.thoroughfare}, ${place.locality}, ${place.postalCode}, ${place.country}";
+        }
       });
     } catch (e) {
       print(e);
@@ -420,8 +442,7 @@ class GoogleMapsState extends State<GoogleMaps> {
               Global.resultCords[i].latitude, Global.resultCords[i].longitude),
           infoWindow:
               InfoWindow(title: Global.names[i], snippet: Global.locations[i]),
-          icon:
-              BitmapDescriptor.defaultMarker,
+          icon: BitmapDescriptor.defaultMarker,
           //Setting midpoint marker to blue so it's identifiable
           onTap: () {
             setState(() {
