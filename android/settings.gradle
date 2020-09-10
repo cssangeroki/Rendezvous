@@ -30,9 +30,8 @@ def flutterSdkPath = properties.getProperty("flutter.sdk")
 assert flutterSdkPath != null, "flutter.sdk not set in local.properties"
 apply from: "$flutterSdkPath/packages/flutter_tools/gradle/app_plugin_loader.gradle"
 
-<<<<<<< HEAD
-=======
 
+/*
 //Added below lines to get rid of firebase warning:
 // [firebase_core_web , firebase_auth_web, cloud_firestore_web ] Plugin project :firebase_auth_web not found.
 // Please update settings.gradle.
@@ -51,4 +50,4 @@ plugins.each { name, path ->
     include ":$name"
     project(":$name").projectDir = pluginDirectory
 }
->>>>>>> 13d33cb2ecc4c2044380faa0c3bc8004def715fb
+*/
