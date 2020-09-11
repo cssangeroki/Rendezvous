@@ -11,6 +11,7 @@ class FirebaseFunctions {
   static Map<String, dynamic> roomData = {
     "roomCode": null,
     "host": null,
+    "host UID": null,
     "Final Location": null,
     "Final Location Address": null,
     "Final LatLng": null
@@ -25,6 +26,7 @@ class FirebaseFunctions {
           .then((snapshot) {
         FirebaseFunctions.roomData["roomCode"] = snapshot.data["roomCode"];
         FirebaseFunctions.roomData["host"] = snapshot.data["host"];
+        FirebaseFunctions.roomData["host UID"] = snapshot.data["host UID"];
         FirebaseFunctions.roomData["Final Location"] =
             snapshot.data["Final Location"];
         FirebaseFunctions.roomData["Final Location Address"] =
@@ -116,6 +118,7 @@ class FirebaseFunctions {
           .get()
           .then((value) {
         roomData["host"] = value.data["host"];
+        roomData["host UID"] = value.data["host UID"];
         roomData["Final Location"] = value.data["Final Location"];
         roomData["Final Location Address"] =
             value.data["Final Location Address"];
@@ -157,6 +160,7 @@ class FirebaseFunctions {
       FirebaseFunctions.roomData = {
         "roomCode": null,
         "host": null,
+        "host UID": null,
         "Final Location": null,
         "Final Location Address": null,
         "Final LatLng": null
@@ -188,12 +192,13 @@ class FirebaseFunctions {
         .then((value) {
       var userDocs = value.documents;
       roomData["host"] = userDocs[0].data["userName"];
+      roomData["host UID"] = userDocs[0].toString();
     });
     //Might have to change this line in case a different host shows up for everyone
     await Firestore.instance
         .collection("rooms")
         .document(roomData["roomCode"])
-        .updateData({"host": roomData["host"]});
+        .updateData({"host": roomData["host"], "host UID": roomData["host UID"]});
   }
 
   static createFirebaseRoom(String userName) async {
@@ -220,11 +225,13 @@ class FirebaseFunctions {
     FirebaseFunctions.roomData = {"roomCode": roomCode};
     //Setting the host variable for the current user to true
     FirebaseFunctions.roomData["host"] = userName;
+    //Adding the host UID to keep track of host to not prevent conflicts in names
+    FirebaseFunctions.roomData["host UID"] = currentUID;
     // stores the room to database
     await Firestore.instance
         .collection("rooms")
         .document(roomCode)
-        .setData({"roomCode": roomCode, "host": userName}).then((value) async {
+        .setData({"roomCode": roomCode, "host": userName, "host UID": currentUID}).then((value) async {
       await Firestore.instance
           .collection("users")
           .document(FirebaseFunctions?.currentUID)

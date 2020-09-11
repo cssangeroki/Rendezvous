@@ -619,8 +619,8 @@ class GoogleMapsState extends State<GoogleMaps> {
 
   //Widget for when a marker is tapped
   Widget confirmFinalPosition() {
-    if ((FirebaseFunctions.currentUserData["userName"] ==
-            FirebaseFunctions.roomData["host"]) &&
+    if ((FirebaseFunctions.currentUID ==
+            FirebaseFunctions.roomData["host UID"]) &&
         (confirmDialogTrigger == true)) {
       return Padding(
           padding: const EdgeInsets.fromLTRB(0.0, 10.0, 0.0, 0.0),
