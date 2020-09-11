@@ -192,7 +192,7 @@ class FirebaseFunctions {
         .then((value) {
       var userDocs = value.documents;
       roomData["host"] = userDocs[0].data["userName"];
-      roomData["host UID"] = userDocs[0].toString();
+      roomData["host UID"] = userDocs[0].documentID;
     });
     //Might have to change this line in case a different host shows up for everyone
     await Firestore.instance

@@ -98,6 +98,7 @@ class _MapRenderState extends State<MapRender>
       }
       setState(() {
         FirebaseFunctions.roomData["host"] = event.data["host"];
+        FirebaseFunctions.roomData["host UID"] = event.data["host UID"];
         //If the final location changed, we will alert the listener so that the route can be changed
         if (FirebaseFunctions.roomData["Final Location"] !=
             event.data["Final Location"]) {
