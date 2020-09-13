@@ -679,31 +679,7 @@ class _MapRenderState extends State<MapRender>
                               }),
                         ),
                       ),
-
-                      //Final Location Button
-                      Container(
-                        margin: EdgeInsets.fromLTRB(40, 20, 0, 0),
-                        height: 70,
-                        width: 70,
-                        child: FittedBox(
-                          child: FloatingActionButton(
-                            heroTag: null,
-                            backgroundColor: Color(Global.backgroundColor),
-                            child: Icon(
-                              Icons.directions_car,
-                              size: 35,
-                              color: Color(0xff21bf73),
-                            ),
-                            elevation: 4,
-                            onPressed: () {
-                              FirebaseFunctions.setFinalPosition(
-                                  Global.names[index],
-                                  Global.locations[index],
-                                  Global.resultCords[index]);
-                            },
-                          ),
-                        ),
-                      ),
+                      slideUpFinalLocSet(index),
                     ],
                   ),
                 ),
@@ -713,6 +689,37 @@ class _MapRenderState extends State<MapRender>
         ),
       ),
     );
+  }
+
+  Widget slideUpFinalLocSet(int index){
+    if (FirebaseFunctions.currentUID == FirebaseFunctions.roomData["host UID"]){
+      return //Final Location Button
+        Container(
+          margin: EdgeInsets.fromLTRB(40, 20, 0, 0),
+          height: 70,
+          width: 70,
+          child: FittedBox(
+            child: FloatingActionButton(
+              heroTag: null,
+              backgroundColor: Colors.greenAccent,
+              child: Icon(
+                Icons.check_circle,
+                size: 35,
+                //color: Color(0xff21bf73),
+              ),
+              elevation: 4,
+              onPressed: () {
+                FirebaseFunctions.setFinalPosition(
+                    Global.names[index],
+                    Global.locations[index],
+                    Global.resultCords[index]);
+              },
+            ),
+          ),
+        );
+    }
+    //Otherwise, we return an empty container
+    return Container();
   }
 
   Widget _slideUpPanel() {
