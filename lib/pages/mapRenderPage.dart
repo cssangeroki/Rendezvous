@@ -299,70 +299,14 @@ class _MapRenderState extends State<MapRender>
             ),
           ]),
         ),
-        Row(
-          children: <Widget>[
-            Container(
-              height: 40,
-              width: 90,
-              padding: EdgeInsets.fromLTRB(10, 5, 5, 5),
-              //color: Colors.blue,
-              child: RaisedButton(
-                elevation: 5,
-                color: Colors.white,
-                shape: RoundedRectangleBorder(
-                  borderRadius: BorderRadius.circular(30.0),
-                  side: BorderSide(color: Colors.grey),
-                ),
-                child: Text("Price",
-                    style:
-                        new TextStyle(fontSize: 13.0, color: Colors.black87)),
-                onPressed: () {
-                  print("Pressed Price");
-                },
-              ),
-            ),
-            Container(
-              height: 40,
-              width: 90,
-              padding: EdgeInsets.fromLTRB(5, 5, 5, 5),
-              //color: Colors.blue,
-              child: RaisedButton(
-                elevation: 5,
-                color: Colors.white,
-                shape: RoundedRectangleBorder(
-                  borderRadius: BorderRadius.circular(30.0),
-                  side: BorderSide(color: Colors.grey),
-                ),
-                child: Text("Rating",
-                    style:
-                        new TextStyle(fontSize: 13.0, color: Colors.black87)),
-                onPressed: () {
-                  print("Pressed Rating");
-                },
-              ),
-            ),
-            Container(
-              height: 40,
-              width: 100,
-              padding: EdgeInsets.fromLTRB(5, 5, 5, 5),
-              //color: Colors.blue,
-              child: RaisedButton(
-                elevation: 5,
-                color: Colors.white,
-                shape: RoundedRectangleBorder(
-                  borderRadius: BorderRadius.circular(30.0),
-                  side: BorderSide(color: Colors.grey),
-                ),
-                child: Text("Distance",
-                    style:
-                        new TextStyle(fontSize: 13.0, color: Colors.black87)),
-                onPressed: () {
-                  print("Pressed Distance");
-                },
-              ),
-            ),
-          ],
+        Container(
+          margin: EdgeInsets.fromLTRB(15, 5, 7, 0),
+          alignment: Alignment.centerLeft,
+          child: Text("Sort by:",
+              style: GoogleFonts.roboto(
+                  fontSize: 15, fontWeight: FontWeight.w400)),
         ),
+        _sortButtons(),
         Align(
           alignment: Alignment.topCenter,
           child: Container(
@@ -435,6 +379,85 @@ class _MapRenderState extends State<MapRender>
           ),
         ),
       ]),
+    );
+  }
+
+  Widget _sortButtons() {
+    return Row(
+      children: <Widget>[
+        Container(
+          height: 40,
+          width: 90,
+          padding: EdgeInsets.fromLTRB(10, 5, 5, 5),
+          //color: Colors.blue,
+          child: RaisedButton(
+            elevation: 5,
+            color: Colors.white,
+            shape: RoundedRectangleBorder(
+              borderRadius: BorderRadius.circular(30.0),
+              side: BorderSide(color: Colors.grey),
+            ),
+            child: Text(
+              "Price",
+              style: GoogleFonts.roboto(
+                fontSize: 13,
+                fontWeight: FontWeight.w700,
+              ),
+            ),
+            onPressed: () {
+              print("Pressed Price");
+            },
+          ),
+        ),
+        Container(
+          height: 40,
+          width: 90,
+          padding: EdgeInsets.fromLTRB(5, 5, 5, 5),
+          //color: Colors.blue,
+          child: RaisedButton(
+            elevation: 5,
+            color: Colors.white,
+            shape: RoundedRectangleBorder(
+              borderRadius: BorderRadius.circular(30.0),
+              side: BorderSide(color: Colors.grey),
+            ),
+            child: Text(
+              "Rating",
+              style: GoogleFonts.roboto(
+                fontSize: 13,
+                fontWeight: FontWeight.w700,
+              ),
+            ),
+            onPressed: () {
+              print("Pressed Rating");
+            },
+          ),
+        ),
+        Container(
+          height: 40,
+          width: 100,
+          padding: EdgeInsets.fromLTRB(5, 5, 5, 5),
+          //color: Colors.blue,
+          child: RaisedButton(
+            elevation: 5,
+            color: Colors.white,
+            shape: RoundedRectangleBorder(
+              borderRadius: BorderRadius.circular(30.0),
+              side: BorderSide(color: Colors.grey),
+            ),
+            child: Text(
+              "Distance",
+              style: GoogleFonts.roboto(
+                fontSize: 13,
+                fontWeight: FontWeight.w700,
+              ),
+            ),
+            onPressed: () {
+              print("Pressed Distance");
+            },
+          ),
+        ),
+      ],
     );
   }
 
