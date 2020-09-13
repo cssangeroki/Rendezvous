@@ -176,6 +176,7 @@ class GoogleMapsState extends State<GoogleMaps> {
     }
   }
 
+
   void initFunctionCaller() async {
     //Resetting the time
     Global.hours = -1;
@@ -243,8 +244,7 @@ class GoogleMapsState extends State<GoogleMaps> {
           infoWindow: InfoWindow(
               title: FirebaseFunctions.roomData["Final Location"],
               snippet: "Final Location"),
-          icon:
-              BitmapDescriptor.defaultMarkerWithHue(BitmapDescriptor.hueYellow),
+          icon: BitmapDescriptor.defaultMarkerWithHue(43.0),
           onTap: () {
             setState(() {
               confirmDialogTrigger = false;
