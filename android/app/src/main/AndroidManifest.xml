@@ -10,7 +10,7 @@
     <application
         android:name="io.flutter.app.FlutterApplication"
         android:label="Rendezvous"
-        android:icon="@mipmap/ic_launcher">
+        android:icon="@mipmap/rendezvous_icon">
         <meta-data
             android:name="com.google.android.geo.API_KEY"
             android:value="AIzaSyCWiD_UhJO573Mc5RoKjRbzu8r_YYKl30M" />
