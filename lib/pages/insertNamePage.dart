@@ -7,6 +7,10 @@ import 'package:google_fonts/google_fonts.dart';
 import '../appBar.dart';
 import 'createOrJoinPage.dart';
 import '../globalVar.dart';
+import 'package:flutter/cupertino.dart';
+import 'package:flutter/services.dart';
+import 'package:image_picker/image_picker.dart';
+import 'dart:io';
 
 Future<void> saveNamePreference(String userName) async {
   SharedPreferences userNamePrefs = await SharedPreferences.getInstance();
@@ -31,6 +35,11 @@ class Page1 extends StatefulWidget {
 class _Page1State extends State<Page1> {
 //  bool isLoading = false;
   bool _nameEntered = false;
+
+
+  File imagePicked;
+  final picker = ImagePicker();
+  
   @override
   void initState() {
     super.initState();
@@ -71,17 +80,48 @@ class _Page1State extends State<Page1> {
 
   bool _focus = false;
 
+  Future getImage() async {
+    final pickedFile = await picker.getImage(source: ImageSource.gallery);
+
+    setState(() {
+        imagePicked = File(pickedFile.path);
+    });
+
+    Global.profileImage = File(pickedFile.path);
+    Global.updateProfileImage = true;
+
+  }
+
   @override
   Widget build(BuildContext context) {
+    var screenHeight = MediaQuery.of(context).size.height;
+    var showAnonymous = imagePicked == null ? true : false;
     return Scaffold(
       body: SingleChildScrollView(
         child: SafeArea(
           child: Container(
             child: Center(
               child: Column(children: <Widget>[
+                GestureDetector(
+                  onTap: () {
+                      getImage();
+                  },
+                  child: Container(margin: EdgeInsets.fromLTRB(0, screenHeight * 0.2, 0, 0),
+                          width: screenHeight * 0.2,
+                          height: screenHeight * 0.2,
+                          child: showAnonymous ? Image(
+                      image: AssetImage('images/anonymous.png'),
+                    ) : null,
+                          decoration: !showAnonymous ? new BoxDecoration(
+                            shape: BoxShape.circle,
+                            image: new DecorationImage(fit:BoxFit.cover,
+                            image: new FileImage(imagePicked))) : null,
+                ),
+                ),
+                CupertinoButton(child: Text("Choose Profile Image"), onPressed: () {
+                    getImage();
+                }),
                 Container(
-                  margin: EdgeInsets.fromLTRB(
-                      0, MediaQuery.of(context).size.height * 0.4, 0, 0),
                   width: 220.0,
                   child: AnimatedOpacity(
                     duration: Duration(milliseconds: 100),

@@ -32,6 +32,13 @@ import '../routes.dart';
 
 //import for error checking
 import '../errorChecking.dart';
+import '../backendFunctions.dart';
+import 'firebaseFunctions.dart';
+import 'firebaseFunctions.dart';
+import 'firebaseFunctions.dart';
+import 'firebaseFunctions.dart';
+import 'firebaseFunctions.dart';
+
 
 const String mapsAPI_KEY = "AIzaSyBV961Ztopz9vyZrJq0AYAMJUTHmluu3FM";
 //Below are variables we will use for the sliders
@@ -55,6 +62,118 @@ class MapRender extends StatefulWidget {
   _MapRenderState createState() => _MapRenderState();
 }
 
+
+class Message {
+
+
+  static List messages = [];
+
+  
+
+  static Future<List<Widget>> getAndUpdateMessages(size, {isUpdate=false, var message}) async {
+      
+      if(!isUpdate) {
+          messages = await BackendMethods.getMessages(FirebaseFunctions.roomData["groupChatID"]);
+      } else {
+          messages.add(message);
+      }
+
+
+      String userID = FirebaseFunctions.currentUID;
+
+      
+      List<Widget> msgList = <Widget>[];
+
+      
+      DateTime currentDate = DateTime.now();
+      bool didAdd = false;
+      
+      for (var message in messages) {
+          DateTime datetime = DateTime.parse(message["dateCreated"]).toLocal();
+
+          if(currentDate.day == datetime.day && currentDate.year == datetime.year && currentDate.month == datetime.month) {
+            if(!didAdd) {
+                Widget msgTitle = Message.createDayTitle(BackendMethods.convertDateToPresentDate(datetime, isTitle:true));
+                msgList.add(msgTitle);
+                didAdd = true;
+            }
+          } else {
+            didAdd = false;
+          }
+          String img = FirebaseFunctions.roomData["profileImages"][message["from"]];
+          Widget msg = Message.createMessage(size, FirebaseFunctions.roomData["userNames"][message["from"]], message["body"], datetime, userID == message["from"], img != null ? img : null);
+          msgList.add(msg);
+      }
+      
+      if(msgList.length == 0) {
+        msgList.add(Message.createDayTitle("No messages found"));
+      }
+
+      return msgList;
+  }
+
+  static Widget createDayTitle(String title) {
+    return Container(child: Text(title, textAlign: TextAlign.center, style: TextStyle(decoration: TextDecoration.underline, fontStyle: FontStyle.italic)));
+  }
+
+  static Widget createMessage(double size, String who, String text, DateTime date, bool isMe, String img) {
+
+    Color backgroundColor = isMe ? Color.fromRGBO(240, 215, 255, 1.0) : Color.fromRGBO(236, 236, 236, 1.0);
+    var showAnonymous = img == null ? true : false;
+    return 
+      Container(
+      child: Padding(
+      padding: EdgeInsets.all(10.0),
+      child : Row(
+      crossAxisAlignment: CrossAxisAlignment.end,
+      children: <Widget>[
+          Container(margin: EdgeInsets.fromLTRB(0, 0, 5, 0),
+                    width: size*0.08,
+                    height: size*0.08,
+                    child: showAnonymous ? Image(
+                      image: AssetImage('images/anonymous.png'),
+                    ) : null,
+                          decoration: !showAnonymous ? new BoxDecoration(
+                            shape: BoxShape.circle,
+                            image: new DecorationImage(fit:BoxFit.cover,
+                            image: NetworkImage(img))) : null,
+                ),
+        Align(
+        alignment: Alignment.centerRight,
+        child:ClipRRect(
+        borderRadius: BorderRadius.circular(10.0),
+        child:Container(
+        width: size,
+        color: backgroundColor,
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.stretch,
+          children: <Widget>[
+            Column(crossAxisAlignment: CrossAxisAlignment.start,
+            children:<Widget>[Padding(
+              padding: EdgeInsets.fromLTRB(20, 10.0, 20.0, 10),
+              child: Text(isMe ? "Me" : who, textAlign: TextAlign.left, style:TextStyle(fontWeight: FontWeight.bold))),
+            Padding(
+              padding: EdgeInsets.fromLTRB(20, 0, 20.0, 10),
+              child: Text(text, textAlign: TextAlign.left))
+            ]),
+            Column(crossAxisAlignment: CrossAxisAlignment.end,
+            children:<Widget>[Padding(
+              padding: EdgeInsets.fromLTRB(20, 0, 20.0, 10),
+              child: Text(BackendMethods.convertDateToPresentDate(date), textAlign: TextAlign.right, style: TextStyle(fontStyle: FontStyle.italic))),
+            ])
+            ])
+        ))
+      )]
+    )
+    ));
+  }
+
+}
+
+
+
+
+
 class _MapRenderState extends State<MapRender>
     with SingleTickerProviderStateMixin {
   List<String> nameList = Global.nameList;
@@ -63,7 +182,22 @@ class _MapRenderState extends State<MapRender>
   StreamSubscription<DocumentSnapshot> roomListener;
   int hours;
   int min;
+
+
   String timeDisplayText;
+  bool doSendMessage = false;
+  List<Widget> messages = [];
+  bool didRetrieveMessages = false;
+  double height = 0;
+
+
+    double keyboardPadding = 0.0;
+  double currentKeyBoardPadding = 0.0;
+  
+  String messageBody;
+
+  ScrollController scrollController = new ScrollController();
+  double maxHeightScroll = 0.0;
 
   List<String> suggestedAddresses = [];
 
@@ -71,6 +205,7 @@ class _MapRenderState extends State<MapRender>
   GlobalKey<AutoCompleteTextFieldState> key = new GlobalKey();
 
   CancelableOperation futureToCancel;
+
 
   var _isExpanded = new List<bool>.filled(50, false, growable: true);
 
@@ -85,6 +220,29 @@ class _MapRenderState extends State<MapRender>
     searchingForCategory();
   }
 
+ void callbackSocket(String type, data) async {
+    if(type == "messageAdded") {
+
+      Future<List<Widget>> futureMsgs = Message.getAndUpdateMessages(MediaQuery.of(context).size.width * 0.75);
+
+  
+
+      
+      futureMsgs.then((msgs) async {
+          setState(() {
+            messages = msgs;
+            maxHeightScroll = 0.0;
+          });
+
+          Timer(Duration(milliseconds: 500),(){
+            
+                    scrollController.jumpTo(scrollController.position.maxScrollExtent);
+          });
+          
+      });
+    }
+  }
+
   //Another function that creates a listener for the roomData (Not the users, but other room data)
   void listenToRoom() {
     var locChanged = false;
@@ -97,6 +255,7 @@ class _MapRenderState extends State<MapRender>
         return;
       }
       setState(() {
+        FirebaseFunctions.roomData["groupChatID"] = event.data["groupChatID"];
         FirebaseFunctions.roomData["host"] = event.data["host"];
         FirebaseFunctions.roomData["host UID"] = event.data["host UID"];
         //If the final location changed, we will alert the listener so that the route can be changed
@@ -996,12 +1155,109 @@ class _MapRenderState extends State<MapRender>
     );
   }
 
-  Widget _tab3Contents() {
-    return new Container(
+   Widget _tab3Contents() {
+    double width = MediaQuery.of(context).size.width;
+    double height = MediaQuery.of(context).size.height;
+    
+    if(!didRetrieveMessages) {
+
+        WidgetsBinding.instance.addPostFrameCallback((timeStamp) {
+                      Future<List<Widget>> futureMsgs = Message.getAndUpdateMessages(MediaQuery.of(context).size.width * 0.75);
+                      futureMsgs.then((msgs) async {
+                          await BackendMethods.establishSocket(callbackSocket);
+                          setState(() {
+                            didRetrieveMessages = true;
+                            messages = msgs;
+                            height = MediaQuery.of(context).size.width * 0.75;
+                          });
+                      });
+        });
+    } else if(maxHeightScroll == 0.0) {
+        WidgetsBinding.instance.addPostFrameCallback((timeStamp) {
+            if(scrollController.hasClients) {
+                double h = scrollController.position.maxScrollExtent;
+                setState(() {
+                  maxHeightScroll = h == 0.0 ? 1.0 : h;
+                  scrollController = new ScrollController(initialScrollOffset:h);
+                });
+            }});
+    }
+
+    
+    return new GestureDetector(
+      onTap: () {
+        FocusScope.of(context).unfocus();
+        setState(() {
+          currentKeyBoardPadding = 0.0;
+        });
+      },
+      child: Container(
       height: MediaQuery.of(context).size.height,
       width: double.infinity,
-      child: Container(),
-    );
+      child: Stack(
+        children: <Widget>[
+          Container(padding: EdgeInsets.fromLTRB(0, 0, 0, 0.10*height), height: height * 0.75, child: new ListView.builder(controller: scrollController,scrollDirection: Axis.vertical, itemCount: messages.length,itemBuilder: (BuildContext ctx, int index){
+                return messages[index];
+          })),
+          Align(alignment: Alignment.bottomCenter, child: Padding(padding: EdgeInsets.fromLTRB(0, 0, 0, currentKeyBoardPadding), child:Container(color: Colors.white, padding: EdgeInsets.fromLTRB(10, 10, 10, 0), height: height*0.20, child:
+            Column(crossAxisAlignment: CrossAxisAlignment.end, children: [TextField(textInputAction: TextInputAction.done,
+            onEditingComplete: () {
+              print(messages.length);
+                
+            },
+            onChanged: (text) {
+                bool isNotEmpty = true;
+                if(text.replaceAll(" ", "") == "" || text == null) {
+                  isNotEmpty = false;
+                }
+
+                setState(() {
+                    doSendMessage = isNotEmpty;
+                    messageBody = text;
+                });
+            },
+            onTap: () {
+              Future<bool> waiting() async {
+                  await Future.delayed(const Duration(seconds: 1));
+                  return true;
+              }
+
+              if(keyboardPadding == 0.0) {
+                  waiting().then((value) {
+                      double keyboardHeight = MediaQuery.of(context).viewInsets.bottom;
+                      if(keyboardHeight != 0.0) {
+                        setState(() {
+                          keyboardPadding = keyboardHeight;
+                          currentKeyBoardPadding = keyboardHeight;
+                        });
+                      }
+                  });
+              } else {
+                setState(() {
+                  currentKeyBoardPadding = keyboardPadding;
+                });
+              }
+                
+            },
+            decoration: InputDecoration(hintText: "Enter message", border: InputBorder.none,
+            
+            enabledBorder: OutlineInputBorder(
+              borderRadius: BorderRadius.all(Radius.circular(25.0)),
+              borderSide:BorderSide(color:Colors.grey)
+            ),
+            focusedBorder: OutlineInputBorder(
+              borderRadius: BorderRadius.all(Radius.circular(25.0)),
+              borderSide:BorderSide(color:Colors.grey)
+            )
+            ),
+            keyboardType: TextInputType.multiline, maxLines: null), 
+            Padding(padding: EdgeInsets.fromLTRB(0, 10, 0, 0), child:CupertinoButton(color: doSendMessage ? Color.fromRGBO(106, 171, 249, 1.0) : Color.fromRGBO(236, 236, 236, 1.0), onPressed: () async {
+                String message = messageBody;
+                await BackendMethods.sendMessage(FirebaseFunctions.roomData["groupChatID"], message, BackendMethods.getCurrentUTCTime(), FirebaseFunctions.currentUID);
+            }, child: Text("Send")))]))
+          ))]
+
+    )));
   }
 
   Widget _viewDrawer() {
@@ -1233,6 +1489,8 @@ class _MapRenderState extends State<MapRender>
         child: Text("Leave Room",
             style: new TextStyle(fontSize: 20.0, color: Colors.white)),
         onPressed: () async {
+          
+
           //Adding some code to turn off all listeners
           Global.mapRPnameListListener.removeListener(() {});
           Global.mapRPfindYPListener.removeListener(() {});
@@ -1242,7 +1500,10 @@ class _MapRenderState extends State<MapRender>
           Global.userLocChanged.removeListener(() {});
 
           String roomCodeString = FirebaseFunctions.roomData["roomCode"];
-
+          String groupChatID = FirebaseFunctions.roomData["groupChatID"];
+          String memberID = FirebaseFunctions.currentUserData["memberID"];
+          print(memberID);
+          print(groupChatID);
           await Firestore.instance
               .collection("rooms")
               .document(roomCodeString)
@@ -1254,7 +1515,7 @@ class _MapRenderState extends State<MapRender>
             Global.memberListener.cancel();
             roomListener.cancel();
             FirebaseFunctions.removeCurrentUserFromRoom(
-                roomCodeString, data.documents.length);
+                roomCodeString, data.documents.length, groupChatID:groupChatID, memberID:memberID);
           });
 
           Navigator.pushNamedAndRemoveUntil(

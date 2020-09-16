@@ -31,6 +31,9 @@ class Global {
   static var whiteColor = 0xffffffff;
   static var yellowColor = 0xffffcd3c;
 
+  static var profileImage;
+  static var updateProfileImage = false;
+
   static var arrLength;
 
   static List<String> nameList = [];

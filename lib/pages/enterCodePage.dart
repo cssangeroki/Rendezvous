@@ -5,6 +5,7 @@ import 'package:google_fonts/google_fonts.dart';
 import '../globalVar.dart';
 import '../appBar.dart';
 import 'firebaseFunctions.dart';
+import 'firebaseFunctions.dart';
 import 'mapRenderPage.dart';
 import 'package:flutter_fadein/flutter_fadein.dart';
 
@@ -162,6 +163,7 @@ class _Page4State extends State<Page4> {
                         setState(() {
                           isLoading = true;
                         });
+
                         bool isSuccess =
                             await FirebaseFunctions.addCurrentUserToRoom(
                                 this.roomCode);

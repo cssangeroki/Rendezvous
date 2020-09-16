@@ -40,10 +40,15 @@ dependencies:
   secure_random: ^1.0.0 # adds use of cryptographically secure source of random numbers
   shared_preferences: ^0.5.8 # adds storage for simple data
 
+
+  image_picker: ^0.6.7+7 # image picker for profile
+  socket_io_client: ^0.9.11 # Socket io
   # Add the dependency for the Firebase Core Flutter SDK
   firebase_core: ^0.4.0+9
   # Add the dependency for the FlutterFire plugin for Google Analytics
   firebase_analytics: ^5.0.2
+
+  firebase_storage: ^3.0.6 # for uploading profile image
 
   # Add the dependencies for any other Firebase products you want to use in your app
   # For example, to use Firebase Authentication and Cloud Firestore
@@ -98,6 +103,7 @@ flutter:
     - images/Map_loading.png
     - images/Rendezvous_logo.png # added logo from imagßßßßes folder
     - images/backgroundArt.jpg
+    - images/anonymous.png 
 
   # An image asset can refer to one or more resolution-specific "variants", see
   # https://flutter.dev/assets-and-images/#resolution-aware.
