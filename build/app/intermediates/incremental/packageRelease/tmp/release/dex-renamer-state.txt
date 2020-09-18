@@ -1,0 +1,4 @@
+#Fri Sep 18 04:09:01 PDT 2020
+base.0=C\:\\Users\\Ulysses\\Development\\Rendezvous\\build\\app\\intermediates\\transforms\\r8\\release\\0\\classes.dex
+path.0=classes.dex
+renamed.0=classes.dex
