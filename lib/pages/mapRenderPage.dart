@@ -33,11 +33,6 @@ import '../routes.dart';
 //import for error checking
 import '../errorChecking.dart';
 import '../backendFunctions.dart';
-import 'firebaseFunctions.dart';
-import 'firebaseFunctions.dart';
-import 'firebaseFunctions.dart';
-import 'firebaseFunctions.dart';
-import 'firebaseFunctions.dart';
 
 
 const String mapsAPI_KEY = "AIzaSyBV961Ztopz9vyZrJq0AYAMJUTHmluu3FM";
@@ -965,11 +960,20 @@ class _MapRenderState extends State<MapRender>
           style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
         ),
       );
-    } else if (Global.searchingCategory == false) {
+    } else if (Global.searchingCategory == false && Global.arrLength > 0) {
       return Container(
         padding: EdgeInsets.fromLTRB(10, 10, 0, 0),
         child: Text(
           'Showing ${Global.arrLength} results for: ${Global.finalCategory} within ${Global.finalRad}mi',
+          style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
+        ),
+      );
+    }
+    else if (Global.searchingCategory == false && Global.arrLength == 0) {
+      return Container(
+        padding: EdgeInsets.fromLTRB(10, 10, 0, 0),
+        child: Text(
+          'No places found for: ${Global.finalCategory} within ${Global.finalRad}mi. Try increasing the search radius or changing the category',
           style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
         ),
       );
@@ -1156,7 +1160,7 @@ class _MapRenderState extends State<MapRender>
   }
 
    Widget _tab3Contents() {
-    double width = MediaQuery.of(context).size.width;
+    //double width = MediaQuery.of(context).size.width;
     double height = MediaQuery.of(context).size.height;
     
     if(!didRetrieveMessages) {

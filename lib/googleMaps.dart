@@ -113,7 +113,7 @@ class GoogleMapsState extends State<GoogleMaps> {
 
   String finalLocName;
   String finalLocAddress;
-  LatLng finalLatLng;
+  LatLng finalLatLng = null;
 
   String tempCategory;
 
@@ -255,6 +255,11 @@ class GoogleMapsState extends State<GoogleMaps> {
 
   //Function that will send an http request to google maps to calculate the travel time
   void calculateTravelTime() async {
+    if (currLocation != null || finalLatLng != null){
+      Global.hours = 0;
+      Global.minutes = 0;
+      return;
+    }
     //We send an http request to get to the google maps api, to get the travel time
     var response = await http.post(
         "https://maps.googleapis.com/maps/api/distancematrix/json?units=imperial&origins=${currLocation.latitude},${currLocation.longitude}&destinations=${finalLatLng.latitude},${finalLatLng.longitude}&departure_time=now&key=$mapsAPI_KEY");
@@ -279,7 +284,7 @@ class GoogleMapsState extends State<GoogleMaps> {
   //This function will be used to update the travel time every minute
   void updateTravelTime() async {
     Timer.periodic(timeReset, (timer) {
-      if (currLocation != null && finalLatLng != null) {
+      if (currLocation != null || finalLatLng != null) {
         calculateTravelTime();
       }
     });
