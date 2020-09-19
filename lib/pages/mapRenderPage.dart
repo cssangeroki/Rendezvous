@@ -324,6 +324,8 @@ class _MapRenderState extends State<MapRender>
     if (futureToCancel != null) {
       futureToCancel.cancel();
     }
+    //Set searching Category to true so that the loading sign shows
+    Global.searchingCategory = true;
     //print("Future is Canceled: ${futureToCancel.isCanceled}");
     futureToCancel = CancelableOperation.fromFuture(YelpPlaces.findingPlaces(),
         onCancel: () {
@@ -333,6 +335,8 @@ class _MapRenderState extends State<MapRender>
     if (futureToCancel.isCanceled) {
       return;
     }
+    //If the future is not cancelled, set the result to false, so that the result is displayed
+    Global.searchingCategory = false;
     //await YelpPlaces.findingPlaces();
     Global.findYPCalled.value ^= true;
     _updateYelpVenues();

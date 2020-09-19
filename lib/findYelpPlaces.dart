@@ -108,6 +108,7 @@ class YelpPlaces {
       Global.zipCodes.add(zip);
     }
     print("done");
+    updateYelpVenues();
   }
 
   static void updateYelpVenues() {

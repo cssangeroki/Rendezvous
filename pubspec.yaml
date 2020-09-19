@@ -103,7 +103,9 @@ flutter:
     - images/Map_loading.png
     - images/Rendezvous_logo.png # added logo from imagßßßßes folder
     - images/backgroundArt.jpg
-    - images/anonymous.png 
+    - images/anonymous.png
+    - images/final_loc_marker_android.png
+    - images/final_loc_marker_ios.png
 
   # An image asset can refer to one or more resolution-specific "variants", see
   # https://flutter.dev/assets-and-images/#resolution-aware.

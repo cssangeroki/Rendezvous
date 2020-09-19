@@ -75,7 +75,7 @@ class GoogleMapsState extends State<GoogleMaps> {
 
   //static List<String> nameList = [];
   BitmapDescriptor myIcon;
-
+  BitmapDescriptor finalIcon;
   //static StreamSubscription<QuerySnapshot> memberListener;
 
 //Initializing center of map
@@ -113,7 +113,7 @@ class GoogleMapsState extends State<GoogleMaps> {
 
   String finalLocName;
   String finalLocAddress;
-  LatLng finalLatLng = null;
+  LatLng finalLatLng;
 
   String tempCategory;
 
@@ -126,6 +126,7 @@ class GoogleMapsState extends State<GoogleMaps> {
   void initState() {
     super.initState();
     setBitmapIcon();
+    setFinalIcon();
     setMapStyle();
     initFunctionCaller();
     mapLoaded = true;
@@ -176,6 +177,24 @@ class GoogleMapsState extends State<GoogleMaps> {
     }
   }
 
+  void setFinalIcon() {
+    //If the platform is android, we use a slightly bigger picture as the marker strangely is smaller on android than ios
+    if (Platform.isAndroid) {
+      BitmapDescriptor.fromAssetImage(
+          ImageConfiguration(size: Size(2, 2)), 'images/final_loc_marker_android.png')
+          .then((onValue) {
+        finalIcon = onValue;
+      });
+    }
+    //Otherwise, we use the ios version
+    else {
+      BitmapDescriptor.fromAssetImage(
+          ImageConfiguration(size: Size(2, 2)), 'images/final_loc_marker_ios.png')
+          .then((onValue) {
+        finalIcon = onValue;
+      });
+    }
+  }
 
   void initFunctionCaller() async {
     //Resetting the time
@@ -244,7 +263,7 @@ class GoogleMapsState extends State<GoogleMaps> {
           infoWindow: InfoWindow(
               title: FirebaseFunctions.roomData["Final Location"],
               snippet: "Final Location"),
-          icon: BitmapDescriptor.defaultMarkerWithHue(43.0),
+          icon: finalIcon,
           onTap: () {
             setState(() {
               confirmDialogTrigger = false;
@@ -255,7 +274,7 @@ class GoogleMapsState extends State<GoogleMaps> {
 
   //Function that will send an http request to google maps to calculate the travel time
   void calculateTravelTime() async {
-    if (currLocation != null || finalLatLng != null){
+    if (currLocation == null || finalLatLng == null){
       Global.hours = 0;
       Global.minutes = 0;
       return;
@@ -284,7 +303,8 @@ class GoogleMapsState extends State<GoogleMaps> {
   //This function will be used to update the travel time every minute
   void updateTravelTime() async {
     Timer.periodic(timeReset, (timer) {
-      if (currLocation != null || finalLatLng != null) {
+      //If both the current location and finalLatLng are not null, only then do we calculate the travel time
+      if (currLocation != null && finalLatLng != null) {
         calculateTravelTime();
       }
     });
@@ -736,8 +756,11 @@ class GoogleMapsState extends State<GoogleMaps> {
                               Global.searchingCategory = true;
                               Global.searchingPlaces.value ^= true;
                               await YelpPlaces.findingPlaces();
+                              print("Got places");
                               Global.findYPCalled.value ^= true;
+                              print("About to add markers");
                               addYelpMarkers();
+                              print("SearchingCategory = ${Global.searchingCategory}");
                               Global.searchingCategory = false;
                               Global.searchingPlaces.value ^= true;
                             },
