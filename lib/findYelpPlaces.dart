@@ -1,6 +1,8 @@
 //This file will simply have the class YelpPlaces, and the functions _findingPlaces.
 //It is so to increase modularity and have certain variables be accessed via different pages
 
+import 'dart:math';
+
 import 'backendFunctions.dart';
 import 'dart:async';
 import 'package:async/async.dart';
@@ -13,6 +15,8 @@ class YelpPlaces {
 
   //Function that will connect to yelp API
   static Future<void> findingPlaces() async {
+    print("Final Rad = ${Global.finalRad}");
+
     Global.names.clear();
     Global.resultCords.clear();
     Global.locations.clear();
@@ -43,7 +47,7 @@ class YelpPlaces {
     }
     print(businesses);
     //This if statement is in case there is an error propo
-    if (Global.errorFindingYelpPlaces == true){
+    if (Global.errorFindingYelpPlaces == true) {
       Global.errorFindingYelpPlaces = true;
       return;
     }
@@ -69,6 +73,11 @@ class YelpPlaces {
       lat = place['coordinates']['latitude'];
       lon = place['coordinates']['longitude'];
       var myLatlng = new LatLng(lat, lon);
+      //Check if the place is actually withing the given radius. If it isn't, skip this place and don't add it to our displayed places
+      bool validPlace = haversineDist(myLatlng);
+      if (validPlace == false){
+        continue;
+      }
       Global.resultCords.add(myLatlng);
 
       name = place['name'];
@@ -113,5 +122,45 @@ class YelpPlaces {
 
   static void updateYelpVenues() {
     Global.arrLength = Global.names.length;
+  }
+
+  //This function uses the haversine formula as described on https://en.wikipedia.org/wiki/Haversine_formula
+  //to calculate the distance between a newPlace and a midpoint, to ensure that the new place is within the
+  //given radius.
+  static bool haversineDist(LatLng newPlace) {
+    print("New LatLng = $newPlace");
+    double midLatRad = convertToRadians(Global.finalMidLat);
+    double midLonRad = convertToRadians(Global.finalMidLon);
+    double newLatRad = convertToRadians(newPlace.latitude);
+    double newLonRad = convertToRadians(newPlace.longitude);
+    double distanceInKm = Global.finalRad * 1.60934;
+    print("Radius = $distanceInKm");
+    var hav = haversine(midLatRad, newLatRad) +
+        cos(midLatRad) *
+            cos(newLatRad) *
+            haversine(midLonRad, newLonRad);
+    //print("Have = $hav");
+    double radEarth = 6371;
+    var dist = 2*radEarth*asin(sqrt(hav));
+    //print("Distance of this place = $dist");
+    //If the distance calculated is within the radius, return true, so we can display this location
+    if (dist <= distanceInKm){
+      //print("Returning true");
+      return true;
+    }
+    print("Distance = $dist");
+    //Otherwise return false
+    return false;
+  }
+
+  //This function will be implementing the haversine formula to calculate angles
+  static double haversine(double val1, double val2) {
+    double newVal = val2 - val1;
+    double toReturn = sin(newVal) * sin(newVal);
+    return toReturn;
+  }
+
+  static double convertToRadians(double val){
+    return val*pi/180;
   }
 }
