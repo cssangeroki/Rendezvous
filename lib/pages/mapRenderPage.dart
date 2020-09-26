@@ -184,10 +184,12 @@ class _MapRenderState extends State<MapRender>
   List<Widget> messages = [];
   bool didRetrieveMessages = false;
   double height = 0;
+  final textController = TextEditingController();
 
 
     double keyboardPadding = 0.0;
   double currentKeyBoardPadding = 0.0;
+  bool isTextEditing = false;
   
   String messageBody;
 
@@ -881,7 +883,18 @@ class _MapRenderState extends State<MapRender>
   }
 
   Widget _slideUpPanel() {
+    // for the keyboard
+    if(isTextEditing) {
+      final RenderBox box = _drawerKey.currentContext?.findRenderObject();
+        if (box == null){
+          print("Closed");
+            setState(() {
+              currentKeyBoardPadding = 0.0;
+            });
+        }
+    }
     return SingleChildScrollView(
+      
       child: SlidingUpPanel(
         //maxHeight: 600,
         color: Colors.transparent,
@@ -1197,21 +1210,29 @@ class _MapRenderState extends State<MapRender>
         FocusScope.of(context).unfocus();
         setState(() {
           currentKeyBoardPadding = 0.0;
+          isTextEditing = false;
         });
       },
       child: Container(
       height: MediaQuery.of(context).size.height,
       width: double.infinity,
-      child: Stack(
+      child: Column(
         children: <Widget>[
-          Container(padding: EdgeInsets.fromLTRB(0, 0, 0, 0.10*height), height: height * 0.75, child: new ListView.builder(controller: scrollController,scrollDirection: Axis.vertical, itemCount: messages.length,itemBuilder: (BuildContext ctx, int index){
+          Container(padding: EdgeInsets.fromLTRB(0, 0, 0, 0), height: currentKeyBoardPadding != null ? height * 0.64 - currentKeyBoardPadding : height * 0.64, child: new ListView.builder(controller: scrollController,scrollDirection: Axis.vertical, itemCount: messages.length,itemBuilder: (BuildContext ctx, int index){
                 return messages[index];
           })),
-          Align(alignment: Alignment.bottomCenter, child: Padding(padding: EdgeInsets.fromLTRB(0, 0, 0, currentKeyBoardPadding), child:Container(color: Colors.white, padding: EdgeInsets.fromLTRB(10, 10, 10, 0), height: height*0.20, child:
-            Column(crossAxisAlignment: CrossAxisAlignment.end, children: [TextField(textInputAction: TextInputAction.done,
+          Align(alignment: Alignment.bottomCenter, child: Padding(padding: EdgeInsets.fromLTRB(0, 0, 0, 0), child:Container(color: Colors.white, padding: EdgeInsets.fromLTRB(10, 10, 10, 0), height: height*0.20, child:
+            Column(crossAxisAlignment: CrossAxisAlignment.end, children: [TextFormField(textInputAction: TextInputAction.done,
+            controller: textController,
             onEditingComplete: () {
-              print(messages.length);
-                
+              // when on hits the done button
+              FocusScope.of(context).unfocus();
+                setState(() {
+                  isTextEditing = false;
+                  currentKeyBoardPadding = 0.0;
+                });
+
+                        
             },
             onChanged: (text) {
                 bool isNotEmpty = true;
@@ -1225,16 +1246,20 @@ class _MapRenderState extends State<MapRender>
                 });
             },
             onTap: () {
+              Timer(Duration(milliseconds: 500),(){
+                  scrollController.jumpTo(scrollController.position.maxScrollExtent);
+              });
+
               Future<bool> waiting() async {
                   await Future.delayed(const Duration(seconds: 1));
                   return true;
               }
-
               if(keyboardPadding == 0.0) {
                   waiting().then((value) {
                       double keyboardHeight = MediaQuery.of(context).viewInsets.bottom;
                       if(keyboardHeight != 0.0) {
                         setState(() {
+                          isTextEditing = true;
                           keyboardPadding = keyboardHeight;
                           currentKeyBoardPadding = keyboardHeight;
                         });
@@ -1243,8 +1268,10 @@ class _MapRenderState extends State<MapRender>
               } else {
                 setState(() {
                   currentKeyBoardPadding = keyboardPadding;
+                  isTextEditing = true;
                 });
               }
+
                 
             },
             decoration: InputDecoration(hintText: "Enter message", border: InputBorder.none,
@@ -1260,25 +1287,44 @@ class _MapRenderState extends State<MapRender>
             ),
             keyboardType: TextInputType.multiline, maxLines: null), 
             Padding(padding: EdgeInsets.fromLTRB(0, 10, 0, 0), child:CupertinoButton(color: doSendMessage ? Color.fromRGBO(106, 171, 249, 1.0) : Color.fromRGBO(236, 236, 236, 1.0), onPressed: () async {
-                String message = messageBody;
-                await BackendMethods.sendMessage(FirebaseFunctions.roomData["groupChatID"], message, BackendMethods.getCurrentUTCTime(), FirebaseFunctions.currentUID);
+                if(messageBody != null && doSendMessage) {
+                    String message = messageBody;
+                    
+                    await BackendMethods.sendMessage(FirebaseFunctions.roomData["groupChatID"], message, BackendMethods.getCurrentUTCTime(), FirebaseFunctions.currentUID);
+                    textController.clear();
+                    setState(() {
+                      doSendMessage = false;
+                      messageBody = null;
+                      
+                    });
+                }
+
+
+
             }, child: Text("Send")))]))
           ))]
 
     )));
   }
 
-  Widget _viewDrawer() {
+GlobalKey _drawerKey = GlobalKey();
+
+  Widget _viewDrawer() {  
+    
     return Theme(
       data: Theme.of(context).copyWith(
         canvasColor: Color(Global
             .backgroundColor), //This will change the drawer background to blue.
         //other styles
       ),
+      // 0.88
       child: Container(
-        width: 340,
-        child: Drawer(
+        width: MediaQuery.of(context).size.width *0.88,
+        child:
+          Drawer(
+          key: _drawerKey,
           child: DefaultTabController(
+            
             length: 3,
             child: Column(
               mainAxisSize: MainAxisSize.max,
@@ -1318,7 +1364,8 @@ class _MapRenderState extends State<MapRender>
               ],
             ),
           ),
-        ),
+        )
+
       ),
     );
   }
@@ -1533,10 +1580,16 @@ class _MapRenderState extends State<MapRender>
     );
   }
 
+
+
+
   @override
   Widget build(BuildContext context) {
     return new WillPopScope(
-      onWillPop: () async => false,
+  
+      onWillPop: () async {
+        return false;
+      },
       child: MaterialApp(
         debugShowCheckedModeBanner: false,
         home: Scaffold(
@@ -1545,7 +1598,12 @@ class _MapRenderState extends State<MapRender>
             color: Color(Global.backgroundColor),
             child: ClipRRect(borderRadius: onlyTop10(), child: _slideUpPanel()),
           ),
+        
+
           drawer: _viewDrawer(),
+        
+
+
         ),
       ),
     );
