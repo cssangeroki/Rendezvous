@@ -34,6 +34,7 @@ import '../routes.dart';
 import '../errorChecking.dart';
 import '../backendFunctions.dart';
 
+import 'package:google_maps_flutter/google_maps_flutter.dart';
 
 const String mapsAPI_KEY = "AIzaSyBV961Ztopz9vyZrJq0AYAMJUTHmluu3FM";
 //Below are variables we will use for the sliders
@@ -57,120 +58,147 @@ class MapRender extends StatefulWidget {
   _MapRenderState createState() => _MapRenderState();
 }
 
-
 class Message {
-
-
   static List messages = [];
 
-  
+  static Future<List<Widget>> getAndUpdateMessages(size,
+      {isUpdate = false, var message}) async {
+    if (!isUpdate) {
+      messages = await BackendMethods.getMessages(
+          FirebaseFunctions.roomData["groupChatID"]);
+    } else {
+      messages.add(message);
+    }
 
-  static Future<List<Widget>> getAndUpdateMessages(size, {isUpdate=false, var message}) async {
-      
-      if(!isUpdate) {
-          messages = await BackendMethods.getMessages(FirebaseFunctions.roomData["groupChatID"]);
+    String userID = FirebaseFunctions.currentUID;
+
+    List<Widget> msgList = <Widget>[];
+
+    DateTime currentDate = DateTime.now();
+    bool didAdd = false;
+
+    for (var message in messages) {
+      DateTime datetime = DateTime.parse(message["dateCreated"]).toLocal();
+
+      if (currentDate.day == datetime.day &&
+          currentDate.year == datetime.year &&
+          currentDate.month == datetime.month) {
+        if (!didAdd) {
+          Widget msgTitle = Message.createDayTitle(
+              BackendMethods.convertDateToPresentDate(datetime, isTitle: true));
+          msgList.add(msgTitle);
+          didAdd = true;
+        }
       } else {
-          messages.add(message);
+        didAdd = false;
       }
+      String img = FirebaseFunctions.roomData["profileImages"][message["from"]];
+      Widget msg = Message.createMessage(
+          size,
+          FirebaseFunctions.roomData["userNames"][message["from"]],
+          message["body"],
+          datetime,
+          userID == message["from"],
+          img != null ? img : null);
+      msgList.add(msg);
+    }
 
+    if (msgList.length == 0) {
+      msgList.add(Message.createDayTitle("No messages found"));
+    }
 
-      String userID = FirebaseFunctions.currentUID;
-
-      
-      List<Widget> msgList = <Widget>[];
-
-      
-      DateTime currentDate = DateTime.now();
-      bool didAdd = false;
-      
-      for (var message in messages) {
-          DateTime datetime = DateTime.parse(message["dateCreated"]).toLocal();
-
-          if(currentDate.day == datetime.day && currentDate.year == datetime.year && currentDate.month == datetime.month) {
-            if(!didAdd) {
-                Widget msgTitle = Message.createDayTitle(BackendMethods.convertDateToPresentDate(datetime, isTitle:true));
-                msgList.add(msgTitle);
-                didAdd = true;
-            }
-          } else {
-            didAdd = false;
-          }
-          String img = FirebaseFunctions.roomData["profileImages"][message["from"]];
-          Widget msg = Message.createMessage(size, FirebaseFunctions.roomData["userNames"][message["from"]], message["body"], datetime, userID == message["from"], img != null ? img : null);
-          msgList.add(msg);
-      }
-      
-      if(msgList.length == 0) {
-        msgList.add(Message.createDayTitle("No messages found"));
-      }
-
-      return msgList;
+    return msgList;
   }
 
   static Widget createDayTitle(String title) {
-    return Container(child: Text(title, textAlign: TextAlign.center, style: TextStyle(decoration: TextDecoration.underline, fontStyle: FontStyle.italic)));
+    return Container(
+        child: Text(title,
+            textAlign: TextAlign.center,
+            style: TextStyle(
+                decoration: TextDecoration.underline,
+                fontStyle: FontStyle.italic)));
   }
 
-  static Widget createMessage(double size, String who, String text, DateTime date, bool isMe, String img) {
-
-    Color backgroundColor = isMe ? Color.fromRGBO(240, 215, 255, 1.0) : Color.fromRGBO(236, 236, 236, 1.0);
+  static Widget createMessage(double size, String who, String text,
+      DateTime date, bool isMe, String img) {
+    Color backgroundColor = isMe
+        ? Color.fromRGBO(240, 215, 255, 1.0)
+        : Color.fromRGBO(236, 236, 236, 1.0);
     var showAnonymous = img == null ? true : false;
-    return 
-      Container(
-      child: Padding(
-      padding: EdgeInsets.all(10.0),
-      child : Row(
-      crossAxisAlignment: CrossAxisAlignment.end,
-      children: <Widget>[
-          Container(margin: EdgeInsets.fromLTRB(0, 0, 5, 0),
-                    width: size*0.08,
-                    height: size*0.08,
-                    child: showAnonymous ? Image(
-                      image: AssetImage('images/anonymous.png'),
-                    ) : null,
-                          decoration: !showAnonymous ? new BoxDecoration(
+    return Container(
+        child: Padding(
+            padding: EdgeInsets.all(10.0),
+            child: Row(
+                crossAxisAlignment: CrossAxisAlignment.end,
+                children: <Widget>[
+                  Container(
+                    margin: EdgeInsets.fromLTRB(0, 0, 5, 0),
+                    width: size * 0.08,
+                    height: size * 0.08,
+                    child: showAnonymous
+                        ? Image(
+                            image: AssetImage('images/anonymous.png'),
+                          )
+                        : null,
+                    decoration: !showAnonymous
+                        ? new BoxDecoration(
                             shape: BoxShape.circle,
-                            image: new DecorationImage(fit:BoxFit.cover,
-                            image: NetworkImage(img))) : null,
-                ),
-        Align(
-        alignment: Alignment.centerRight,
-        child:ClipRRect(
-        borderRadius: BorderRadius.circular(10.0),
-        child:Container(
-        width: size,
-        color: backgroundColor,
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.stretch,
-          children: <Widget>[
-            Column(crossAxisAlignment: CrossAxisAlignment.start,
-            children:<Widget>[Padding(
-              padding: EdgeInsets.fromLTRB(20, 10.0, 20.0, 10),
-              child: Text(isMe ? "Me" : who, textAlign: TextAlign.left, style:TextStyle(fontWeight: FontWeight.bold))),
-            Padding(
-              padding: EdgeInsets.fromLTRB(20, 0, 20.0, 10),
-              child: Text(text, textAlign: TextAlign.left))
-            ]),
-            Column(crossAxisAlignment: CrossAxisAlignment.end,
-            children:<Widget>[Padding(
-              padding: EdgeInsets.fromLTRB(20, 0, 20.0, 10),
-              child: Text(BackendMethods.convertDateToPresentDate(date), textAlign: TextAlign.right, style: TextStyle(fontStyle: FontStyle.italic))),
-            ])
-            ])
-        ))
-      )]
-    )
-    ));
+                            image: new DecorationImage(
+                                fit: BoxFit.cover, image: NetworkImage(img)))
+                        : null,
+                  ),
+                  Align(
+                      alignment: Alignment.centerRight,
+                      child: ClipRRect(
+                          borderRadius: BorderRadius.circular(10.0),
+                          child: Container(
+                              width: size,
+                              color: backgroundColor,
+                              child: Column(
+                                  crossAxisAlignment:
+                                      CrossAxisAlignment.stretch,
+                                  children: <Widget>[
+                                    Column(
+                                        crossAxisAlignment:
+                                            CrossAxisAlignment.start,
+                                        children: <Widget>[
+                                          Padding(
+                                              padding: EdgeInsets.fromLTRB(
+                                                  20, 10.0, 20.0, 10),
+                                              child: Text(isMe ? "Me" : who,
+                                                  textAlign: TextAlign.left,
+                                                  style: TextStyle(
+                                                      fontWeight:
+                                                          FontWeight.bold))),
+                                          Padding(
+                                              padding: EdgeInsets.fromLTRB(
+                                                  20, 0, 20.0, 10),
+                                              child: Text(text,
+                                                  textAlign: TextAlign.left))
+                                        ]),
+                                    Column(
+                                        crossAxisAlignment:
+                                            CrossAxisAlignment.end,
+                                        children: <Widget>[
+                                          Padding(
+                                              padding: EdgeInsets.fromLTRB(
+                                                  20, 0, 20.0, 10),
+                                              child: Text(
+                                                  BackendMethods
+                                                      .convertDateToPresentDate(
+                                                          date),
+                                                  textAlign: TextAlign.right,
+                                                  style: TextStyle(
+                                                      fontStyle:
+                                                          FontStyle.italic))),
+                                        ])
+                                  ]))))
+                ])));
   }
-
 }
 
-
-
-
-
 class _MapRenderState extends State<MapRender>
-    with SingleTickerProviderStateMixin {
+     with SingleTickerProviderStateMixin{
   List<String> nameList = Global.nameList;
   final String userDocID = FirebaseFunctions.currentUID;
   final String roomDocID = FirebaseFunctions.currentUserData["roomCode"];
@@ -178,17 +206,19 @@ class _MapRenderState extends State<MapRender>
   int hours;
   int min;
 
+  String sortCategory = "Distance";
 
   String timeDisplayText;
   bool doSendMessage = false;
   List<Widget> messages = [];
   bool didRetrieveMessages = false;
   double height = 0;
+  final textController = TextEditingController();
 
-
-    double keyboardPadding = 0.0;
+  double keyboardPadding = 0.0;
   double currentKeyBoardPadding = 0.0;
-  
+  bool isTextEditing = false;
+
   String messageBody;
 
   ScrollController scrollController = new ScrollController();
@@ -200,7 +230,6 @@ class _MapRenderState extends State<MapRender>
   GlobalKey<AutoCompleteTextFieldState> key = new GlobalKey();
 
   CancelableOperation futureToCancel;
-
 
   var _isExpanded = new List<bool>.filled(50, false, growable: true);
 
@@ -215,25 +244,20 @@ class _MapRenderState extends State<MapRender>
     searchingForCategory();
   }
 
- void callbackSocket(String type, data) async {
-    if(type == "messageAdded") {
+  void callbackSocket(String type, data) async {
+    if (type == "messageAdded") {
+      Future<List<Widget>> futureMsgs = Message.getAndUpdateMessages(
+          MediaQuery.of(context).size.width * 0.75);
 
-      Future<List<Widget>> futureMsgs = Message.getAndUpdateMessages(MediaQuery.of(context).size.width * 0.75);
-
-  
-
-      
       futureMsgs.then((msgs) async {
-          setState(() {
-            messages = msgs;
-            maxHeightScroll = 0.0;
-          });
+        setState(() {
+          messages = msgs;
+          maxHeightScroll = 0.0;
+        });
 
-          Timer(Duration(milliseconds: 500),(){
-            
-                    scrollController.jumpTo(scrollController.position.maxScrollExtent);
-          });
-          
+        Timer(Duration(milliseconds: 500), () {
+          scrollController.jumpTo(scrollController.position.maxScrollExtent);
+        });
       });
     }
   }
@@ -404,6 +428,89 @@ class _MapRenderState extends State<MapRender>
     });
   }
 
+  void clearGlobalArrays() {
+    Global.names.clear();
+    Global.resultCords.clear();
+    Global.locations.clear();
+    Global.urls.clear();
+    Global.images.clear();
+    Global.ratings.clear();
+    Global.phoneNums.clear();
+    Global.prices.clear();
+    Global.isOpen.clear();
+    Global.addresses.clear();
+    Global.states.clear();
+    Global.cities.clear();
+    Global.zipCodes.clear();
+  }
+
+  void changeOrderToPrice() {
+    setState(() {
+      for (var place in Global.orderedByPrice) {
+        Global.names.add(place['name']);
+        Global.resultCords.add(LatLng(place['coordinates']['latitude'],
+            place['coordinates']['longitude']));
+        Global.locations.add(place['location']);
+        Global.urls.add(place['url']);
+        Global.images.add(place['image_url']);
+        Global.ratings.add(place['rating']);
+        Global.isOpen.add(place['isOpen']);
+        Global.phoneNums.add(place['phone']);
+        Global.prices.add(place['price']);
+      }
+    });
+  }
+
+  void changeOrderToRating() {
+    setState(() {
+      for (var place in Global.orderedByRating) {
+        Global.names.add(place['name']);
+        Global.resultCords.add(LatLng(place['coordinates']['latitude'],
+            place['coordinates']['longitude']));
+        Global.locations.add(place['location']);
+        Global.urls.add(place['url']);
+        Global.images.add(place['image_url']);
+        Global.ratings.add(place['rating']);
+        Global.isOpen.add(place['isOpen']);
+        Global.phoneNums.add(place['phone']);
+        Global.prices.add(place['price']);
+      }
+    });
+  }
+
+  void changeOrderToDistance() {
+    setState(() {
+      for (var place in Global.orderedByDistance) {
+        Global.names.add(place['name']);
+        Global.resultCords.add(LatLng(place['coordinates']['latitude'],
+            place['coordinates']['longitude']));
+        Global.locations.add(place['location']);
+        Global.urls.add(place['url']);
+        Global.images.add(place['image_url']);
+        Global.ratings.add(place['rating']);
+        Global.isOpen.add(place['isOpen']);
+        Global.phoneNums.add(place['phone']);
+        Global.prices.add(place['price']);
+      }
+    });
+  }
+
+  //Function used to return the button color to show highlighted button
+  Color sortOrderButtonColor(String category) {
+    if (sortCategory == category) {
+      return Colors.black;
+    }
+    return Colors.white;
+  }
+
+  //Function used to return the color of the text of the sorting buttons
+  Color sortOrderButtonTextColor(String category) {
+    if (sortCategory == category) {
+      return Colors.white;
+    }
+    return Colors.black;
+  }
+
   Widget _viewYelp() {
     _updateYelpVenues();
     if (_arrLength == null) {
@@ -541,53 +648,36 @@ class _MapRenderState extends State<MapRender>
   }
 
   Widget _sortButtons() {
-    return Row(
+    return Wrap(
+      alignment: WrapAlignment.start,
       children: <Widget>[
         Container(
           height: 40,
-          width: 90,
-          padding: EdgeInsets.fromLTRB(10, 5, 5, 5),
-          //color: Colors.blue,
-          child: RaisedButton(
-            elevation: 5,
-            color: Colors.white,
-            shape: RoundedRectangleBorder(
-              borderRadius: BorderRadius.circular(30.0),
-              side: BorderSide(color: Colors.grey),
-            ),
-            child: Text(
-              "Price",
-              style: GoogleFonts.roboto(
-                fontSize: 13,
-                fontWeight: FontWeight.w700,
-              ),
-            ),
-            onPressed: () {
-              print("Pressed Price");
-            },
-          ),
-        ),
-        Container(
-          height: 40,
-          width: 90,
+          width: 100,
           padding: EdgeInsets.fromLTRB(5, 5, 5, 5),
           //color: Colors.blue,
           child: RaisedButton(
             elevation: 5,
-            color: Colors.white,
+            color: sortOrderButtonColor("Distance"),
             shape: RoundedRectangleBorder(
               borderRadius: BorderRadius.circular(30.0),
               side: BorderSide(color: Colors.grey),
             ),
             child: Text(
-              "Rating",
+              "Distance",
               style: GoogleFonts.roboto(
                 fontSize: 13,
                 fontWeight: FontWeight.w700,
+                color: sortOrderButtonTextColor('Distance'),
               ),
             ),
             onPressed: () {
-              print("Pressed Rating");
+              setState(() {
+                print("Category is Distance");
+                sortCategory = "Distance";
+              });
+              clearGlobalArrays();
+              changeOrderToDistance();
             },
           ),
         ),
@@ -598,20 +688,54 @@ class _MapRenderState extends State<MapRender>
           //color: Colors.blue,
           child: RaisedButton(
             elevation: 5,
-            color: Colors.white,
+            color: sortOrderButtonColor("Price"),
             shape: RoundedRectangleBorder(
               borderRadius: BorderRadius.circular(30.0),
               side: BorderSide(color: Colors.grey),
             ),
             child: Text(
-              "Distance",
+              "Price",
               style: GoogleFonts.roboto(
                 fontSize: 13,
                 fontWeight: FontWeight.w700,
+                color: sortOrderButtonTextColor('Price'),
               ),
             ),
             onPressed: () {
-              print("Pressed Distance");
+              setState(() {
+                sortCategory = "Price";
+              });
+              //Want to add a function here that changes the slide up bar ordering;
+              clearGlobalArrays();
+              changeOrderToPrice();
+            },
+          ),
+        ),
+        Container(
+          height: 40,
+          width: 100,
+          padding: EdgeInsets.fromLTRB(5, 5, 5, 5),
+          //color: Colors.blue,
+          child: RaisedButton(
+            elevation: 5,
+            color: sortOrderButtonColor("Rating"),
+            shape: RoundedRectangleBorder(
+              borderRadius: BorderRadius.circular(30.0),
+              side: BorderSide(color: Colors.grey),
+            ),
+            child: Text(
+              "Rating",
+              style: GoogleFonts.roboto(
+                  fontSize: 13,
+                  fontWeight: FontWeight.w700,
+                  color: sortOrderButtonTextColor('Rating')),
+            ),
+            onPressed: () {
+              setState(() {
+                sortCategory = "Rating";
+              });
+              clearGlobalArrays();
+              changeOrderToRating();
             },
           ),
         ),
@@ -849,38 +973,47 @@ class _MapRenderState extends State<MapRender>
     );
   }
 
-  Widget slideUpFinalLocSet(int index){
-    if (FirebaseFunctions.currentUID == FirebaseFunctions.roomData["host UID"]){
+  Widget slideUpFinalLocSet(int index) {
+    if (FirebaseFunctions.currentUID ==
+        FirebaseFunctions.roomData["host UID"]) {
       return //Final Location Button
-        Container(
-          margin: EdgeInsets.fromLTRB(40, 20, 0, 0),
-          height: 70,
-          width: 70,
-          child: FittedBox(
-            child: FloatingActionButton(
-              heroTag: null,
-              backgroundColor: Colors.greenAccent,
-              child: Icon(
-                Icons.check_circle,
-                size: 35,
-                //color: Color(0xff21bf73),
-              ),
-              elevation: 4,
-              onPressed: () {
-                FirebaseFunctions.setFinalPosition(
-                    Global.names[index],
-                    Global.locations[index],
-                    Global.resultCords[index]);
-              },
+          Container(
+        margin: EdgeInsets.fromLTRB(40, 20, 0, 0),
+        height: 70,
+        width: 70,
+        child: FittedBox(
+          child: FloatingActionButton(
+            heroTag: null,
+            backgroundColor: Colors.greenAccent,
+            child: Icon(
+              Icons.check_circle,
+              size: 35,
+              //color: Color(0xff21bf73),
             ),
+            elevation: 4,
+            onPressed: () {
+              FirebaseFunctions.setFinalPosition(Global.names[index],
+                  Global.locations[index], Global.resultCords[index]);
+            },
           ),
-        );
+        ),
+      );
     }
     //Otherwise, we return an empty container
     return Container();
   }
 
   Widget _slideUpPanel() {
+    // for the keyboard
+    if (isTextEditing) {
+      final RenderBox box = _drawerKey.currentContext?.findRenderObject();
+      if (box == null) {
+        print("Closed");
+        setState(() {
+          currentKeyBoardPadding = 0.0;
+        });
+      }
+    }
     return SingleChildScrollView(
       child: SlidingUpPanel(
         //maxHeight: 600,
@@ -972,8 +1105,7 @@ class _MapRenderState extends State<MapRender>
           style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
         ),
       );
-    }
-    else if (Global.searchingCategory == false && Global.arrLength == 0) {
+    } else if (Global.searchingCategory == false && Global.arrLength == 0) {
       return Container(
         padding: EdgeInsets.fromLTRB(10, 10, 0, 0),
         child: Text(
@@ -982,6 +1114,7 @@ class _MapRenderState extends State<MapRender>
         ),
       );
     } else {
+      sortCategory = "Distance";
       return Container(
         padding: EdgeInsets.fromLTRB(10, 10, 0, 0),
         child: Column(
@@ -1163,110 +1296,175 @@ class _MapRenderState extends State<MapRender>
     );
   }
 
-   Widget _tab3Contents() {
+  Widget _tab3Contents() {
     //double width = MediaQuery.of(context).size.width;
     double height = MediaQuery.of(context).size.height;
-    
-    if(!didRetrieveMessages) {
 
-        WidgetsBinding.instance.addPostFrameCallback((timeStamp) {
-                      Future<List<Widget>> futureMsgs = Message.getAndUpdateMessages(MediaQuery.of(context).size.width * 0.75);
-                      futureMsgs.then((msgs) async {
-                          await BackendMethods.establishSocket(callbackSocket);
-                          setState(() {
-                            didRetrieveMessages = true;
-                            messages = msgs;
-                            height = MediaQuery.of(context).size.width * 0.75;
-                          });
-                      });
+    if (!didRetrieveMessages) {
+      WidgetsBinding.instance.addPostFrameCallback((timeStamp) {
+        Future<List<Widget>> futureMsgs = Message.getAndUpdateMessages(
+            MediaQuery.of(context).size.width * 0.75);
+        futureMsgs.then((msgs) async {
+          await BackendMethods.establishSocket(callbackSocket);
+          setState(() {
+            didRetrieveMessages = true;
+            messages = msgs;
+            height = MediaQuery.of(context).size.width * 0.75;
+          });
         });
-    } else if(maxHeightScroll == 0.0) {
-        WidgetsBinding.instance.addPostFrameCallback((timeStamp) {
-            if(scrollController.hasClients) {
-                double h = scrollController.position.maxScrollExtent;
-                setState(() {
-                  maxHeightScroll = h == 0.0 ? 1.0 : h;
-                  scrollController = new ScrollController(initialScrollOffset:h);
-                });
-            }});
+      });
+    } else if (maxHeightScroll == 0.0) {
+      WidgetsBinding.instance.addPostFrameCallback((timeStamp) {
+        if (scrollController.hasClients) {
+          double h = scrollController.position.maxScrollExtent;
+          setState(() {
+            maxHeightScroll = h == 0.0 ? 1.0 : h;
+            scrollController = new ScrollController(initialScrollOffset: h);
+          });
+        }
+      });
     }
 
-    
     return new GestureDetector(
-      onTap: () {
-        FocusScope.of(context).unfocus();
-        setState(() {
-          currentKeyBoardPadding = 0.0;
-        });
-      },
-      child: Container(
-      height: MediaQuery.of(context).size.height,
-      width: double.infinity,
-      child: Stack(
-        children: <Widget>[
-          Container(padding: EdgeInsets.fromLTRB(0, 0, 0, 0.10*height), height: height * 0.75, child: new ListView.builder(controller: scrollController,scrollDirection: Axis.vertical, itemCount: messages.length,itemBuilder: (BuildContext ctx, int index){
-                return messages[index];
-          })),
-          Align(alignment: Alignment.bottomCenter, child: Padding(padding: EdgeInsets.fromLTRB(0, 0, 0, currentKeyBoardPadding), child:Container(color: Colors.white, padding: EdgeInsets.fromLTRB(10, 10, 10, 0), height: height*0.20, child:
-            Column(crossAxisAlignment: CrossAxisAlignment.end, children: [TextField(textInputAction: TextInputAction.done,
-            onEditingComplete: () {
-              print(messages.length);
-                
-            },
-            onChanged: (text) {
-                bool isNotEmpty = true;
-                if(text.replaceAll(" ", "") == "" || text == null) {
-                  isNotEmpty = false;
-                }
+        onTap: () {
+          FocusScope.of(context).unfocus();
+          setState(() {
+            currentKeyBoardPadding = 0.0;
+            isTextEditing = false;
+          });
+        },
+        child: Container(
+            height: MediaQuery.of(context).size.height,
+            width: double.infinity,
+            child: Column(children: <Widget>[
+              Container(
+                  padding: EdgeInsets.fromLTRB(0, 0, 0, 0),
+                  height: currentKeyBoardPadding != null
+                      ? height * 0.64 - currentKeyBoardPadding
+                      : height * 0.64,
+                  child: new ListView.builder(
+                      controller: scrollController,
+                      scrollDirection: Axis.vertical,
+                      itemCount: messages.length,
+                      itemBuilder: (BuildContext ctx, int index) {
+                        return messages[index];
+                      })),
+              Align(
+                  alignment: Alignment.bottomCenter,
+                  child: Padding(
+                      padding: EdgeInsets.fromLTRB(0, 0, 0, 0),
+                      child: Container(
+                          color: Colors.white,
+                          padding: EdgeInsets.fromLTRB(10, 10, 10, 0),
+                          height: height * 0.20,
+                          child: Column(
+                              crossAxisAlignment: CrossAxisAlignment.end,
+                              children: [
+                                TextFormField(
+                                    textInputAction: TextInputAction.done,
+                                    controller: textController,
+                                    onEditingComplete: () {
+                                      // when on hits the done button
+                                      FocusScope.of(context).unfocus();
+                                      setState(() {
+                                        isTextEditing = false;
+                                        currentKeyBoardPadding = 0.0;
+                                      });
+                                    },
+                                    onChanged: (text) {
+                                      bool isNotEmpty = true;
+                                      if (text.replaceAll(" ", "") == "" ||
+                                          text == null) {
+                                        isNotEmpty = false;
+                                      }
 
-                setState(() {
-                    doSendMessage = isNotEmpty;
-                    messageBody = text;
-                });
-            },
-            onTap: () {
-              Future<bool> waiting() async {
-                  await Future.delayed(const Duration(seconds: 1));
-                  return true;
-              }
+                                      setState(() {
+                                        doSendMessage = isNotEmpty;
+                                        messageBody = text;
+                                      });
+                                    },
+                                    onTap: () {
+                                      Timer(Duration(milliseconds: 500), () {
+                                        scrollController.jumpTo(scrollController
+                                            .position.maxScrollExtent);
+                                      });
 
-              if(keyboardPadding == 0.0) {
-                  waiting().then((value) {
-                      double keyboardHeight = MediaQuery.of(context).viewInsets.bottom;
-                      if(keyboardHeight != 0.0) {
-                        setState(() {
-                          keyboardPadding = keyboardHeight;
-                          currentKeyBoardPadding = keyboardHeight;
-                        });
-                      }
-                  });
-              } else {
-                setState(() {
-                  currentKeyBoardPadding = keyboardPadding;
-                });
-              }
-                
-            },
-            decoration: InputDecoration(hintText: "Enter message", border: InputBorder.none,
-            
-            enabledBorder: OutlineInputBorder(
-              borderRadius: BorderRadius.all(Radius.circular(25.0)),
-              borderSide:BorderSide(color:Colors.grey)
-            ),
-            focusedBorder: OutlineInputBorder(
-              borderRadius: BorderRadius.all(Radius.circular(25.0)),
-              borderSide:BorderSide(color:Colors.grey)
-            )
-            ),
-            keyboardType: TextInputType.multiline, maxLines: null), 
-            Padding(padding: EdgeInsets.fromLTRB(0, 10, 0, 0), child:CupertinoButton(color: doSendMessage ? Color.fromRGBO(106, 171, 249, 1.0) : Color.fromRGBO(236, 236, 236, 1.0), onPressed: () async {
-                String message = messageBody;
-                await BackendMethods.sendMessage(FirebaseFunctions.roomData["groupChatID"], message, BackendMethods.getCurrentUTCTime(), FirebaseFunctions.currentUID);
-            }, child: Text("Send")))]))
-          ))]
+                                      Future<bool> waiting() async {
+                                        await Future.delayed(
+                                            const Duration(seconds: 1));
+                                        return true;
+                                      }
 
-    )));
+                                      if (keyboardPadding == 0.0) {
+                                        waiting().then((value) {
+                                          double keyboardHeight =
+                                              MediaQuery.of(context)
+                                                  .viewInsets
+                                                  .bottom;
+                                          if (keyboardHeight != 0.0) {
+                                            setState(() {
+                                              isTextEditing = true;
+                                              keyboardPadding = keyboardHeight;
+                                              currentKeyBoardPadding =
+                                                  keyboardHeight;
+                                            });
+                                          }
+                                        });
+                                      } else {
+                                        setState(() {
+                                          currentKeyBoardPadding =
+                                              keyboardPadding;
+                                          isTextEditing = true;
+                                        });
+                                      }
+                                    },
+                                    decoration: InputDecoration(
+                                        hintText: "Enter message",
+                                        border: InputBorder.none,
+                                        enabledBorder: OutlineInputBorder(
+                                            borderRadius: BorderRadius.all(
+                                                Radius.circular(25.0)),
+                                            borderSide:
+                                                BorderSide(color: Colors.grey)),
+                                        focusedBorder: OutlineInputBorder(
+                                            borderRadius: BorderRadius.all(
+                                                Radius.circular(25.0)),
+                                            borderSide: BorderSide(
+                                                color: Colors.grey))),
+                                    keyboardType: TextInputType.multiline,
+                                    maxLines: null),
+                                Padding(
+                                    padding: EdgeInsets.fromLTRB(0, 10, 0, 0),
+                                    child: CupertinoButton(
+                                        color: doSendMessage
+                                            ? Color.fromRGBO(106, 171, 249, 1.0)
+                                            : Color.fromRGBO(
+                                                236, 236, 236, 1.0),
+                                        onPressed: () async {
+                                          if (messageBody != null &&
+                                              doSendMessage) {
+                                            String message = messageBody;
+
+                                            await BackendMethods.sendMessage(
+                                                FirebaseFunctions
+                                                    .roomData["groupChatID"],
+                                                message,
+                                                BackendMethods
+                                                    .getCurrentUTCTime(),
+                                                FirebaseFunctions.currentUID);
+                                            textController.clear();
+                                            setState(() {
+                                              doSendMessage = false;
+                                              messageBody = null;
+                                            });
+                                          }
+                                        },
+                                        child: Text("Send")))
+                              ]))))
+            ])));
   }
+
+  GlobalKey _drawerKey = GlobalKey();
 
   Widget _viewDrawer() {
     return Theme(
@@ -1275,51 +1473,53 @@ class _MapRenderState extends State<MapRender>
             .backgroundColor), //This will change the drawer background to blue.
         //other styles
       ),
+      // 0.88
       child: Container(
-        width: 340,
-        child: Drawer(
-          child: DefaultTabController(
-            length: 3,
-            child: Column(
-              mainAxisSize: MainAxisSize.max,
-              children: <Widget>[
-                Container(
-                  height: MediaQuery.of(context).size.height * 0.08,
-                ),
-                Container(
-                  height: 50,
-                  color: Color(Global.backgroundColor),
-                  child: TabBar(
-                      labelColor: Colors.black,
-                      unselectedLabelColor: Colors.black38,
-                      labelStyle: TextStyle(fontSize: 20, fontFamily: 'Roboto'),
-                      unselectedLabelStyle:
-                          TextStyle(fontSize: 15, fontFamily: 'Roboto'),
-                      indicator: BubbleTabIndicator(
-                        indicatorColor: Color(Global.yellowColor),
-                        padding: EdgeInsets.fromLTRB(-24, -12, -24, 16),
-                        indicatorHeight: 2,
-                      ),
-                      tabs: [
-                        Tab(text: "Info"),
-                        Tab(text: "Venue"),
-                        Tab(text: "Chat"),
-                      ]),
-                ),
-                Expanded(
-                  child: Container(
-                    child: TabBarView(children: [
-                      _tab1Contents(),
-                      _tab2Contents(),
-                      _tab3Contents(),
-                    ]),
+          width: MediaQuery.of(context).size.width * 0.88,
+          child: Drawer(
+            key: _drawerKey,
+            child: DefaultTabController(
+              length: 3,
+              child: Column(
+                mainAxisSize: MainAxisSize.max,
+                children: <Widget>[
+                  Container(
+                    height: MediaQuery.of(context).size.height * 0.08,
                   ),
-                ),
-              ],
+                  Container(
+                    height: 50,
+                    color: Color(Global.backgroundColor),
+                    child: TabBar(
+                        labelColor: Colors.black,
+                        unselectedLabelColor: Colors.black38,
+                        labelStyle:
+                            TextStyle(fontSize: 20, fontFamily: 'Roboto'),
+                        unselectedLabelStyle:
+                            TextStyle(fontSize: 15, fontFamily: 'Roboto'),
+                        indicator: BubbleTabIndicator(
+                          indicatorColor: Color(Global.yellowColor),
+                          padding: EdgeInsets.fromLTRB(-24, -12, -24, 16),
+                          indicatorHeight: 2,
+                        ),
+                        tabs: [
+                          Tab(text: "Info"),
+                          Tab(text: "Venue"),
+                          Tab(text: "Chat"),
+                        ]),
+                  ),
+                  Expanded(
+                    child: Container(
+                      child: TabBarView(children: [
+                        _tab1Contents(),
+                        _tab2Contents(),
+                        _tab3Contents(),
+                      ]),
+                    ),
+                  ),
+                ],
+              ),
             ),
-          ),
-        ),
-      ),
+          )),
     );
   }
 
@@ -1497,8 +1697,6 @@ class _MapRenderState extends State<MapRender>
         child: Text("Leave Room",
             style: new TextStyle(fontSize: 20.0, color: Colors.white)),
         onPressed: () async {
-          
-
           //Adding some code to turn off all listeners
           Global.mapRPnameListListener.removeListener(() {});
           Global.mapRPfindYPListener.removeListener(() {});
@@ -1523,7 +1721,8 @@ class _MapRenderState extends State<MapRender>
             Global.memberListener.cancel();
             roomListener.cancel();
             FirebaseFunctions.removeCurrentUserFromRoom(
-                roomCodeString, data.documents.length, groupChatID:groupChatID, memberID:memberID);
+                roomCodeString, data.documents.length,
+                groupChatID: groupChatID, memberID: memberID);
           });
 
           Navigator.pushNamedAndRemoveUntil(
@@ -1536,7 +1735,9 @@ class _MapRenderState extends State<MapRender>
   @override
   Widget build(BuildContext context) {
     return new WillPopScope(
-      onWillPop: () async => false,
+      onWillPop: () async {
+        return false;
+      },
       child: MaterialApp(
         debugShowCheckedModeBanner: false,
         home: Scaffold(
@@ -1545,6 +1746,7 @@ class _MapRenderState extends State<MapRender>
             color: Color(Global.backgroundColor),
             child: ClipRRect(borderRadius: onlyTop10(), child: _slideUpPanel()),
           ),
+
           drawer: _viewDrawer(),
         ),
       ),

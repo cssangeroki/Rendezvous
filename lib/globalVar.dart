@@ -70,4 +70,10 @@ class Global {
 
   //Error checker for failure to get yelp places
   static bool errorFindingYelpPlaces = false;
+
+  //Below are dictionaries that will be used for the different sorts
+  static List<Map<String, dynamic>> orderedByPrice = [];
+  //static List<Map<String, dynamic>> orderedByBestMatch = [];
+  static List<Map<String, dynamic>> orderedByDistance = [];
+  static List<Map<String, dynamic>> orderedByRating = [];
 }

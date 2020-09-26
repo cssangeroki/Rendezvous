@@ -726,6 +726,7 @@ class GoogleMapsState extends State<GoogleMaps> {
                       ),
                       onPressed: () => Scaffold.of(context).openDrawer(),
                     )),
+                    
                 Positioned(
                   top: 65,
                   right: 15,

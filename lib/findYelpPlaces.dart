@@ -25,6 +25,14 @@ class YelpPlaces {
     Global.ratings.clear();
     Global.phoneNums.clear();
     Global.prices.clear();
+    Global.zipCodes.clear();
+    Global.cities.clear();
+    Global.addresses.clear();
+    Global.states.clear();
+    Global.orderedByPrice.clear();
+    Global.orderedByDistance.clear();
+    Global.orderedByRating.clear();
+
     double finalRadMiles = Global.finalRad * 1609.344;
     var businesses;
     //businesses = await BackendMethods.getLocations(Global.finalLon,
@@ -78,6 +86,7 @@ class YelpPlaces {
       if (validPlace == false){
         continue;
       }
+      addToDifferentOrders(place);
       Global.resultCords.add(myLatlng);
 
       name = place['name'];
@@ -116,8 +125,38 @@ class YelpPlaces {
       zip = place['zip_code'];
       Global.zipCodes.add(zip);
     }
+    sortOrderedByPrice();
+    sortOrderedByRating();
     print("done");
     updateYelpVenues();
+  }
+
+  //This function simply adds the place to our orderedByPrice array
+  static void addToDifferentOrders (dynamic place){
+    Global.orderedByPrice.add(place);
+    Global.orderedByDistance.add(place);
+    Global.orderedByRating.add(place);
+  }
+
+  //This function sorts our orderedByPrice array
+  static void sortOrderedByPrice(){
+    Global.orderedByPrice.sort((a, b){
+      return a['price'].toString().compareTo(b['price'].toString());
+    });
+  }
+
+  static void sortOrderedByRating(){
+    Global.orderedByRating.sort((a, b){
+      if (a['rating'] > b['rating']){
+        return -1;
+      }
+      else if (a['rating'] < b['rating']){
+        return 1;
+      }
+      else{
+        return 0;
+      }
+    });
   }
 
   static void updateYelpVenues() {
