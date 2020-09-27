@@ -198,7 +198,7 @@ class Message {
 }
 
 class _MapRenderState extends State<MapRender>
-     with SingleTickerProviderStateMixin{
+    with SingleTickerProviderStateMixin {
   List<String> nameList = Global.nameList;
   final String userDocID = FirebaseFunctions.currentUID;
   final String roomDocID = FirebaseFunctions.currentUserData["roomCode"];
@@ -1003,90 +1003,6 @@ class _MapRenderState extends State<MapRender>
     return Container();
   }
 
-  Widget _slideUpPanel() {
-    // for the keyboard
-    if (isTextEditing) {
-      final RenderBox box = _drawerKey.currentContext?.findRenderObject();
-      if (box == null) {
-        print("Closed");
-        setState(() {
-          currentKeyBoardPadding = 0.0;
-        });
-      }
-    }
-    return SingleChildScrollView(
-      child: SlidingUpPanel(
-        //maxHeight: 600,
-        color: Colors.transparent,
-        boxShadow: [
-          BoxShadow(
-            color: Colors.grey.withOpacity(0.5),
-            spreadRadius: 3,
-            blurRadius: 9,
-            offset: Offset(0, 15),
-          ),
-        ],
-        backdropEnabled: true,
-        borderRadius: onlyTop20(),
-        panel: Container(
-          padding: EdgeInsets.fromLTRB(0, 25, 0, 0),
-          child: Center(
-            child: Container(
-                decoration: BoxDecoration(
-                  color: Color(Global.backgroundColor),
-                  borderRadius: onlyTop20(),
-                ),
-                child: _viewYelp()),
-          ),
-        ),
-
-        collapsed: _collapsedSlideUpPanel(),
-        minHeight: 135,
-        maxHeight: MediaQuery.of(context).size.height * 0.85,
-        body: GoogleMaps(),
-      ),
-    );
-  }
-
-  Widget _collapsedSlideUpPanel() {
-    return Stack(
-      children: <Widget>[
-        Align(
-          alignment: Alignment.topCenter,
-          child: Container(
-            margin: EdgeInsets.fromLTRB(0, 10, 0, 0),
-            decoration: BoxDecoration(
-              color: Colors.white,
-              borderRadius: BorderRadius.all(Radius.circular(20)),
-              boxShadow: [
-                BoxShadow(
-                  color: Colors.black.withOpacity(0.2),
-                  spreadRadius: 6,
-                  blurRadius: 5,
-                  offset: Offset(0, 0), // changes position of shadow
-                ),
-              ],
-            ),
-            child: SizedBox(
-              width: 80,
-              height: 8,
-            ),
-          ),
-        ),
-        Container(
-          margin: EdgeInsets.fromLTRB(0, 25, 0, 0),
-          width: double.infinity,
-          height: double.infinity,
-          decoration: BoxDecoration(
-            color: Colors.white,
-            borderRadius: onlyTop20(),
-          ),
-          child: slideUpPanelDisplayText(),
-        ),
-      ],
-    );
-  }
-
   Widget slideUpPanelDisplayText() {
     //If the backend returned an error for the findingYelpPlaces call, we print an error
     if (Global.errorFindingYelpPlaces == true) {
@@ -1148,6 +1064,92 @@ class _MapRenderState extends State<MapRender>
     }
   }
 
+  Widget _collapsedSlideUpPanel() {
+    return Stack(
+      children: <Widget>[
+        Align(
+          alignment: Alignment.topCenter,
+          child: Container(
+            margin: EdgeInsets.fromLTRB(0, 10, 0, 0),
+            decoration: BoxDecoration(
+              color: Colors.white,
+              borderRadius: BorderRadius.all(Radius.circular(20)),
+              boxShadow: [
+                BoxShadow(
+                  color: Colors.black.withOpacity(0.2),
+                  spreadRadius: 6,
+                  blurRadius: 5,
+                  offset: Offset(0, 0), // changes position of shadow
+                ),
+              ],
+            ),
+            child: SizedBox(
+              width: 80,
+              height: 8,
+            ),
+          ),
+        ),
+        Container(
+          margin: EdgeInsets.fromLTRB(0, 25, 0, 0),
+          width: double.infinity,
+          height: double.infinity,
+          decoration: BoxDecoration(
+            color: Colors.white,
+            borderRadius: onlyTop20(),
+          ),
+          child: slideUpPanelDisplayText(),
+        ),
+      ],
+    );
+  }
+
+  GlobalKey _drawerKey = GlobalKey();
+
+  Widget _slideUpPanel() {
+    // for the keyboard
+    if (isTextEditing) {
+      final RenderBox box = _drawerKey.currentContext?.findRenderObject();
+      if (box == null) {
+        print("Closed");
+        setState(() {
+          currentKeyBoardPadding = 0.0;
+        });
+      }
+    }
+    return SingleChildScrollView(
+      child: SlidingUpPanel(
+        //maxHeight: 600,
+        color: Colors.transparent,
+        boxShadow: [
+          BoxShadow(
+            color: Colors.grey.withOpacity(0.5),
+            spreadRadius: 3,
+            blurRadius: 9,
+            offset: Offset(0, 15),
+          ),
+        ],
+        backdropEnabled: true,
+        borderRadius: onlyTop20(),
+        panel: Container(
+          padding: EdgeInsets.fromLTRB(0, 25, 0, 0),
+          child: Center(
+            child: Container(
+                decoration: BoxDecoration(
+                  color: Color(Global.backgroundColor),
+                  borderRadius: onlyTop20(),
+                ),
+                child: _viewYelp()),
+          ),
+        ),
+
+        collapsed: _collapsedSlideUpPanel(),
+        minHeight: 135,
+        maxHeight: MediaQuery.of(context).size.height * 0.85,
+        body: GoogleMaps(),
+      ),
+    );
+  }
+
   Widget _tab2Contents() {
     return new Container(
       height: MediaQuery.of(context).size.height,
@@ -1196,6 +1198,92 @@ class _MapRenderState extends State<MapRender>
         ],
       ),
     );
+  }
+
+  Widget _leaveRoomButton() {
+    return Container(
+      height: 60,
+      width: 100,
+      padding: EdgeInsets.fromLTRB(60, 0, 60, 0),
+      margin: EdgeInsets.fromLTRB(0, 20, 0, 0),
+      child: RaisedButton(
+        color: Colors.black54,
+        shape: RoundedRectangleBorder(
+          borderRadius: BorderRadius.circular(30.0),
+        ),
+        child: Text("Leave Room",
+            style: new TextStyle(fontSize: 20.0, color: Colors.white)),
+        onPressed: () async {
+          //Adding some code to turn off all listeners
+          Global.mapRPnameListListener.removeListener(() {});
+          Global.mapRPfindYPListener.removeListener(() {});
+          Global.findYPCalled.removeListener(() {});
+          Global.finalLocationChanged.removeListener(() {});
+          Global.timeChanged.removeListener(() {});
+          Global.userLocChanged.removeListener(() {});
+
+          String roomCodeString = FirebaseFunctions.roomData["roomCode"];
+          String groupChatID = FirebaseFunctions.roomData["groupChatID"];
+          String memberID = FirebaseFunctions.currentUserData["memberID"];
+          print(memberID);
+          print(groupChatID);
+          await Firestore.instance
+              .collection("rooms")
+              .document(roomCodeString)
+              .collection("users")
+              .getDocuments()
+              .then((data) {
+            //print("I'm running");
+            //print(data.documents.length);
+            Global.memberListener.cancel();
+            roomListener.cancel();
+            FirebaseFunctions.removeCurrentUserFromRoom(
+                roomCodeString, data.documents.length,
+                groupChatID: groupChatID, memberID: memberID);
+          });
+
+          Navigator.pushNamedAndRemoveUntil(
+              context, '/page1', (route) => false);
+        },
+      ),
+    );
+  }
+
+  Widget _midpointSlider() {
+    return SliderTheme(
+        data: SliderTheme.of(context).copyWith(
+          activeTrackColor: Colors.black,
+          inactiveTrackColor: Color(0xff757575),
+          trackShape: RectangularSliderTrackShape(),
+          trackHeight: 3.0,
+          thumbColor: Colors.white,
+          thumbShape: RoundSliderThumbShape(enabledThumbRadius: 10.0),
+          overlayColor: Color(Global.yellowColor).withAlpha(90),
+          overlayShape: RoundSliderOverlayShape(overlayRadius: 23.0),
+        ),
+        child: Container(
+          child: Slider(
+            value: midSliderVal,
+            onChanged: (double val) {
+              //We need to connect the yelp API here
+              setState(() {
+                midSliderVal = val;
+              });
+            },
+            onChangeStart: (val) {},
+            onChangeEnd: (double val) {
+              setState(() {
+                //can I do this
+                print("Entered onChangeEnd");
+                Global.finalRad = val;
+                searchingYelpCategory();
+              });
+            },
+            min: 1,
+            max: 25,
+            divisions: 24,
+          ),
+        ));
   }
 
   Widget _tab1Contents() {
@@ -1292,6 +1380,92 @@ class _MapRenderState extends State<MapRender>
             height: 120.0,
           )
         ],
+      ),
+    );
+  }
+
+  //This widget will be used to display the hints
+  Widget suggestedHints(String hint) {
+    return Row(
+      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+      children: <Widget>[
+        Expanded(
+            child: Text(
+          hint,
+          style: TextStyle(fontSize: 16.0, color: Colors.lightBlue),
+          softWrap: true,
+        )),
+      ],
+    );
+  }
+
+  Widget _addressBar() {
+    print("Should be able to enter text");
+    return Container(
+      margin: EdgeInsets.fromLTRB(15.0, 15.0, 15.0, 15.0),
+      height: 50.0,
+      width: double.infinity,
+      decoration: BoxDecoration(
+        borderRadius: BorderRadius.circular(10.0),
+        color: Colors.white,
+      ),
+      child: addressSearchField = AutoCompleteTextField(
+        key: key,
+        clearOnSubmit: false,
+        //Suggestions that will be shown
+        suggestions: suggestedAddresses,
+        //Filters results suggested
+        itemFilter: (item, query) {
+          return item.toString().toLowerCase().startsWith(query.toLowerCase());
+        },
+        //Sorts suggestions
+        itemSorter: (a, b) {
+          return a.toString().compareTo(b.toString());
+        },
+        itemSubmitted: (item) {
+          setState(() {
+            addressSearchField.textField.controller.text = item;
+            newAddress = item;
+            Global.userAddress = newAddress;
+            userAddressChanged();
+          });
+        },
+        //UI for each row of suggestions
+        itemBuilder: (context, item) {
+          return suggestedHints(item);
+        },
+        decoration: InputDecoration(
+            focusedBorder: OutlineInputBorder(
+              borderSide: BorderSide(color: Colors.black, width: 1.5),
+            ),
+            enabledBorder: OutlineInputBorder(
+              borderSide: BorderSide(color: Colors.black, width: 1.5),
+            ),
+            hintText: "Enter your address...",
+            contentPadding: EdgeInsets.only(left: 15.0, top: 15.0),
+            suffixIcon: IconButton(
+              icon: Icon(Icons.search),
+              onPressed: () {
+                //This line is used to remove the keyboard whenever the search button is pressed
+                FocusManager.instance.primaryFocus.unfocus();
+                //Needs this check in case user hits search without entering anything
+                if (newAddress == null) {
+                  return;
+                }
+                Global.userAddress = newAddress;
+                userAddressChanged();
+                //Navigator.pop(context);
+              },
+              iconSize: 30.0,
+            )),
+        textChanged: (val) {
+          setState(() {
+            newAddress = val;
+            //Global.userAddress = val;
+            autoCompleteSuggestions(val);
+            //Global.finalCategory = category;
+          });
+        },
       ),
     );
   }
@@ -1464,8 +1638,6 @@ class _MapRenderState extends State<MapRender>
             ])));
   }
 
-  GlobalKey _drawerKey = GlobalKey();
-
   Widget _viewDrawer() {
     return Theme(
       data: Theme.of(context).copyWith(
@@ -1523,128 +1695,6 @@ class _MapRenderState extends State<MapRender>
     );
   }
 
-  Widget _addressBar() {
-    return Container(
-      margin: EdgeInsets.fromLTRB(15.0, 15.0, 15.0, 15.0),
-      height: 50.0,
-      width: double.infinity,
-      decoration: BoxDecoration(
-        borderRadius: BorderRadius.circular(10.0),
-        color: Colors.white,
-      ),
-      child: addressSearchField = AutoCompleteTextField(
-        key: key,
-        clearOnSubmit: false,
-        //Suggestions that will be shown
-        suggestions: suggestedAddresses,
-        //Filters results suggested
-        itemFilter: (item, query) {
-          return item.toString().toLowerCase().startsWith(query.toLowerCase());
-        },
-        //Sorts suggestions
-        itemSorter: (a, b) {
-          return a.toString().compareTo(b.toString());
-        },
-        itemSubmitted: (item) {
-          setState(() {
-            addressSearchField.textField.controller.text = item;
-            newAddress = item;
-            Global.userAddress = newAddress;
-            userAddressChanged();
-          });
-        },
-        //UI for each row of suggestions
-        itemBuilder: (context, item) {
-          return suggestedHints(item);
-        },
-        decoration: InputDecoration(
-            focusedBorder: OutlineInputBorder(
-              borderSide: BorderSide(color: Colors.black, width: 1.5),
-            ),
-            enabledBorder: OutlineInputBorder(
-              borderSide: BorderSide(color: Colors.black, width: 1.5),
-            ),
-            hintText: "Enter your address...",
-            contentPadding: EdgeInsets.only(left: 15.0, top: 15.0),
-            suffixIcon: IconButton(
-              icon: Icon(Icons.search),
-              onPressed: () {
-                //This line is used to remove the keyboard whenever the search button is pressed
-                FocusManager.instance.primaryFocus.unfocus();
-                //Needs this check in case user hits search without entering anything
-                if (newAddress == null) {
-                  return;
-                }
-                Global.userAddress = newAddress;
-                userAddressChanged();
-                //Navigator.pop(context);
-              },
-              iconSize: 30.0,
-            )),
-        textChanged: (val) {
-          setState(() {
-            newAddress = val;
-            //Global.userAddress = val;
-            autoCompleteSuggestions(val);
-            //Global.finalCategory = category;
-          });
-        },
-      ),
-    );
-  }
-
-  //This widget will be used to display the hints
-  Widget suggestedHints(String hint) {
-    return Row(
-      mainAxisAlignment: MainAxisAlignment.spaceBetween,
-      children: <Widget>[
-        Expanded(
-            child: Text(
-          hint,
-          style: TextStyle(fontSize: 16.0, color: Colors.lightBlue),
-          softWrap: true,
-        )),
-      ],
-    );
-  }
-
-  Widget _midpointSlider() {
-    return SliderTheme(
-        data: SliderTheme.of(context).copyWith(
-          activeTrackColor: Colors.black,
-          inactiveTrackColor: Color(0xff757575),
-          trackShape: RectangularSliderTrackShape(),
-          trackHeight: 3.0,
-          thumbColor: Colors.white,
-          thumbShape: RoundSliderThumbShape(enabledThumbRadius: 10.0),
-          overlayColor: Color(Global.yellowColor).withAlpha(90),
-          overlayShape: RoundSliderOverlayShape(overlayRadius: 23.0),
-        ),
-        child: Container(
-          child: Slider(
-            value: midSliderVal,
-            onChanged: (double val) {
-              //We need to connect the yelp API here
-              setState(() {
-                midSliderVal = val;
-              });
-            },
-            onChangeStart: (val) {},
-            onChangeEnd: (double val) {
-              setState(() {
-                //can I do this
-                print("Entered onChangeEnd");
-                Global.finalRad = val;
-                searchingYelpCategory();
-              });
-            },
-            min: 1,
-            max: 25,
-            divisions: 24,
-          ),
-        ));
-  }
-
 /*
   Widget _userSlider() {
     return SliderTheme(
@@ -1682,55 +1732,6 @@ class _MapRenderState extends State<MapRender>
       ),
     );
   }*/
-
-  Widget _leaveRoomButton() {
-    return Container(
-      height: 60,
-      width: 100,
-      padding: EdgeInsets.fromLTRB(60, 0, 60, 0),
-      margin: EdgeInsets.fromLTRB(0, 20, 0, 0),
-      child: RaisedButton(
-        color: Colors.black54,
-        shape: RoundedRectangleBorder(
-          borderRadius: BorderRadius.circular(30.0),
-        ),
-        child: Text("Leave Room",
-            style: new TextStyle(fontSize: 20.0, color: Colors.white)),
-        onPressed: () async {
-          //Adding some code to turn off all listeners
-          Global.mapRPnameListListener.removeListener(() {});
-          Global.mapRPfindYPListener.removeListener(() {});
-          Global.findYPCalled.removeListener(() {});
-          Global.finalLocationChanged.removeListener(() {});
-          Global.timeChanged.removeListener(() {});
-          Global.userLocChanged.removeListener(() {});
-
-          String roomCodeString = FirebaseFunctions.roomData["roomCode"];
-          String groupChatID = FirebaseFunctions.roomData["groupChatID"];
-          String memberID = FirebaseFunctions.currentUserData["memberID"];
-          print(memberID);
-          print(groupChatID);
-          await Firestore.instance
-              .collection("rooms")
-              .document(roomCodeString)
-              .collection("users")
-              .getDocuments()
-              .then((data) {
-            //print("I'm running");
-            //print(data.documents.length);
-            Global.memberListener.cancel();
-            roomListener.cancel();
-            FirebaseFunctions.removeCurrentUserFromRoom(
-                roomCodeString, data.documents.length,
-                groupChatID: groupChatID, memberID: memberID);
-          });
-
-          Navigator.pushNamedAndRemoveUntil(
-              context, '/page1', (route) => false);
-        },
-      ),
-    );
-  }
 
   @override
   Widget build(BuildContext context) {
