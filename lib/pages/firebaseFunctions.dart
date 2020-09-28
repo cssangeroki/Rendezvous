@@ -241,8 +241,6 @@ class FirebaseFunctions {
       FirebaseFunctions.currentUserData = {"roomCode": null};
       //If there is only 1 person in the room, we will delete the room
       if (membersLength == 1) {
-        print("This is the length of members");
-        print(membersLength);
         await deleteRoom(roomCode);
         return;
       }

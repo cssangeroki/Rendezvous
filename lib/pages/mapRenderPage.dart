@@ -1224,6 +1224,9 @@ class _MapRenderState extends State<MapRender>
           Global.timeChanged.removeListener(() {});
           Global.userLocChanged.removeListener(() {});
 
+          //Reset the category
+          Global.finalCategory = "All";
+
           String roomCodeString = FirebaseFunctions.roomData["roomCode"];
           String groupChatID = FirebaseFunctions.roomData["groupChatID"];
           String memberID = FirebaseFunctions.currentUserData["memberID"];

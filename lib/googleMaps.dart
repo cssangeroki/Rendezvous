@@ -200,6 +200,8 @@ class GoogleMapsState extends State<GoogleMaps> {
     //Resetting the time
     Global.hours = -1;
     Global.minutes = -1;
+    finalLatLng = null;
+    _center = null;
     addYelpMarkersWhenFindYPCalled();
     changeUserLocationWhenNewAddressEntered();
     setFinalLocationWhenButtonPressedOnSlideBar();
@@ -274,6 +276,7 @@ class GoogleMapsState extends State<GoogleMaps> {
 
   //Function that will send an http request to google maps to calculate the travel time
   void calculateTravelTime() async {
+    print("finalLatLng = $finalLatLng");
     if (currLocation == null || finalLatLng == null){
       Global.hours = 0;
       Global.minutes = 0;
@@ -305,6 +308,7 @@ class GoogleMapsState extends State<GoogleMaps> {
     Timer.periodic(timeReset, (timer) {
       //If both the current location and finalLatLng are not null, only then do we calculate the travel time
       if (currLocation != null && finalLatLng != null) {
+        print("Neither are null");
         calculateTravelTime();
       }
     });
