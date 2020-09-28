@@ -15,8 +15,6 @@ class YelpPlaces {
 
   //Function that will connect to yelp API
   static Future<void> findingPlaces() async {
-    print("Final Rad = ${Global.finalRad}");
-
     Global.names.clear();
     Global.resultCords.clear();
     Global.locations.clear();
@@ -29,6 +27,7 @@ class YelpPlaces {
     Global.cities.clear();
     Global.addresses.clear();
     Global.states.clear();
+
     Global.orderedByPrice.clear();
     Global.orderedByDistance.clear();
     Global.orderedByRating.clear();
@@ -147,15 +146,7 @@ class YelpPlaces {
 
   static void sortOrderedByRating(){
     Global.orderedByRating.sort((a, b){
-      if (a['rating'] > b['rating']){
-        return -1;
-      }
-      else if (a['rating'] < b['rating']){
-        return 1;
-      }
-      else{
-        return 0;
-      }
+      return  -1 * a['rating'].compareTo(b['rating']);
     });
   }
 
@@ -167,13 +158,11 @@ class YelpPlaces {
   //to calculate the distance between a newPlace and a midpoint, to ensure that the new place is within the
   //given radius.
   static bool haversineDist(LatLng newPlace) {
-    print("New LatLng = $newPlace");
     double midLatRad = convertToRadians(Global.finalMidLat);
     double midLonRad = convertToRadians(Global.finalMidLon);
     double newLatRad = convertToRadians(newPlace.latitude);
     double newLonRad = convertToRadians(newPlace.longitude);
     double distanceInKm = Global.finalRad * 1.60934;
-    print("Radius = $distanceInKm");
     var hav = haversine(midLatRad, newLatRad) +
         cos(midLatRad) *
             cos(newLatRad) *
@@ -187,7 +176,6 @@ class YelpPlaces {
       //print("Returning true");
       return true;
     }
-    print("Distance = $dist");
     //Otherwise return false
     return false;
   }

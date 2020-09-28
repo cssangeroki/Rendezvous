@@ -208,7 +208,6 @@ class BackendMethods {
   //              returns the businesses
   static getLocations(double longitude, double latitude,
       [String term, int radius, int time]) async {
-    print("Start getting data");
 
     var bodyJSON = <String, dynamic>{
       'longitude': longitude,
@@ -235,13 +234,7 @@ class BackendMethods {
           'Content-Type': 'application/json; charset=UTF-8',
         },
         body: jsonEncode(bodyJSON));
-    print("check statement 1");
     if (res.statusCode == 200) {
-      print("check statement 2");
-
-
-      print(res.body);
-
       return res.body;
     } else {
       Global.errorFindingYelpPlaces = true;

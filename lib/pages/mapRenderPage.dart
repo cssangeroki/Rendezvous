@@ -12,7 +12,7 @@ import 'package:url_launcher/url_launcher.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:sliding_up_panel/sliding_up_panel.dart';
-import 'package:smooth_star_rating/smooth_star_rating.dart';
+import 'package:flutter_rating_bar/flutter_rating_bar.dart'; //Alternate Rating
 
 //import 'package:link/link.dart';
 import "../googleMaps.dart";
@@ -327,6 +327,7 @@ class _MapRenderState extends State<MapRender>
       if (!mounted) {
         return;
       }
+      sortCategory = "Distance";
       _updateYelpVenues();
     });
   }
@@ -672,12 +673,11 @@ class _MapRenderState extends State<MapRender>
               ),
             ),
             onPressed: () {
-              setState(() {
-                print("Category is Distance");
-                sortCategory = "Distance";
-              });
               clearGlobalArrays();
               changeOrderToDistance();
+              setState(() {
+                sortCategory = "Distance";
+              });
             },
           ),
         ),
@@ -702,12 +702,12 @@ class _MapRenderState extends State<MapRender>
               ),
             ),
             onPressed: () {
-              setState(() {
-                sortCategory = "Price";
-              });
               //Want to add a function here that changes the slide up bar ordering;
               clearGlobalArrays();
               changeOrderToPrice();
+              setState(() {
+                sortCategory = "Price";
+              });
             },
           ),
         ),
@@ -731,11 +731,11 @@ class _MapRenderState extends State<MapRender>
                   color: sortOrderButtonTextColor('Rating')),
             ),
             onPressed: () {
+              clearGlobalArrays();
+              changeOrderToRating();
               setState(() {
                 sortCategory = "Rating";
               });
-              clearGlobalArrays();
-              changeOrderToRating();
             },
           ),
         ),
@@ -854,6 +854,20 @@ class _MapRenderState extends State<MapRender>
     );
   }
 
+  Widget starRating(int index) {
+    double rating = Global.ratings[index].toDouble();
+    return RatingBarIndicator(
+      itemBuilder: (context, _) => Icon(
+        Icons.star,
+        color: Color(Global.yellowColor),
+      ),
+      rating: rating,
+      itemCount: 5,
+      itemSize: 25.0,
+      direction: Axis.horizontal,
+    );
+  }
+
   Widget _expandedContainer(index) {
     return Flexible(
       child: ExpandedSection(
@@ -871,19 +885,7 @@ class _MapRenderState extends State<MapRender>
                   children: <Widget>[
                     Row(children: <Widget>[
                       Container(
-                        child: SmoothStarRating(
-                          allowHalfRating: true,
-                          onRated: (v) {},
-                          starCount: 5,
-                          rating: Global.ratings[index].toDouble(),
-                          size: 25.0,
-                          isReadOnly: true,
-                          //fullRatedIconData: Icons.blur_off,
-                          //halfRatedIconData: Icons.blur_on,
-                          color: Color(Global.yellowColor),
-                          borderColor: Color(Global.yellowColor),
-                          spacing: 0.0,
-                        ),
+                        child: starRating(index),//Text(Global.ratings[index] == null ? '' : '${Global.ratings[index]}'), //
                       ),
                       Container(
                         padding: EdgeInsets.fromLTRB(10, 0, 0, 0),
@@ -1400,7 +1402,6 @@ class _MapRenderState extends State<MapRender>
   }
 
   Widget _addressBar() {
-    print("Should be able to enter text");
     return Container(
       margin: EdgeInsets.fromLTRB(15.0, 15.0, 15.0, 15.0),
       height: 50.0,

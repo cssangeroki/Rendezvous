@@ -25,7 +25,9 @@ dependencies:
     sdk: flutter
 
   async: ^2.4.1 #This is needed to cancel async functions
-  smooth_star_rating: ^1.1.1
+
+  flutter_rating_bar: ^3.0.1+1 #For star rating
+
   scroll_snap_list: ^0.4.1
   flutter_fadein: ^1.1.1
   flutter_spinkit: "^4.1.2"

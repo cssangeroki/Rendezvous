@@ -757,11 +757,11 @@ class GoogleMapsState extends State<GoogleMaps> {
                               Global.searchingCategory = true;
                               Global.searchingPlaces.value ^= true;
                               await YelpPlaces.findingPlaces();
-                              print("Got places");
+                              //print("Got places");
                               Global.findYPCalled.value ^= true;
-                              print("About to add markers");
+                              //print("About to add markers");
                               addYelpMarkers();
-                              print("SearchingCategory = ${Global.searchingCategory}");
+                              //print("SearchingCategory = ${Global.searchingCategory}");
                               Global.searchingCategory = false;
                               Global.searchingPlaces.value ^= true;
                             },
