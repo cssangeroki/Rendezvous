@@ -122,7 +122,7 @@ class _Page2State extends State<Page2> {
             child: Center(
               child: SpinKitPulse(
                 size: 280,
-                color: Colors.blue,
+                color: Colors.black38,
               ),
             ),
           )

@@ -19,7 +19,7 @@ import "../googleMaps.dart";
 import "../globalVar.dart";
 import "../findYelpPlaces.dart";
 import 'package:share/share.dart';
-import "../dynamicLinks.dart";
+//import "../dynamicLinks.dart";
 
 import 'package:http/http.dart' as http;
 import 'dart:convert' as convert;
@@ -1369,10 +1369,10 @@ class _MapRenderState extends State<MapRender>
                 style: textSize35(),
                 enableInteractiveSelection: true,
                 onTap: () async {
-                  String link =
-                      await DynamicLinkService.createAppLink("Join my room!");
+                  //String link =
+                  //    await DynamicLinkService.createAppLink("Join my room!");
                   Share.share(
-                    "${FirebaseFunctions.roomData["roomCode"]}\n$link",
+                    "${FirebaseFunctions.roomData["roomCode"]}",//\n$link",
                     subject: "Let's Rendezvous! Join my room!",
                   );
                 },
