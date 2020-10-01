@@ -113,12 +113,13 @@ class _Page2State extends State<Page2> {
   Widget build(BuildContext context) {
     return (loadingScreen == true)
         ? Container(
-            decoration: BoxDecoration(
+            color: Color(Global.backgroundColor),
+            /*decoration: BoxDecoration(
               image: DecorationImage(
                 image: AssetImage("images/Map_loading.png"),
                 fit: BoxFit.cover,
               ),
-            ),
+            ),*/
             child: Center(
               child: SpinKitPulse(
                 size: 280,

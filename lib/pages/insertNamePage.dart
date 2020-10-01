@@ -36,10 +36,9 @@ class _Page1State extends State<Page1> {
 //  bool isLoading = false;
   bool _nameEntered = false;
 
-
   File imagePicked;
   final picker = ImagePicker();
-  
+
   @override
   void initState() {
     super.initState();
@@ -84,12 +83,11 @@ class _Page1State extends State<Page1> {
     final pickedFile = await picker.getImage(source: ImageSource.gallery);
 
     setState(() {
-        imagePicked = File(pickedFile.path);
+      imagePicked = File(pickedFile.path);
     });
 
     Global.profileImage = File(pickedFile.path);
     Global.updateProfileImage = true;
-
   }
 
   @override
@@ -104,23 +102,34 @@ class _Page1State extends State<Page1> {
               child: Column(children: <Widget>[
                 GestureDetector(
                   onTap: () {
-                      getImage();
-                  },
-                  child: Container(margin: EdgeInsets.fromLTRB(0, screenHeight * 0.2, 0, 0),
-                          width: screenHeight * 0.2,
-                          height: screenHeight * 0.2,
-                          child: showAnonymous ? Image(
-                      image: AssetImage('images/anonymous.png'),
-                    ) : null,
-                          decoration: !showAnonymous ? new BoxDecoration(
-                            shape: BoxShape.circle,
-                            image: new DecorationImage(fit:BoxFit.cover,
-                            image: new FileImage(imagePicked))) : null,
-                ),
-                ),
-                CupertinoButton(child: Text("Choose Profile Image"), onPressed: () {
                     getImage();
-                }),
+                  },
+                  child: Container(
+                    margin: EdgeInsets.fromLTRB(0, screenHeight * 0.2, 0, 0),
+                    width: screenHeight * 0.2,
+                    height: screenHeight * 0.2,
+                    child: showAnonymous
+                        ? ClipRRect(
+                            borderRadius: BorderRadius.circular(100.0),
+                            child: Image(
+                              image: AssetImage('images/anonymous.png'),
+                            ),
+                          )
+                        : null,
+                    decoration: !showAnonymous
+                        ? new BoxDecoration(
+                            shape: BoxShape.circle,
+                            image: new DecorationImage(
+                                fit: BoxFit.cover,
+                                image: new FileImage(imagePicked)))
+                        : null,
+                  ),
+                ),
+                CupertinoButton(
+                    child: Text("Choose Profile Image"),
+                    onPressed: () {
+                      getImage();
+                    }),
                 Container(
                   width: 220.0,
                   child: AnimatedOpacity(
