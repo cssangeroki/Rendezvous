@@ -770,7 +770,7 @@ class _MapRenderState extends State<MapRender>
                             borderRadius: BorderRadius.all(Radius.circular(10)),
                             child: Image.network(
                               Global.images[index] == ''
-                                  ? 'https://firebasestorage.googleapis.com/v0/b/rendezvous-b51b4.appspot.com/o/photo-1550747545-c896b5f89ff7.jpeg?alt=media&token=eb3eb883-86da-4b89-87e1-7490fd518910'
+                                  ? 'https://firebasestorage.googleapis.com/v0/b/rendezvous-b51b4.appspot.com/o/NoImage.png?alt=media&token=1db51462-9844-4073-8252-54622e5283d0'
                                   : '${Global.images[index]}',
                               // 'https://firebasestorage.googleapis.com/v0/b/rendezvous-b51b4.appspot.com/o/photo-1550747545-c896b5f89ff7.jpeg?alt=media&token=eb3eb883-86da-4b89-87e1-7490fd518910',
                               fit: BoxFit.cover,
@@ -782,7 +782,7 @@ class _MapRenderState extends State<MapRender>
                                 topRight: Radius.circular(10)),
                             child: Image.network(
                               Global.images[index] == ''
-                                  ? 'https://firebasestorage.googleapis.com/v0/b/rendezvous-b51b4.appspot.com/o/photo-1550747545-c896b5f89ff7.jpeg?alt=media&token=eb3eb883-86da-4b89-87e1-7490fd518910'
+                                  ? 'https://firebasestorage.googleapis.com/v0/b/rendezvous-b51b4.appspot.com/o/NoImage.png?alt=media&token=1db51462-9844-4073-8252-54622e5283d0'
                                   : '${Global.images[index]}',
                               // 'https://firebasestorage.googleapis.com/v0/b/rendezvous-b51b4.appspot.com/o/photo-1550747545-c896b5f89ff7.jpeg?alt=media&token=eb3eb883-86da-4b89-87e1-7490fd518910',
                               fit: BoxFit.cover,
@@ -885,7 +885,8 @@ class _MapRenderState extends State<MapRender>
                   children: <Widget>[
                     Row(children: <Widget>[
                       Container(
-                        child: starRating(index),//Text(Global.ratings[index] == null ? '' : '${Global.ratings[index]}'), //
+                        child: starRating(
+                            index), //Text(Global.ratings[index] == null ? '' : '${Global.ratings[index]}'), //
                       ),
                       Container(
                         padding: EdgeInsets.fromLTRB(10, 0, 0, 0),
@@ -1372,7 +1373,7 @@ class _MapRenderState extends State<MapRender>
                   //String link =
                   //    await DynamicLinkService.createAppLink("Join my room!");
                   Share.share(
-                    "${FirebaseFunctions.roomData["roomCode"]}",//\n$link",
+                    "${FirebaseFunctions.roomData["roomCode"]}", //\n$link",
                     subject: "Let's Rendezvous! Join my room!",
                   );
                 },
