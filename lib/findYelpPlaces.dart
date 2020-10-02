@@ -11,6 +11,7 @@ import 'dart:convert';
 import 'globalVar.dart';
 
 class YelpPlaces {
+  static double meterToMiles = 0.000621371;
   static CancelableOperation futureToCancel;
 
   //Function that will connect to yelp API
@@ -27,6 +28,7 @@ class YelpPlaces {
     Global.cities.clear();
     Global.addresses.clear();
     Global.states.clear();
+    Global.distances.clear();
 
     Global.orderedByPrice.clear();
     Global.orderedByDistance.clear();
@@ -123,6 +125,8 @@ class YelpPlaces {
 
       zip = place['zip_code'];
       Global.zipCodes.add(zip);
+
+      Global.distances.add(place['distance'].toDouble() * meterToMiles);
     }
     sortOrderedByPrice();
     sortOrderedByRating();
