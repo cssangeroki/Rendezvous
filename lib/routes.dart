@@ -47,15 +47,15 @@ class Routes extends StatelessWidget {
       padding: EdgeInsets.fromLTRB(60, 0, 60, 0),
       margin: EdgeInsets.fromLTRB(0, 20, 0, 0),
       child: RaisedButton(
-        color: Colors.deepPurple,
+        color: Colors.black54,
         shape: RoundedRectangleBorder(
           borderRadius: BorderRadius.circular(30.0),
         ),
         child: Text("Route",
             style: new TextStyle(fontSize: 20.0, color: Colors.white)),
         onPressed: () async {
-            await launchMap();
-          },
+          await launchMap();
+        },
       ),
     );
   }
