@@ -31,8 +31,16 @@ class Global {
   static var whiteColor = 0xffffffff;
   static var yellowColor = 0xffffcd3c;
 
+  // type NetworkImage, current profile image
   static var profileImage;
+  // whether image should be updated
   static var updateProfileImage = false;
+  // the string url of the current profile image
+  static var profileImageURL;
+  // key is the imageURL, value is Network image, prevents repeated network calls
+  static var imageCache = {};
+
+  static var userName;
 
   static var arrLength;
 

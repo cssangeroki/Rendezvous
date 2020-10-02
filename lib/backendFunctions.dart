@@ -26,7 +26,7 @@ class BackendMethods {
       socket = IO.io(rootURL, <String, dynamic>{
       'transports': ['websocket'],
       });
-      
+    
       socket.on('connect', (_) async {
         String token = await getToken();
         await FirebaseFunctions.refreshChatToken(token);
@@ -38,23 +38,20 @@ class BackendMethods {
       });
 
       socket.on("error", (data){
-        print(data);
+        //print(data);
       });
     
       socket.on("memberJoined", (data){
-        print(data);
+       // print(data);
       });
     
 
       socket.on('syncMessages', (data){
-          print(data);
+         // print(data);
       });
 
-
-
-      socket.emit('connect');
-
       socket.connect();
+      //socket.emit('connect');
 
   }
 
@@ -69,8 +66,13 @@ class BackendMethods {
       "membersLength" : membersLength,
       "memberID" : memberID
     };
+
+
+
+
+
+
     
-    print(request);
     final response = await http.post("$rootURL/twilioRoutes/leaveChat", headers: <String, String>{
       'Content-type': 'application/json; charset=UTF-8'
     },
@@ -142,19 +144,28 @@ class BackendMethods {
 
   static sendMessage(String channelID, String messageContent, String dateCreated, String from) async {
 
+    String profileImage = FirebaseFunctions.currentUserData["profileImage"];
+    String userName = FirebaseFunctions.currentUserData["userName"];
     var bodyJSON = <String, dynamic>{
         'channelID':channelID,
         'messageContent':messageContent,
         'from':from,
-        'dateCreated':dateCreated
+        'dateCreated':dateCreated,
+        'profileImage' : profileImage,
+        'userName' : userName
     };
+
     final res = await http.post('$rootURL/twilioRoutes/pushMessage',
         headers: <String, String>{
           'Content-Type': 'application/json; charset=UTF-8',
         },
         body: jsonEncode(bodyJSON));
+
     if(res.statusCode == 200) {
-      return jsonDecode(res.body);
+      Map<String, dynamic> jsonResult = jsonDecode(res.body);
+      Map<String, dynamic> attributes = jsonDecode(jsonResult["attributes"]);
+      jsonResult["attributes"] = attributes;
+      return jsonResult;
     } else {
       return {"error":1};
     }

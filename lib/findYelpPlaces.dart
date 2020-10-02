@@ -52,7 +52,6 @@ class YelpPlaces {
       Global.errorFindingYelpPlaces = true;
       return;
     }
-    print(businesses);
     //This if statement is in case there is an error propo
     if (Global.errorFindingYelpPlaces == true) {
       Global.errorFindingYelpPlaces = true;

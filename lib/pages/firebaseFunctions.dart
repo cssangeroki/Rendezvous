@@ -1,3 +1,4 @@
+import 'package:flutter/material.dart';
 import 'package:secure_random/secure_random.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
@@ -23,7 +24,9 @@ class FirebaseFunctions {
     "host UID": null,
     "Final Location": null,
     "Final Location Address": null,
-    "Final LatLng": null
+    "Final LatLng": null,
+    "profileImages": {},
+    "userNames": {}
   };
 
   static refreshChatToken(String token) async {
@@ -35,13 +38,13 @@ class FirebaseFunctions {
   }
 
   static uploadImage(String path, String fileName, File img) async {
-      print("Began");
       final StorageReference storageReference = FirebaseStorage().ref().child(path).child(fileName);
       final StorageUploadTask uploadTask = storageReference.putFile(img);
       await uploadTask.onComplete;
       // Return the image url
 
       String url = await storageReference.getDownloadURL();
+      Global.profileImage = NetworkImage(url);
       
       return url;
     }
@@ -104,7 +107,9 @@ class FirebaseFunctions {
         .then((snapshot) {
       if (snapshot.exists) {
         FirebaseFunctions.currentUserData = snapshot.data;
-        Global.profileImage = snapshot.data["profileImage"];
+        if(snapshot.data["profileImage"] != null) {
+            Global.profileImage = NetworkImage(snapshot.data["profileImage"]);
+        }
       } else {
         Firestore.instance
             .collection("users")
@@ -145,13 +150,15 @@ class FirebaseFunctions {
       "userName": userName,
     };
 
+    Global.userName = userName;
+
     String memberID = memberCode;
     var userData = {"roomCode": roomCode, "memberID": memberID, "userName": userName};
     FirebaseFunctions.currentUserData["memberID"] = memberID;
     if(Global.updateProfileImage) {
         String imageID = await FirebaseFunctions.uploadImage("profileImages", FirebaseFunctions?.currentUID, Global.profileImage);
         Global.updateProfileImage = false;
-        Global.profileImage = imageID;
+        Global.profileImage = NetworkImage(imageID);
         roomData["profileImage"] = imageID;
         userData["profileImage"] = imageID;
     }
@@ -179,18 +186,22 @@ class FirebaseFunctions {
           .get()
           .then((value) async {
 
+
           if(callBackend) {
               var memberData = await BackendMethods.joinGroupChat(FirebaseFunctions?.currentUID, value.data["groupChatID"]);
               memberID = memberData["sid"];
+              userData["memberID"] = memberID;
+
+              
           }
+          FirebaseFunctions.currentUserData["memberID"] = memberID;
 
-
-        roomData["host"] = value.data["host"];
-        roomData["host UID"] = value.data["host UID"];
-        roomData["Final Location"] = value.data["Final Location"];
-        roomData["Final Location Address"] =
-            value.data["Final Location Address"];
-        roomData["Final LatLng"] = value.data["Final LatLng"];
+          roomData["host"] = value.data["host"];
+          roomData["host UID"] = value.data["host UID"];
+          roomData["Final Location"] = value.data["Final Location"];
+          roomData["Final Location Address"] =
+              value.data["Final Location Address"];
+          roomData["Final LatLng"] = value.data["Final LatLng"];
       });
       await Firestore.instance
           .collection("users")
@@ -238,7 +249,9 @@ class FirebaseFunctions {
         "Final Location Address": null,
         "Final LatLng": null
       };
-      FirebaseFunctions.currentUserData = {"roomCode": null};
+      FirebaseFunctions.currentUserData["roomCode"] = null;
+      FirebaseFunctions.currentUserData["chatToken"] = null;
+      FirebaseFunctions.currentUserData["memberID"] = null;
       //If there is only 1 person in the room, we will delete the room
       if (membersLength == 1) {
         await deleteRoom(roomCode);

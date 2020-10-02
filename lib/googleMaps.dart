@@ -356,9 +356,21 @@ class GoogleMapsState extends State<GoogleMaps> {
         .collection("users")
         .snapshots()
         .listen((snapshot) async {
-      clearOtherUserMarkers();
-      await callAddOtherUserMarkers(snapshot);
-      await findMidpoint(_markers);
+        Map<dynamic, dynamic> names = FirebaseFunctions.roomData["userNames"] == null ? {} : FirebaseFunctions.roomData["userNames"];
+        Map<dynamic, dynamic> imagesURL = FirebaseFunctions.roomData["profileImages"] == null ? {} : FirebaseFunctions.roomData["profileImages"];
+        
+        for(var doc in snapshot.documents) {
+          names[doc.documentID] = doc.data["userName"];
+          imagesURL[doc.documentID] = NetworkImage(doc.data["profileImage"]);
+        }
+
+        FirebaseFunctions.roomData["userNames"] =  names;
+        FirebaseFunctions.roomData["profileImages"] = imagesURL;
+
+        clearOtherUserMarkers();
+        await callAddOtherUserMarkers(snapshot);
+        await findMidpoint(_markers);
+
     });
   }
 

@@ -4,6 +4,7 @@ import 'dart:async';
 import 'package:async/async.dart';
 
 import 'package:bubble_tab_indicator/bubble_tab_indicator.dart';
+import 'package:socket_io_client/socket_io_client.dart';
 import '../appBar.dart';
 import 'firebaseFunctions.dart';
 import '../expandedSection.dart';
@@ -19,7 +20,10 @@ import "../googleMaps.dart";
 import "../globalVar.dart";
 import "../findYelpPlaces.dart";
 import 'package:share/share.dart';
-import "../dynamicLinks.dart";
+//import "../dynamicLinks.dart";
+import 'dart:convert';
+
+
 
 import 'package:http/http.dart' as http;
 import 'dart:convert' as convert;
@@ -64,8 +68,7 @@ class Message {
   static Future<List<Widget>> getAndUpdateMessages(size,
       {isUpdate = false, var message}) async {
     if (!isUpdate) {
-      messages = await BackendMethods.getMessages(
-          FirebaseFunctions.roomData["groupChatID"]);
+      messages = await BackendMethods.getMessages(FirebaseFunctions.roomData["groupChatID"]);
     } else {
       messages.add(message);
     }
@@ -74,7 +77,7 @@ class Message {
 
     List<Widget> msgList = <Widget>[];
 
-    DateTime currentDate = DateTime.now();
+    DateTime currentDate = messages.length == 0 ? DateTime.now() : DateTime.parse(messages[0]["dateCreated"]).toLocal();
     bool didAdd = false;
 
     for (var message in messages) {
@@ -83,23 +86,47 @@ class Message {
       if (currentDate.day == datetime.day &&
           currentDate.year == datetime.year &&
           currentDate.month == datetime.month) {
+      
         if (!didAdd) {
-          Widget msgTitle = Message.createDayTitle(
-              BackendMethods.convertDateToPresentDate(datetime, isTitle: true));
+          Widget msgTitle = Message.createDayTitle(BackendMethods.convertDateToPresentDate(datetime, isTitle: true));
           msgList.add(msgTitle);
           didAdd = true;
         }
       } else {
+        currentDate = datetime;
         didAdd = false;
       }
-      String img = FirebaseFunctions.roomData["profileImages"][message["from"]];
+     
+      NetworkImage profileImage = FirebaseFunctions.roomData["profileImages"][message["from"]];
+      String name = FirebaseFunctions.roomData["userNames"][message["from"]] ?? null;
+      
+      if(profileImage == null || name == null) {
+        // if one of them is null, have to run bottom code
+        Map<String, dynamic> attributes = jsonDecode(message["attributes"]);
+        String profileImageURL = attributes["profileImage"];
+        // when the user of this message left the chat, here's the backup data
+        NetworkImage cachedData = Global.imageCache[profileImageURL];
+        if(profileImage == null) {
+          if(cachedData != null) {
+            profileImage = cachedData;
+          } else {
+            Global.imageCache[profileImageURL] = NetworkImage(profileImageURL);
+            profileImage = Global.imageCache[profileImageURL];
+          }
+        }
+
+        if(name == null) {
+          name = attributes["userName"];
+        }
+      }
+    
       Widget msg = Message.createMessage(
           size,
-          FirebaseFunctions.roomData["userNames"][message["from"]],
+          name,
           message["body"],
           datetime,
           userID == message["from"],
-          img != null ? img : null);
+          profileImage != null ? profileImage : null);
       msgList.add(msg);
     }
 
@@ -111,7 +138,7 @@ class Message {
   }
 
   static Widget createDayTitle(String title) {
-    return Container(
+    return new Container(
         child: Text(title,
             textAlign: TextAlign.center,
             style: TextStyle(
@@ -120,7 +147,7 @@ class Message {
   }
 
   static Widget createMessage(double size, String who, String text,
-      DateTime date, bool isMe, String img) {
+      DateTime date, bool isMe, NetworkImage img) {
     Color backgroundColor = isMe
         ? Color.fromRGBO(240, 215, 255, 1.0)
         : Color.fromRGBO(236, 236, 236, 1.0);
@@ -144,7 +171,7 @@ class Message {
                         ? new BoxDecoration(
                             shape: BoxShape.circle,
                             image: new DecorationImage(
-                                fit: BoxFit.cover, image: NetworkImage(img)))
+                                fit: BoxFit.cover, image: img))
                         : null,
                   ),
                   Align(
@@ -246,10 +273,10 @@ class _MapRenderState extends State<MapRender>
 
   void callbackSocket(String type, data) async {
     if (type == "messageAdded") {
-      Future<List<Widget>> futureMsgs = Message.getAndUpdateMessages(
-          MediaQuery.of(context).size.width * 0.75);
+      Future<List<Widget>> futureMsgs = Message.getAndUpdateMessages(MediaQuery.of(context).size.width * 0.75);
 
       futureMsgs.then((msgs) async {
+
         setState(() {
           messages = msgs;
           maxHeightScroll = 0.0;
@@ -1230,8 +1257,7 @@ class _MapRenderState extends State<MapRender>
           String roomCodeString = FirebaseFunctions.roomData["roomCode"];
           String groupChatID = FirebaseFunctions.roomData["groupChatID"];
           String memberID = FirebaseFunctions.currentUserData["memberID"];
-          print(memberID);
-          print(groupChatID);
+
           await Firestore.instance
               .collection("rooms")
               .document(roomCodeString)
@@ -1369,10 +1395,10 @@ class _MapRenderState extends State<MapRender>
                 style: textSize35(),
                 enableInteractiveSelection: true,
                 onTap: () async {
-                  String link =
-                      await DynamicLinkService.createAppLink("Join my room!");
+                  //String link =
+                  //    await DynamicLinkService.createAppLink("Join my room!");
                   Share.share(
-                    "${FirebaseFunctions.roomData["roomCode"]}\n$link",
+                    "${FirebaseFunctions.roomData["roomCode"]}",//\n$link",
                     subject: "Let's Rendezvous! Join my room!",
                   );
                 },
@@ -1479,13 +1505,15 @@ class _MapRenderState extends State<MapRender>
     double height = MediaQuery.of(context).size.height;
 
     if (!didRetrieveMessages) {
+      setState(() {
+        didRetrieveMessages = true;
+      });
       WidgetsBinding.instance.addPostFrameCallback((timeStamp) {
-        Future<List<Widget>> futureMsgs = Message.getAndUpdateMessages(
-            MediaQuery.of(context).size.width * 0.75);
+        Future<List<Widget>> futureMsgs = Message.getAndUpdateMessages(MediaQuery.of(context).size.width * 0.75);
+
         futureMsgs.then((msgs) async {
           await BackendMethods.establishSocket(callbackSocket);
           setState(() {
-            didRetrieveMessages = true;
             messages = msgs;
             height = MediaQuery.of(context).size.width * 0.75;
           });
@@ -1543,6 +1571,7 @@ class _MapRenderState extends State<MapRender>
                                     controller: textController,
                                     onEditingComplete: () {
                                       // when on hits the done button
+
                                       FocusScope.of(context).unfocus();
                                       setState(() {
                                         isTextEditing = false;

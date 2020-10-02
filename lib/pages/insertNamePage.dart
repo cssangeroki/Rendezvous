@@ -43,6 +43,7 @@ class _Page1State extends State<Page1> {
   @override
   void initState() {
     super.initState();
+
   }
 
   @override
@@ -55,11 +56,16 @@ class _Page1State extends State<Page1> {
   //_Page1State(this.userName);
   // Create a text controller and use it to retrieve the current value
   // of the TextField.
-  final userNameController = TextEditingController();
-  String userName;
+  final userNameController = new TextEditingController(text: Global.userName ?? "");
+
+  
+  String userName = Global.userName ?? "";
+
+  String userImageSaved = FirebaseFunctions.currentUserData["profileImage"];
 
   // checks if name is valid then saves name and sends to page2
   void _signMeUp() {
+  
     setState(() {
       if (formKey.currentState.validate()) {
         String userName = userNameController.text;
@@ -81,21 +87,26 @@ class _Page1State extends State<Page1> {
   bool _focus = false;
 
   Future getImage() async {
+
     final pickedFile = await picker.getImage(source: ImageSource.gallery);
 
-    setState(() {
-        imagePicked = File(pickedFile.path);
-    });
+    if(pickedFile != null) {
+        setState(() {
+            imagePicked = File(pickedFile.path);
+        });
 
-    Global.profileImage = File(pickedFile.path);
-    Global.updateProfileImage = true;
-
+        userImageSaved = null;
+        Global.profileImage = File(pickedFile.path);
+        Global.profileImageURL = pickedFile.path;
+        Global.updateProfileImage = true;
+    }
   }
+  
 
   @override
   Widget build(BuildContext context) {
     var screenHeight = MediaQuery.of(context).size.height;
-    var showAnonymous = imagePicked == null ? true : false;
+    var showAnonymous = imagePicked == null && userImageSaved == null ? true : false;
     return Scaffold(
       body: SingleChildScrollView(
         child: SafeArea(
@@ -112,10 +123,10 @@ class _Page1State extends State<Page1> {
                           child: showAnonymous ? Image(
                       image: AssetImage('images/anonymous.png'),
                     ) : null,
-                          decoration: !showAnonymous ? new BoxDecoration(
+                      decoration: !showAnonymous ? new BoxDecoration(
                             shape: BoxShape.circle,
                             image: new DecorationImage(fit:BoxFit.cover,
-                            image: new FileImage(imagePicked))) : null,
+                            image: userImageSaved != null ? NetworkImage(userImageSaved) : new FileImage(imagePicked))) : null,
                 ),
                 ),
                 CupertinoButton(child: Text("Choose Profile Image"), onPressed: () {
@@ -142,7 +153,7 @@ class _Page1State extends State<Page1> {
                           ),
                         ),
                         validator: (val) {
-                          if (val == "") {
+                          if (val == "" || val == null) {
                             return "Please enter a name";
                           }
                           return null;
