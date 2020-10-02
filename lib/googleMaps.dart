@@ -180,16 +180,16 @@ class GoogleMapsState extends State<GoogleMaps> {
   void setFinalIcon() {
     //If the platform is android, we use a slightly bigger picture as the marker strangely is smaller on android than ios
     if (Platform.isAndroid) {
-      BitmapDescriptor.fromAssetImage(
-          ImageConfiguration(size: Size(2, 2)), 'images/final_loc_marker_android.png')
+      BitmapDescriptor.fromAssetImage(ImageConfiguration(size: Size(2, 2)),
+              'images/final_loc_marker_android.png')
           .then((onValue) {
         finalIcon = onValue;
       });
     }
     //Otherwise, we use the ios version
     else {
-      BitmapDescriptor.fromAssetImage(
-          ImageConfiguration(size: Size(2, 2)), 'images/final_loc_marker_ios.png')
+      BitmapDescriptor.fromAssetImage(ImageConfiguration(size: Size(2, 2)),
+              'images/final_loc_marker_ios.png')
           .then((onValue) {
         finalIcon = onValue;
       });
@@ -277,7 +277,7 @@ class GoogleMapsState extends State<GoogleMaps> {
   //Function that will send an http request to google maps to calculate the travel time
   void calculateTravelTime() async {
     print("finalLatLng = $finalLatLng");
-    if (currLocation == null || finalLatLng == null){
+    if (currLocation == null || finalLatLng == null) {
       Global.hours = 0;
       Global.minutes = 0;
       return;
@@ -338,9 +338,9 @@ class GoogleMapsState extends State<GoogleMaps> {
               "${place.name}, ${place.subLocality}, ${place.locality}, ${place.postalCode}, ${place.country}";
         }
         //If platform is Android
-        else{
+        else {
           searchAddr =
-          "${place.name}, ${place.thoroughfare}, ${place.locality}, ${place.postalCode}, ${place.country}";
+              "${place.name}, ${place.thoroughfare}, ${place.locality}, ${place.postalCode}, ${place.country}";
         }
       });
     } catch (e) {
@@ -696,12 +696,13 @@ class GoogleMapsState extends State<GoogleMaps> {
   Widget build(BuildContext context) {
     return (_center == null || mapLoaded == false)
         ? Container(
-            decoration: BoxDecoration(
+            color: Color(Global.backgroundColor),
+            /*decoration: BoxDecoration(
               image: DecorationImage(
                 image: AssetImage("images/Map_loading.png"),
                 fit: BoxFit.cover,
               ),
-            ),
+            ),*/
             child: Center(
               child: SpinKitPulse(
                 size: 280,
@@ -742,7 +743,6 @@ class GoogleMapsState extends State<GoogleMaps> {
                       ),
                       onPressed: () => Scaffold.of(context).openDrawer(),
                     )),
-                    
                 Positioned(
                   top: 65,
                   right: 15,

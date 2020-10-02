@@ -18,6 +18,7 @@ class Global {
   static List cities = [];
   static List states = [];
   static List zipCodes = [];
+  static List distances = [];
 
   static double finalMidLon;
   static double finalMidLat;

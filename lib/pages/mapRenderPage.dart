@@ -21,9 +21,6 @@ import "../globalVar.dart";
 import "../findYelpPlaces.dart";
 import 'package:share/share.dart';
 //import "../dynamicLinks.dart";
-import 'dart:convert';
-
-
 
 import 'package:http/http.dart' as http;
 import 'dart:convert' as convert;
@@ -102,7 +99,7 @@ class Message {
       
       if(profileImage == null || name == null) {
         // if one of them is null, have to run bottom code
-        Map<String, dynamic> attributes = jsonDecode(message["attributes"]);
+        Map<String, dynamic> attributes = convert.jsonDecode(message["attributes"]);
         String profileImageURL = attributes["profileImage"];
         // when the user of this message left the chat, here's the backup data
         NetworkImage cachedData = Global.imageCache[profileImageURL];
@@ -460,6 +457,7 @@ class _MapRenderState extends State<MapRender>
     Global.names.clear();
     Global.resultCords.clear();
     Global.locations.clear();
+    Global.distances.clear();
     Global.urls.clear();
     Global.images.clear();
     Global.ratings.clear();
@@ -485,6 +483,11 @@ class _MapRenderState extends State<MapRender>
         Global.isOpen.add(place['isOpen']);
         Global.phoneNums.add(place['phone']);
         Global.prices.add(place['price']);
+        Global.addresses.add(place['address']);
+        Global.states.add(place['state']);
+        Global.cities.add(place['city']);
+        Global.zipCodes.add(place['zip_code']);
+        Global.distances.add(place['distance']);
       }
     });
   }
@@ -502,6 +505,11 @@ class _MapRenderState extends State<MapRender>
         Global.isOpen.add(place['isOpen']);
         Global.phoneNums.add(place['phone']);
         Global.prices.add(place['price']);
+        Global.addresses.add(place['address']);
+        Global.states.add(place['state']);
+        Global.cities.add(place['city']);
+        Global.zipCodes.add(place['zip_code']);
+        Global.distances.add(place['distance']);
       }
     });
   }
@@ -519,6 +527,11 @@ class _MapRenderState extends State<MapRender>
         Global.isOpen.add(place['isOpen']);
         Global.phoneNums.add(place['phone']);
         Global.prices.add(place['price']);
+        Global.addresses.add(place['address']);
+        Global.states.add(place['state']);
+        Global.cities.add(place['city']);
+        Global.zipCodes.add(place['zip_code']);
+        Global.distances.add(place['distance']);
       }
     });
   }
@@ -554,7 +567,7 @@ class _MapRenderState extends State<MapRender>
         width: double.infinity,
         decoration: BoxDecoration(
           color: Colors.white,
-          borderRadius: BorderRadius.all(Radius.circular(10)),
+          borderRadius: BorderRadius.all(Radius.circular(20)),
         ),
         child: Text(
           "No Places Found.",
@@ -797,7 +810,7 @@ class _MapRenderState extends State<MapRender>
                             borderRadius: BorderRadius.all(Radius.circular(10)),
                             child: Image.network(
                               Global.images[index] == ''
-                                  ? 'https://firebasestorage.googleapis.com/v0/b/rendezvous-b51b4.appspot.com/o/photo-1550747545-c896b5f89ff7.jpeg?alt=media&token=eb3eb883-86da-4b89-87e1-7490fd518910'
+                                  ? 'https://firebasestorage.googleapis.com/v0/b/rendezvous-b51b4.appspot.com/o/NoImage.png?alt=media&token=1db51462-9844-4073-8252-54622e5283d0'
                                   : '${Global.images[index]}',
                               // 'https://firebasestorage.googleapis.com/v0/b/rendezvous-b51b4.appspot.com/o/photo-1550747545-c896b5f89ff7.jpeg?alt=media&token=eb3eb883-86da-4b89-87e1-7490fd518910',
                               fit: BoxFit.cover,
@@ -809,7 +822,7 @@ class _MapRenderState extends State<MapRender>
                                 topRight: Radius.circular(10)),
                             child: Image.network(
                               Global.images[index] == ''
-                                  ? 'https://firebasestorage.googleapis.com/v0/b/rendezvous-b51b4.appspot.com/o/photo-1550747545-c896b5f89ff7.jpeg?alt=media&token=eb3eb883-86da-4b89-87e1-7490fd518910'
+                                  ? 'https://firebasestorage.googleapis.com/v0/b/rendezvous-b51b4.appspot.com/o/NoImage.png?alt=media&token=1db51462-9844-4073-8252-54622e5283d0'
                                   : '${Global.images[index]}',
                               // 'https://firebasestorage.googleapis.com/v0/b/rendezvous-b51b4.appspot.com/o/photo-1550747545-c896b5f89ff7.jpeg?alt=media&token=eb3eb883-86da-4b89-87e1-7490fd518910',
                               fit: BoxFit.cover,
@@ -861,7 +874,7 @@ class _MapRenderState extends State<MapRender>
                               width: !_isExpanded[index] ? double.infinity : 0,
                               duration: Duration(milliseconds: 500),
                               child: Text(
-                                'Click to see more information',
+                                '${(Global.distances[index] * 0.000621371).toStringAsFixed(2)} mi',
                                 maxLines: 1,
                                 style: textSize12Grey(),
                               ),
@@ -912,7 +925,8 @@ class _MapRenderState extends State<MapRender>
                   children: <Widget>[
                     Row(children: <Widget>[
                       Container(
-                        child: starRating(index),//Text(Global.ratings[index] == null ? '' : '${Global.ratings[index]}'), //
+                        child: starRating(
+                            index), //Text(Global.ratings[index] == null ? '' : '${Global.ratings[index]}'), //
                       ),
                       Container(
                         padding: EdgeInsets.fromLTRB(10, 0, 0, 0),
@@ -943,7 +957,8 @@ class _MapRenderState extends State<MapRender>
                       padding: EdgeInsets.fromLTRB(0, 10, 0, 0),
                       width: MediaQuery.of(context).size.width * 0.5,
                       child: Text(
-                        "${Global.locations[index]} ",
+                        "${Global.addresses[index]} \n${Global.cities[index]}, ${Global.states[index]} \n${Global.zipCodes[index]} ",
+                        //"${Global.locations[index]}",
                         softWrap: true,
                         style: GoogleFonts.roboto(fontSize: 16),
                         textAlign: TextAlign.left,
@@ -1013,14 +1028,16 @@ class _MapRenderState extends State<MapRender>
         child: FittedBox(
           child: FloatingActionButton(
             heroTag: null,
-            backgroundColor: Colors.greenAccent,
+            backgroundColor: Color(Global.backgroundColor),
             child: Icon(
-              Icons.check_circle,
+              Icons.check,
               size: 35,
+              color: Colors.green,
               //color: Color(0xff21bf73),
             ),
             elevation: 4,
             onPressed: () {
+              _showDialog();
               FirebaseFunctions.setFinalPosition(Global.names[index],
                   Global.locations[index], Global.resultCords[index]);
             },
@@ -1039,39 +1056,46 @@ class _MapRenderState extends State<MapRender>
         padding: EdgeInsets.fromLTRB(10, 10, 0, 0),
         child: Text(
           'Sorry, but there seems to be a problem with retrieving the yelp Places. Please try searching again',
-          style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
+          style: GoogleFonts.roboto(fontSize: 18, fontWeight: FontWeight.bold),
         ),
       );
     } else if (Global.searchingCategory == false && Global.arrLength > 0) {
       return Container(
-        padding: EdgeInsets.fromLTRB(10, 10, 0, 0),
-        child: Text(
-          'Showing ${Global.arrLength} results for: ${Global.finalCategory} within ${Global.finalRad}mi',
-          style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
+        margin: EdgeInsets.fromLTRB(0, 0, 0, 40),
+        child: Center(
+          child: Text(
+            'Showing ${Global.arrLength} results for: ${Global.finalCategory} within ${Global.finalRad}mi',
+            style:
+                GoogleFonts.roboto(fontSize: 18, fontWeight: FontWeight.bold),
+          ),
         ),
       );
     } else if (Global.searchingCategory == false && Global.arrLength == 0) {
       return Container(
-        padding: EdgeInsets.fromLTRB(10, 10, 0, 0),
-        child: Text(
-          'No places found for: ${Global.finalCategory} within ${Global.finalRad}mi. Try increasing the search radius or changing the category',
-          style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
+        margin: EdgeInsets.fromLTRB(0, 0, 0, 40),
+        child: Center(
+          child: Text(
+            'No results found for ${Global.finalCategory} within ${Global.finalRad}mi',
+            style:
+                GoogleFonts.roboto(fontSize: 18, fontWeight: FontWeight.bold),
+          ),
         ),
       );
     } else {
       sortCategory = "Distance";
       return Container(
-        padding: EdgeInsets.fromLTRB(10, 10, 0, 0),
+        padding: EdgeInsets.fromLTRB(40, 25, 0, 0),
         child: Column(
           children: <Widget>[
             Row(
-              mainAxisAlignment: MainAxisAlignment.start,
+              //mainAxisAlignment: MainAxisAlignment.start,
               children: <Widget>[
                 Container(
                     child: Text(
                   "Searching for: ${Global.finalCategory}",
                   softWrap: true,
-                  style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
+                  style: GoogleFonts.roboto(
+                      fontSize: 18, fontWeight: FontWeight.bold),
                 )),
                 Padding(
                   padding: EdgeInsets.fromLTRB(5, 0, 0, 0),
@@ -1080,7 +1104,7 @@ class _MapRenderState extends State<MapRender>
                       height: 15,
                       width: 15,
                       child: CircularProgressIndicator(
-                        strokeWidth: 3.0,
+                        strokeWidth: 1.5,
                       ),
                     ),
                   ),
@@ -1277,6 +1301,28 @@ class _MapRenderState extends State<MapRender>
               context, '/page1', (route) => false);
         },
       ),
+    );
+  }
+
+  Widget _showDialog() {
+    // flutter defined function
+    showDialog(
+      context: context,
+      builder: (BuildContext context) {
+        // return object of type Dialog
+        return AlertDialog(
+          title: new Text("Final Location Set!"),
+          actions: <Widget>[
+            // usually buttons at the bottom of the dialog
+            new FlatButton(
+              child: new Text("Close"),
+              onPressed: () {
+                Navigator.of(context).pop();
+              },
+            ),
+          ],
+        );
+      },
     );
   }
 
@@ -1692,7 +1738,7 @@ class _MapRenderState extends State<MapRender>
                     height: MediaQuery.of(context).size.height * 0.08,
                   ),
                   Container(
-                    height: 50,
+                    height: 40,
                     color: Color(Global.backgroundColor),
                     child: TabBar(
                         labelColor: Colors.black,
@@ -1778,7 +1824,7 @@ class _MapRenderState extends State<MapRender>
           //appBar: appBarMain(context),
           body: Container(
             color: Color(Global.backgroundColor),
-            child: ClipRRect(borderRadius: onlyTop10(), child: _slideUpPanel()),
+            child: ClipRRect(borderRadius: onlyTop20(), child: _slideUpPanel()),
           ),
 
           drawer: _viewDrawer(),
