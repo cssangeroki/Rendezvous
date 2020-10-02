@@ -87,7 +87,6 @@ class _Page1State extends State<Page1> {
 
   Future getImage() async {
 
-<<<<<<< HEAD
     final pickedFile = await picker.getImage(source: ImageSource.gallery);
 
     if(pickedFile != null) {
@@ -100,19 +99,12 @@ class _Page1State extends State<Page1> {
         Global.profileImageURL = pickedFile.path;
         Global.updateProfileImage = true;
     }
-=======
-    setState(() {
-      imagePicked = File(pickedFile.path);
-    });
-
-    Global.profileImage = File(pickedFile.path);
-    Global.updateProfileImage = true;
->>>>>>> 918190254bcbb528217625738185d3067af99fdd
   }
   
 
   @override
   Widget build(BuildContext context) {
+    // screen height
     var screenHeight = MediaQuery.of(context).size.height;
     var showAnonymous = imagePicked == null && userImageSaved == null ? true : false;
     return Scaffold(
@@ -125,19 +117,6 @@ class _Page1State extends State<Page1> {
                   onTap: () {
                     getImage();
                   },
-<<<<<<< HEAD
-                  child: Container(margin: EdgeInsets.fromLTRB(0, screenHeight * 0.2, 0, 0),
-                          width: screenHeight * 0.2,
-                          height: screenHeight * 0.2,
-                          child: showAnonymous ? Image(
-                      image: AssetImage('images/anonymous.png'),
-                    ) : null,
-                      decoration: !showAnonymous ? new BoxDecoration(
-                            shape: BoxShape.circle,
-                            image: new DecorationImage(fit:BoxFit.cover,
-                            image: userImageSaved != null ? NetworkImage(userImageSaved) : new FileImage(imagePicked))) : null,
-                ),
-=======
                   child: Container(
                     margin: EdgeInsets.fromLTRB(0, screenHeight * 0.2, 0, 0),
                     width: screenHeight * 0.2,
@@ -158,7 +137,6 @@ class _Page1State extends State<Page1> {
                                 image: new FileImage(imagePicked)))
                         : null,
                   ),
->>>>>>> 918190254bcbb528217625738185d3067af99fdd
                 ),
                 CupertinoButton(
                     child: Text("Choose Profile Image"),
