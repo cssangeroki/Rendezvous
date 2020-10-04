@@ -67,7 +67,6 @@ class _Page2State extends State<Page2> {
     // create a room, send user to room
 
     //databaseMethods.createMapRoom(roomCode, name);
-    print("roomCode is: " + roomCode);
     saveRoomCodePreference(roomCode).then((_) {
       Navigator.push(
         context,

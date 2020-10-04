@@ -199,31 +199,22 @@ class FirebaseFunctions {
                 userData["memberID"] = memberID;
             }
 
-            print("Okay1");
             FirebaseFunctions.currentUserData["memberID"] = memberID;
-            print("Okay2");
             roomData["host"] = value.data["host"];
             roomData["host UID"] = value.data["host UID"];
             roomData["Final Location"] = value.data["Final Location"];
             roomData["Final Location Address"] = value.data["Final Location Address"];
             roomData["Final LatLng"] = value.data["Final LatLng"];
-            print("Okay3");
       });
-            print("Okay4");
       await Firestore.instance
           .collection("users")
           .document(FirebaseFunctions?.currentUID)
           .updateData(userData).then((result) {
-            print("Okay5");
         return true;
       });
-      print("Okay 6");
     }).catchError((err) {
-      print("Error");
-      print(err);
       return false;
     });
-    print("Okay 7");
     return true;
   }
 

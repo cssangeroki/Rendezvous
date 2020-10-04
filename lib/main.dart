@@ -3,7 +3,6 @@ import 'package:flutter/services.dart';
 import 'pages/firebaseFunctions.dart';
 import 'pages/insertNamePage.dart';
 import 'pages/mapRenderPage.dart';
-import 'package:google_fonts/google_fonts.dart';
 import 'globalVar.dart';
 
 import 'package:firebase_auth/firebase_auth.dart';

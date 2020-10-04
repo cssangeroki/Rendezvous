@@ -4,11 +4,9 @@ import 'package:Rendezvous/pages/firebaseFunctions.dart';
 import 'package:flutter/material.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:google_fonts/google_fonts.dart';
-import '../appBar.dart';
 import 'createOrJoinPage.dart';
 import '../globalVar.dart';
 import 'package:flutter/cupertino.dart';
-import 'package:flutter/services.dart';
 import 'package:image_picker/image_picker.dart';
 import 'dart:io';
 
@@ -82,8 +80,6 @@ class _Page1State extends State<Page1> {
       }
     });
   }
-
-  bool _focus = false;
 
   Future getImage() async {
 

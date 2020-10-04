@@ -1,12 +1,9 @@
 import 'dart:convert';
 import "globalVar.dart";
 import 'package:Rendezvous/pages/firebaseFunctions.dart';
-import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
 import 'package:socket_io_client/socket_io_client.dart' as IO;
-import 'dart:developer';
 import 'package:intl/intl.dart';
-import 'package:intl/date_symbol_data_local.dart';
 
 import 'pages/firebaseFunctions.dart';
 

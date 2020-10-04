@@ -61,7 +61,8 @@ class Message {
   static Future<List<Widget>> getAndUpdateMessages(size,
       {isUpdate = false, var message}) async {
     if (!isUpdate) {
-      messages = await BackendMethods.getMessages(FirebaseFunctions.roomData["groupChatID"]);
+      messages = await BackendMethods.getMessages(
+          FirebaseFunctions.roomData["groupChatID"]);
     } else {
       messages.add(message);
     }
@@ -70,7 +71,9 @@ class Message {
 
     List<Widget> msgList = <Widget>[];
 
-    DateTime currentDate = messages.length == 0 ? DateTime.now() : DateTime.parse(messages[0]["dateCreated"]).toLocal();
+    DateTime currentDate = messages.length == 0
+        ? DateTime.now()
+        : DateTime.parse(messages[0]["dateCreated"]).toLocal();
     bool didAdd = false;
 
     for (var message in messages) {
@@ -79,9 +82,9 @@ class Message {
       if (currentDate.day == datetime.day &&
           currentDate.year == datetime.year &&
           currentDate.month == datetime.month) {
-      
         if (!didAdd) {
-          Widget msgTitle = Message.createDayTitle(BackendMethods.convertDateToPresentDate(datetime, isTitle: true));
+          Widget msgTitle = Message.createDayTitle(
+              BackendMethods.convertDateToPresentDate(datetime, isTitle: true));
           msgList.add(msgTitle);
           didAdd = true;
         }
@@ -89,32 +92,34 @@ class Message {
         currentDate = datetime;
         didAdd = false;
       }
-     
-      print(FirebaseFunctions.roomData["profileImages"]);
-      NetworkImage profileImage = FirebaseFunctions.roomData["profileImages"][message["from"]];
-      String name = FirebaseFunctions.roomData["userNames"][message["from"]] ?? null;
-      
-      if(profileImage == null || name == null) {
+
+      NetworkImage profileImage =
+          FirebaseFunctions.roomData["profileImages"][message["from"]];
+      String name =
+          FirebaseFunctions.roomData["userNames"][message["from"]] ?? null;
+
+      if (profileImage == null || name == null) {
         // if one of them is null, have to run bottom code
-        Map<String, dynamic> attributes = convert.jsonDecode(message["attributes"]);
+        Map<String, dynamic> attributes =
+            convert.jsonDecode(message["attributes"]);
         String profileImageURL = attributes["profileImage"];
         // when the user of this message left the chat, here's the backup data
         NetworkImage cachedData = Global.imageCache[profileImageURL];
 
-        if(profileImage == null) {
-          if(cachedData != null) {
+        if (profileImage == null) {
+          if (cachedData != null) {
             profileImage = cachedData;
-          } else if(profileImageURL != null) {
+          } else if (profileImageURL != null) {
             Global.imageCache[profileImageURL] = NetworkImage(profileImageURL);
             profileImage = Global.imageCache[profileImageURL];
           }
         }
 
-        if(name == null) {
+        if (name == null) {
           name = attributes["userName"];
         }
       }
-    
+
       Widget msg = Message.createMessage(
           size,
           name,
@@ -150,73 +155,69 @@ class Message {
     return Container(
         child: Padding(
             padding: EdgeInsets.all(10.0),
-            child: Row(
-                crossAxisAlignment: CrossAxisAlignment.end,
-                children: <Widget>[
-                  Container(
-                    margin: EdgeInsets.fromLTRB(0, 0, 5, 0),
-                    width: size * 0.08,
-                    height: size * 0.08,
-                    child: showAnonymous
-                        ? Image(
-                            
-                            image: AssetImage('images/anonymous.png'),
-                          )
-                        : null,
-                    decoration: !showAnonymous
-                        ? new BoxDecoration(
-                            shape: BoxShape.circle,
-                            image: new DecorationImage(
-                                fit: BoxFit.cover, image: img))
-                        : null,
-                  ),
-                  Align(
-                      alignment: Alignment.centerRight,
-                      child: ClipRRect(
-                          borderRadius: BorderRadius.circular(10.0),
-                          child: Container(
-                              width: size,
-                              color: backgroundColor,
-                              child: Column(
-                                  crossAxisAlignment:
-                                      CrossAxisAlignment.stretch,
-                                  children: <Widget>[
-                                    Column(
-                                        crossAxisAlignment:
-                                            CrossAxisAlignment.start,
-                                        children: <Widget>[
-                                          Padding(
-                                              padding: EdgeInsets.fromLTRB(
-                                                  20, 10.0, 20.0, 10),
-                                              child: Text(isMe ? "Me" : who,
-                                                  textAlign: TextAlign.left,
-                                                  style: TextStyle(
-                                                      fontWeight:
-                                                          FontWeight.bold))),
-                                          Padding(
-                                              padding: EdgeInsets.fromLTRB(
-                                                  20, 0, 20.0, 10),
-                                              child: Text(text,
-                                                  textAlign: TextAlign.left))
-                                        ]),
-                                    Column(
-                                        crossAxisAlignment:
-                                            CrossAxisAlignment.end,
-                                        children: <Widget>[
-                                          Padding(
-                                              padding: EdgeInsets.fromLTRB(
-                                                  20, 0, 20.0, 10),
-                                              child: Text(
-                                                  BackendMethods
-                                                      .convertDateToPresentDate(
-                                                          date),
-                                                  textAlign: TextAlign.right,
-                                                  style: TextStyle(
-                                                      fontStyle:
-                                                          FontStyle.italic))),
-                                        ])
-                                  ]))))
-                ])));
+            child: Row(crossAxisAlignment: CrossAxisAlignment.end, children: <
+                Widget>[
+              Container(
+                margin: EdgeInsets.fromLTRB(0, 0, 5, 0),
+                width: size * 0.08,
+                height: size * 0.08,
+                child: showAnonymous
+                    ? Image(
+                        image: AssetImage('images/anonymous.png'),
+                      )
+                    : null,
+                decoration: !showAnonymous
+                    ? new BoxDecoration(
+                        shape: BoxShape.circle,
+                        image:
+                            new DecorationImage(fit: BoxFit.cover, image: img))
+                    : null,
+              ),
+              Align(
+                  alignment: Alignment.centerRight,
+                  child: ClipRRect(
+                      borderRadius: BorderRadius.circular(10.0),
+                      child: Container(
+                          width: size,
+                          color: backgroundColor,
+                          child: Column(
+                              crossAxisAlignment: CrossAxisAlignment.stretch,
+                              children: <Widget>[
+                                Column(
+                                    crossAxisAlignment:
+                                        CrossAxisAlignment.start,
+                                    children: <Widget>[
+                                      Padding(
+                                          padding: EdgeInsets.fromLTRB(
+                                              20, 10.0, 20.0, 10),
+                                          child: Text(isMe ? "Me" : who,
+                                              textAlign: TextAlign.left,
+                                              style: TextStyle(
+                                                  fontWeight:
+                                                      FontWeight.bold))),
+                                      Padding(
+                                          padding: EdgeInsets.fromLTRB(
+                                              20, 0, 20.0, 10),
+                                          child: Text(text,
+                                              textAlign: TextAlign.left))
+                                    ]),
+                                Column(
+                                    crossAxisAlignment: CrossAxisAlignment.end,
+                                    children: <Widget>[
+                                      Padding(
+                                          padding: EdgeInsets.fromLTRB(
+                                              20, 0, 20.0, 10),
+                                          child: Text(
+                                              BackendMethods
+                                                  .convertDateToPresentDate(
+                                                      date),
+                                              textAlign: TextAlign.right,
+                                              style: TextStyle(
+                                                  fontStyle:
+                                                      FontStyle.italic))),
+                                    ])
+                              ]))))
+            ])));
   }
 }
 
@@ -269,10 +270,10 @@ class _MapRenderState extends State<MapRender>
 
   void callbackSocket(String type, data) async {
     if (type == "messageAdded") {
-      Future<List<Widget>> futureMsgs = Message.getAndUpdateMessages(MediaQuery.of(context).size.width * 0.75);
+      Future<List<Widget>> futureMsgs = Message.getAndUpdateMessages(
+          MediaQuery.of(context).size.width * 0.75);
 
       futureMsgs.then((msgs) async {
-
         setState(() {
           messages = msgs;
           maxHeightScroll = 0.0;
@@ -374,11 +375,8 @@ class _MapRenderState extends State<MapRender>
     }
     //Set searching Category to true so that the loading sign shows
     Global.searchingCategory = true;
-    //print("Future is Canceled: ${futureToCancel.isCanceled}");
     futureToCancel = CancelableOperation.fromFuture(YelpPlaces.findingPlaces(),
-        onCancel: () {
-      print("findingPlaces canceled");
-    });
+        onCancel: () {});
     await futureToCancel.value;
     if (futureToCancel.isCanceled) {
       return;
@@ -811,7 +809,6 @@ class _MapRenderState extends State<MapRender>
                               Global.images[index] == ''
                                   ? 'https://firebasestorage.googleapis.com/v0/b/rendezvous-b51b4.appspot.com/o/NoImage.png?alt=media&token=1db51462-9844-4073-8252-54622e5283d0'
                                   : '${Global.images[index]}',
-                              // 'https://firebasestorage.googleapis.com/v0/b/rendezvous-b51b4.appspot.com/o/photo-1550747545-c896b5f89ff7.jpeg?alt=media&token=eb3eb883-86da-4b89-87e1-7490fd518910',
                               fit: BoxFit.cover,
                             ),
                           )
@@ -823,7 +820,6 @@ class _MapRenderState extends State<MapRender>
                               Global.images[index] == ''
                                   ? 'https://firebasestorage.googleapis.com/v0/b/rendezvous-b51b4.appspot.com/o/NoImage.png?alt=media&token=1db51462-9844-4073-8252-54622e5283d0'
                                   : '${Global.images[index]}',
-                              // 'https://firebasestorage.googleapis.com/v0/b/rendezvous-b51b4.appspot.com/o/photo-1550747545-c896b5f89ff7.jpeg?alt=media&token=eb3eb883-86da-4b89-87e1-7490fd518910',
                               fit: BoxFit.cover,
                             ),
                           ),
@@ -858,23 +854,11 @@ class _MapRenderState extends State<MapRender>
                                             fontSize: 18),
                                       ),
                                     ),
-                                    //textAlign: TextAlign.right,
                                   ),
                                 ],
                               ),
                             ),
                             SizedBox(height: 5),
-                            /*AnimatedContainer(
-                              // If the widget is visible, animate to 0.0 (invisible).
-                              // If the widget is hidden, animate to 1.0 (fully visible).
-                              width: !_isExpanded[index] ? double.infinity : 0,
-                              duration: Duration(milliseconds: 500),
-                              child: Text(
-                                '${(Global.distances[index] * 0.000621371).toStringAsFixed(2)} mi',
-                                maxLines: 1,
-                                style: textSize12Grey(),
-                              ),
-                            ),*/
                             SizedBox(height: 5),
                           ],
                         ),
@@ -922,7 +906,7 @@ class _MapRenderState extends State<MapRender>
                     Row(children: <Widget>[
                       Container(
                         child: starRating(
-                            index), //Text(Global.ratings[index] == null ? '' : '${Global.ratings[index]}'), //
+                            index),
                       ),
                       Container(
                         padding: EdgeInsets.fromLTRB(10, 0, 0, 0),
@@ -954,7 +938,6 @@ class _MapRenderState extends State<MapRender>
                       width: MediaQuery.of(context).size.width * 0.5,
                       child: Text(
                         "${Global.addresses[index]} \n${Global.cities[index]}, ${Global.states[index]} \n${Global.zipCodes[index]} ",
-                        //"${Global.locations[index]}",
                         softWrap: true,
                         style: GoogleFonts.roboto(fontSize: 16),
                         textAlign: TextAlign.left,
@@ -1084,7 +1067,6 @@ class _MapRenderState extends State<MapRender>
         child: Column(
           children: <Widget>[
             Row(
-              //mainAxisAlignment: MainAxisAlignment.start,
               children: <Widget>[
                 Container(
                     child: Text(
@@ -1159,7 +1141,6 @@ class _MapRenderState extends State<MapRender>
     if (isTextEditing) {
       final RenderBox box = _drawerKey.currentContext?.findRenderObject();
       if (box == null) {
-        print("Closed");
         setState(() {
           currentKeyBoardPadding = 0.0;
         });
@@ -1283,8 +1264,6 @@ class _MapRenderState extends State<MapRender>
               .collection("users")
               .getDocuments()
               .then((data) {
-            //print("I'm running");
-            //print(data.documents.length);
             Global.memberListener.cancel();
             roomListener.cancel();
             FirebaseFunctions.removeCurrentUserFromRoom(
@@ -1346,7 +1325,6 @@ class _MapRenderState extends State<MapRender>
             onChangeEnd: (double val) {
               setState(() {
                 //can I do this
-                print("Entered onChangeEnd");
                 Global.finalRad = val;
                 searchingYelpCategory();
               });
@@ -1436,10 +1414,8 @@ class _MapRenderState extends State<MapRender>
                 style: textSize35(),
                 enableInteractiveSelection: true,
                 onTap: () async {
-                  //String link =
-                  //    await DynamicLinkService.createAppLink("Join my room!");
                   Share.share(
-                    "${FirebaseFunctions.roomData["roomCode"]}",//\n$link",
+                    "Let's Rendezvous! Room code: ${FirebaseFunctions.roomData["roomCode"]}", //\n$link",
                     subject: "Let's Rendezvous! Join my room!",
                   );
                 },
@@ -1532,9 +1508,7 @@ class _MapRenderState extends State<MapRender>
         textChanged: (val) {
           setState(() {
             newAddress = val;
-            //Global.userAddress = val;
             autoCompleteSuggestions(val);
-            //Global.finalCategory = category;
           });
         },
       ),
@@ -1550,7 +1524,8 @@ class _MapRenderState extends State<MapRender>
         didRetrieveMessages = true;
       });
       WidgetsBinding.instance.addPostFrameCallback((timeStamp) {
-        Future<List<Widget>> futureMsgs = Message.getAndUpdateMessages(MediaQuery.of(context).size.width * 0.75);
+        Future<List<Widget>> futureMsgs = Message.getAndUpdateMessages(
+            MediaQuery.of(context).size.width * 0.75);
 
         futureMsgs.then((msgs) async {
           await BackendMethods.establishSocket(callbackSocket);
@@ -1769,43 +1744,6 @@ class _MapRenderState extends State<MapRender>
     );
   }
 
-/*
-  Widget _userSlider() {
-    return SliderTheme(
-      data: SliderTheme.of(context).copyWith(
-        activeTrackColor: Colors.red[500],
-        inactiveTrackColor: Colors.red[100],
-        trackShape: RectangularSliderTrackShape(),
-        trackHeight: 4.0,
-        thumbColor: Colors.white,
-        thumbShape: RoundSliderThumbShape(enabledThumbRadius: 10.0),
-        overlayColor: Colors.red.withAlpha(32),
-        overlayShape: RoundSliderOverlayShape(overlayRadius: 28.0),
-      ),
-      child: Container(
-        margin: EdgeInsets.all(5),
-        /*
-                      decoration: BoxDecoration(
-                          border: Border.all(
-                            color: Colors.black,
-                          ),
-                          borderRadius: BorderRadius.all(Radius.circular(20))), */
-        child: Slider(
-          value: userSliderVal,
-          onChanged: (double val) {
-            //We need to connect the yelp API here
-
-            setState(() {
-              userSliderVal = val;
-            });
-          },
-          min: 1,
-          max: 25,
-          divisions: 24,
-        ),
-      ),
-    );
-  }*/
 
   @override
   Widget build(BuildContext context) {

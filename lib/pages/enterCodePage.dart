@@ -6,7 +6,6 @@ import 'package:google_fonts/google_fonts.dart';
 import '../globalVar.dart';
 import '../appBar.dart';
 import 'firebaseFunctions.dart';
-import 'firebaseFunctions.dart';
 import 'mapRenderPage.dart';
 import 'package:flutter_fadein/flutter_fadein.dart';
 
@@ -15,7 +14,7 @@ bool loadingScreen = false;
 class Page4 extends StatefulWidget {
   final String roomCode;
   Page4({Key key, this.roomCode, this.name}) : super(key: key);
-  String name;
+  final String name;
 
   @override
   _Page4State createState() => _Page4State(roomCode, name);
@@ -46,7 +45,7 @@ class _Page4State extends State<Page4> {
         ));
   }
 
-  Future<bool> _fadeInFunc() {
+  void _fadeInFunc() {
     Future.delayed(const Duration(milliseconds: 300), () {
       setState(() {
         textController.fadeIn();
@@ -179,12 +178,9 @@ class _Page4State extends State<Page4> {
                               setState(() {
                                 loadingScreen = true;
                               });
-                              print("Before");
                               bool isSuccess =
                                   await FirebaseFunctions.addCurrentUserToRoom(
                                       this.roomCode);
-                              print("After");
-                              print(isSuccess);
                               if (isSuccess) {
                                 await FirebaseFunctions
                                     .refreshFirebaseUserData();
@@ -197,8 +193,8 @@ class _Page4State extends State<Page4> {
                                   loadingScreen = false;
                                   isValid = 'false';
                                   validationMessage = "Invalid code entered";
-                                  print('code not valid');
                                 });
+                                //Is this the same as above
                                 this.setState(() {
                                   validationMessage = "Invalid code entered";
                                 });

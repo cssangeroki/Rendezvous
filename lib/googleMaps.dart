@@ -36,7 +36,6 @@ Future<Position> currentLocation() async {
       await Geolocator().checkGeolocationPermissionStatus();
 //If we get access to the location services, we should get the current location, and return it
   if (geolocationStatus == GeolocationStatus.granted) {
-    print("Using location services to find current location");
 //Get the current location and return it
     Position position = await Geolocator()
         .getCurrentPosition(desiredAccuracy: LocationAccuracy.high);
@@ -44,7 +43,6 @@ Future<Position> currentLocation() async {
   }
 //Else, if we get any other value, we will return the last known position
   else {
-    print("Using last known location");
     Position position = await Geolocator()
         .getLastKnownPosition(desiredAccuracy: LocationAccuracy.high);
     return position;
@@ -278,7 +276,6 @@ class GoogleMapsState extends State<GoogleMaps> {
 
   //Function that will send an http request to google maps to calculate the travel time
   void calculateTravelTime() async {
-    print("finalLatLng = $finalLatLng");
     if (currLocation == null || finalLatLng == null) {
       Global.hours = 0;
       Global.minutes = 0;
@@ -331,7 +328,6 @@ class GoogleMapsState extends State<GoogleMaps> {
     try {
       List<Placemark> p = await Geolocator()
           .placemarkFromCoordinates(_center.latitude, _center.longitude);
-      //print(_center);
       Placemark place = p[0];
 
       //We check the platform as GeoCoding changes between iOS and Android
@@ -348,6 +344,7 @@ class GoogleMapsState extends State<GoogleMaps> {
         }
       });
     } catch (e) {
+      //May have to add some error handling here
       print(e);
     }
   }
@@ -452,11 +449,9 @@ class GoogleMapsState extends State<GoogleMaps> {
   }
 
   void _onMapCreated(GoogleMapController controller) async {
-    print("Creating Map");
     mapController = controller;
     mapController.setMapStyle(_mapStyle);
 
-    print("Done creating Map!");
     _lastMapPosition = _center;
   }
 
@@ -614,10 +609,8 @@ class GoogleMapsState extends State<GoogleMaps> {
 
   void searchAndNavigate() async {
     try {
-      print("Entered here");
       //Get the placemark from the search address, and then store the center and userAddress
       await Geolocator().placemarkFromAddress(searchAddr).then((value) async {
-        print("Got placemark from Address");
         //Set our _center location to the new position
         _center =
             LatLng(value[0].position.latitude, value[0].position.longitude);
@@ -637,7 +630,6 @@ class GoogleMapsState extends State<GoogleMaps> {
     } catch (e) {
       Global.errorFindingUserAddress = true;
       Global.errorFindingUserAddressListener.value ^= true;
-      print("Error in searchAndNavigate in googleMaps.dart: $e");
     }
   }
 
@@ -780,11 +772,8 @@ class GoogleMapsState extends State<GoogleMaps> {
                               Global.searchingCategory = true;
                               Global.searchingPlaces.value ^= true;
                               await YelpPlaces.findingPlaces();
-                              //print("Got places");
                               Global.findYPCalled.value ^= true;
-                              //print("About to add markers");
                               addYelpMarkers();
-                              //print("SearchingCategory = ${Global.searchingCategory}");
                               Global.searchingCategory = false;
                               Global.searchingPlaces.value ^= true;
                             },
