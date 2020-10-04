@@ -44,7 +44,6 @@ class YelpPlaces {
     futureToCancel = CancelableOperation.fromFuture(
         BackendMethods.getLocations(Global.finalMidLon, Global.finalMidLat,
             Global.finalCategory, finalRadMiles.toInt()), onCancel: () {
-      print("Backend Call Cancelled");
     });
     try {
       businesses = await futureToCancel.value;
@@ -129,7 +128,6 @@ class YelpPlaces {
     }
     sortOrderedByPrice();
     sortOrderedByRating();
-    print("done");
     updateYelpVenues();
   }
 
@@ -170,13 +168,10 @@ class YelpPlaces {
         cos(midLatRad) *
             cos(newLatRad) *
             haversine(midLonRad, newLonRad);
-    //print("Have = $hav");
     double radEarth = 6371;
     var dist = 2*radEarth*asin(sqrt(hav));
-    //print("Distance of this place = $dist");
     //If the distance calculated is within the radius, return true, so we can display this location
     if (dist <= distanceInKm){
-      //print("Returning true");
       return true;
     }
     //Otherwise return false

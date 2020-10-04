@@ -35,16 +35,13 @@ class BackendMethods {
       });
 
       socket.on("error", (data){
-        //print(data);
       });
     
       socket.on("memberJoined", (data){
-       // print(data);
       });
     
 
       socket.on('syncMessages', (data){
-         // print(data);
       });
 
       socket.connect();
@@ -106,7 +103,6 @@ class BackendMethods {
   }
 
   static joinGroupChat(String identity, String groupChatID) async {
-      print("Called twice");
       var bodyJSON = <String, dynamic>{'identity':identity, 'channelID':groupChatID};
       final res = await http.post('$rootURL/twilioRoutes/joinGroupChat',
             headers: <String, String>{
