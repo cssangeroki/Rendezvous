@@ -72,8 +72,11 @@ class FirebaseFunctions {
                var names = {};
                var imagesURL = {};
               for(var doc in v.documents) {
-                names[doc.documentID] = doc.data["userName"];
-                imagesURL[doc.documentID] = doc.data["profileImage"];
+                  names[doc.documentID] = doc.data["userName"];
+                  var imageURL = doc.data["profileImage"];
+                  if (imageURL!= null) {   
+                      imagesURL[doc.documentID] = NetworkImage(imageURL);     
+                  }
               }
               FirebaseFunctions.roomData["userNames"] = names;
               FirebaseFunctions.roomData["profileImages"] = imagesURL;
@@ -146,7 +149,7 @@ class FirebaseFunctions {
     // might want to check if room exists here?
     String userName = FirebaseFunctions.currentUserData["userName"];
     var roomData = {
-      "userID": FirebaseFunctions?.currentUID,
+      "userID": FirebaseFunctions.currentUserData["userID"],
       "userName": userName,
     };
 
@@ -156,15 +159,18 @@ class FirebaseFunctions {
     var userData = {"roomCode": roomCode, "memberID": memberID, "userName": userName};
     FirebaseFunctions.currentUserData["memberID"] = memberID;
     if(Global.updateProfileImage) {
-        String imageID = await FirebaseFunctions.uploadImage("profileImages", FirebaseFunctions?.currentUID, Global.profileImage);
+        String imageID = await FirebaseFunctions.uploadImage("profileImages", FirebaseFunctions.currentUserData["userID"], Global.profileImage);
         Global.updateProfileImage = false;
         Global.profileImage = NetworkImage(imageID);
         roomData["profileImage"] = imageID;
         userData["profileImage"] = imageID;
+        FirebaseFunctions.currentUserData["profileImage"] = imageID;
     }
+
     if(FirebaseFunctions.currentUserData["profileImage"] != null) {
         roomData["profileImage"] = FirebaseFunctions.currentUserData["profileImage"];
     }
+
 
     bool isValid = await FirebaseFunctions.checkExist(roomCode);
     if (!isValid) {
@@ -187,32 +193,37 @@ class FirebaseFunctions {
           .then((value) async {
 
 
-          if(callBackend) {
-              var memberData = await BackendMethods.joinGroupChat(FirebaseFunctions?.currentUID, value.data["groupChatID"]);
-              memberID = memberData["sid"];
-              userData["memberID"] = memberID;
+            if(callBackend) {
+                var memberData = await BackendMethods.joinGroupChat(FirebaseFunctions?.currentUID, value.data["groupChatID"]);
+                memberID = memberData["sid"];
+                userData["memberID"] = memberID;
+            }
 
-              
-          }
-          FirebaseFunctions.currentUserData["memberID"] = memberID;
-
-          roomData["host"] = value.data["host"];
-          roomData["host UID"] = value.data["host UID"];
-          roomData["Final Location"] = value.data["Final Location"];
-          roomData["Final Location Address"] =
-              value.data["Final Location Address"];
-          roomData["Final LatLng"] = value.data["Final LatLng"];
+            print("Okay1");
+            FirebaseFunctions.currentUserData["memberID"] = memberID;
+            print("Okay2");
+            roomData["host"] = value.data["host"];
+            roomData["host UID"] = value.data["host UID"];
+            roomData["Final Location"] = value.data["Final Location"];
+            roomData["Final Location Address"] = value.data["Final Location Address"];
+            roomData["Final LatLng"] = value.data["Final LatLng"];
+            print("Okay3");
       });
+            print("Okay4");
       await Firestore.instance
           .collection("users")
           .document(FirebaseFunctions?.currentUID)
           .updateData(userData).then((result) {
+            print("Okay5");
         return true;
       });
+      print("Okay 6");
     }).catchError((err) {
+      print("Error");
+      print(err);
       return false;
     });
-
+    print("Okay 7");
     return true;
   }
 

@@ -135,6 +135,7 @@ class GoogleMapsState extends State<GoogleMaps> {
   @override
   void dispose() {
     super.dispose();
+  
   }
 
   void setCircle(LatLng point) {
@@ -308,6 +309,9 @@ class GoogleMapsState extends State<GoogleMaps> {
     Timer.periodic(timeReset, (timer) {
       //If both the current location and finalLatLng are not null, only then do we calculate the travel time
       if (currLocation != null && finalLatLng != null) {
+        // if(!mounted) {
+        //   return;
+        // }
         print("Neither are null");
         calculateTravelTime();
       }
@@ -360,8 +364,11 @@ class GoogleMapsState extends State<GoogleMaps> {
         Map<dynamic, dynamic> imagesURL = FirebaseFunctions.roomData["profileImages"] == null ? {} : FirebaseFunctions.roomData["profileImages"];
         
         for(var doc in snapshot.documents) {
+          var imageURL = doc.data["profileImage"];
+          if (imageURL!= null){   
+              imagesURL[doc.documentID] = NetworkImage(imageURL);     
+          }
           names[doc.documentID] = doc.data["userName"];
-          imagesURL[doc.documentID] = NetworkImage(doc.data["profileImage"]);
         }
 
         FirebaseFunctions.roomData["userNames"] =  names;

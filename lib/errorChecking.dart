@@ -22,6 +22,9 @@ class _AddressSearchBarErrorState extends State<AddressSearchBarError> {
   }
 
   void listenToSearchAddressError() {
+    // if(!mounted) {
+    //   return;
+    // }
     Global.errorFindingUserAddressListener.addListener(() {
       setState(() {});
     });

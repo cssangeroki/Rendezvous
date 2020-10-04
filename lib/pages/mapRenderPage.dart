@@ -94,6 +94,7 @@ class Message {
         didAdd = false;
       }
      
+      print(FirebaseFunctions.roomData["profileImages"]);
       NetworkImage profileImage = FirebaseFunctions.roomData["profileImages"][message["from"]];
       String name = FirebaseFunctions.roomData["userNames"][message["from"]] ?? null;
       
@@ -103,10 +104,11 @@ class Message {
         String profileImageURL = attributes["profileImage"];
         // when the user of this message left the chat, here's the backup data
         NetworkImage cachedData = Global.imageCache[profileImageURL];
+
         if(profileImage == null) {
           if(cachedData != null) {
             profileImage = cachedData;
-          } else {
+          } else if(profileImageURL != null) {
             Global.imageCache[profileImageURL] = NetworkImage(profileImageURL);
             profileImage = Global.imageCache[profileImageURL];
           }
@@ -161,6 +163,7 @@ class Message {
                     height: size * 0.08,
                     child: showAnonymous
                         ? Image(
+                            
                             image: AssetImage('images/anonymous.png'),
                           )
                         : null,

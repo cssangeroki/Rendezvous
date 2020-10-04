@@ -179,10 +179,12 @@ class _Page4State extends State<Page4> {
                               setState(() {
                                 loadingScreen = true;
                               });
-
+                              print("Before");
                               bool isSuccess =
                                   await FirebaseFunctions.addCurrentUserToRoom(
                                       this.roomCode);
+                              print("After");
+                              print(isSuccess);
                               if (isSuccess) {
                                 await FirebaseFunctions
                                     .refreshFirebaseUserData();

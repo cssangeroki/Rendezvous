@@ -106,7 +106,8 @@ class _Page1State extends State<Page1> {
   Widget build(BuildContext context) {
     // screen height
     var screenHeight = MediaQuery.of(context).size.height;
-    var showAnonymous = imagePicked == null && userImageSaved == null ? true : false;
+    // did you choose an image
+    var showAnonymous = imagePicked == null ? true : false;
     return Scaffold(
       body: SingleChildScrollView(
         child: SafeArea(
@@ -125,7 +126,7 @@ class _Page1State extends State<Page1> {
                         ? ClipRRect(
                             borderRadius: BorderRadius.circular(100.0),
                             child: Image(
-                              image: AssetImage('images/anonymous.png'),
+                              image: userImageSaved != null ? NetworkImage(userImageSaved) : AssetImage('images/anonymous.png'),
                             ),
                           )
                         : null,
