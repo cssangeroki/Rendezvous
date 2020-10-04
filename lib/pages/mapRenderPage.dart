@@ -4,7 +4,6 @@ import 'dart:async';
 import 'package:async/async.dart';
 
 import 'package:bubble_tab_indicator/bubble_tab_indicator.dart';
-import 'package:socket_io_client/socket_io_client.dart';
 import '../appBar.dart';
 import 'firebaseFunctions.dart';
 import '../expandedSection.dart';
@@ -15,13 +14,10 @@ import 'package:google_fonts/google_fonts.dart';
 import 'package:sliding_up_panel/sliding_up_panel.dart';
 import 'package:flutter_rating_bar/flutter_rating_bar.dart'; //Alternate Rating
 
-//import 'package:link/link.dart';
 import "../googleMaps.dart";
 import "../globalVar.dart";
 import "../findYelpPlaces.dart";
 import 'package:share/share.dart';
-//import "../dynamicLinks.dart";
-
 import 'package:http/http.dart' as http;
 import 'dart:convert' as convert;
 
@@ -860,9 +856,6 @@ class _MapRenderState extends State<MapRender>
                                         style: GoogleFonts.roboto(
                                             fontWeight: FontWeight.w700,
                                             fontSize: 18),
-                                        /*textAlign:
-                                                                  TextAlign
-                                                                      .left,*/
                                       ),
                                     ),
                                     //textAlign: TextAlign.right,
@@ -871,7 +864,7 @@ class _MapRenderState extends State<MapRender>
                               ),
                             ),
                             SizedBox(height: 5),
-                            AnimatedContainer(
+                            /*AnimatedContainer(
                               // If the widget is visible, animate to 0.0 (invisible).
                               // If the widget is hidden, animate to 1.0 (fully visible).
                               width: !_isExpanded[index] ? double.infinity : 0,
@@ -881,7 +874,7 @@ class _MapRenderState extends State<MapRender>
                                 maxLines: 1,
                                 style: textSize12Grey(),
                               ),
-                            ),
+                            ),*/
                             SizedBox(height: 5),
                           ],
                         ),
@@ -1277,7 +1270,6 @@ class _MapRenderState extends State<MapRender>
           Global.finalLocationChanged.removeListener(() {});
           Global.timeChanged.removeListener(() {});
           Global.userLocChanged.removeListener(() {});
-
           //Reset the category
           Global.finalCategory = "All";
 
@@ -1307,7 +1299,7 @@ class _MapRenderState extends State<MapRender>
     );
   }
 
-  Widget _showDialog() {
+  void _showDialog() {
     // flutter defined function
     showDialog(
       context: context,

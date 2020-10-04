@@ -109,7 +109,7 @@ class GoogleMapsState extends State<GoogleMaps> {
   bool userMarkerDragged = false;
 
   //This will be used to reset the time every 60 seconds
-  Duration timeReset = Duration(seconds: 60);
+  //Duration timeReset = Duration(seconds: 60);
 
   String finalLocName;
   String finalLocAddress;
@@ -210,7 +210,8 @@ class GoogleMapsState extends State<GoogleMaps> {
     _lastMapPosition = _center;
     await _onAddMarkerButtonPressed();
     await _initMarkers();
-    updateTravelTime();
+    calculateTravelTime();
+    //updateTravelTime();
   }
 
   //This functions will listen to when the function addYelpMarkers is called outside and will add the yelpMarkers to the widget
@@ -305,18 +306,17 @@ class GoogleMapsState extends State<GoogleMaps> {
   }
 
   //This function will be used to update the travel time every minute
-  void updateTravelTime() async {
+  /*void updateTravelTime() async {
     Timer.periodic(timeReset, (timer) {
       //If both the current location and finalLatLng are not null, only then do we calculate the travel time
       if (currLocation != null && finalLatLng != null) {
         // if(!mounted) {
         //   return;
         // }
-        print("Neither are null");
         calculateTravelTime();
       }
     });
-  }
+  }*/
 
 //Function used to get users original position
   Future<void> _getUserLocation() async {
