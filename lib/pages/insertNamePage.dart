@@ -101,16 +101,16 @@ class _Page1State extends State<Page1> {
   @override
   Widget build(BuildContext context) {
     // screen height
-    var screenHeight = MediaQuery.of(context).size.height;
+    //var screenHeight = MediaQuery.of(context).size.height;
     // did you choose an image
-    var showAnonymous = imagePicked == null ? true : false;
+    //var showAnonymous = imagePicked == null ? true : false;
     return Scaffold(
       body: SingleChildScrollView(
         child: SafeArea(
           child: Container(
             child: Center(
               child: Column(children: <Widget>[
-                GestureDetector(
+                /*GestureDetector(
                   onTap: () {
                     getImage();
                   },
@@ -139,7 +139,7 @@ class _Page1State extends State<Page1> {
                     child: Text("Choose Profile Image"),
                     onPressed: () {
                       getImage();
-                    }),
+                    }),*/
                 Container(
                   width: 220.0,
                   child: AnimatedOpacity(
