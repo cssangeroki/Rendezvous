@@ -141,6 +141,7 @@ class _Page1State extends State<Page1> {
                       getImage();
                     }),*/
                 Container(
+                  margin: const EdgeInsets.fromLTRB(0, 250, 0, 0),
                   width: 220.0,
                   child: AnimatedOpacity(
                     duration: Duration(milliseconds: 100),
