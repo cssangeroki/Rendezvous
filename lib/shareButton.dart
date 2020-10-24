@@ -2,7 +2,6 @@ import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/widgets.dart';
 import 'package:share/share.dart';
-import 'pages/firebaseFunctions.dart';
 
 //This will be used for the share button for the room code and address
 class ShareButton extends StatelessWidget{

@@ -10,8 +10,9 @@ import 'dart:async';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
 import 'package:flutter_spinkit/flutter_spinkit.dart';
 
-//import 'pages/mapRenderPage.dart';
+//Needed for finding user location
 import 'package:geolocator/geolocator.dart';
+import 'package:geocoding/geocoding.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 
 import "globalVar.dart";
@@ -32,19 +33,18 @@ GlobalKey<GoogleMapsState> mapsKey = GlobalKey<GoogleMapsState>();
 Future<Position> currentLocation() async {
 //First, I want to check if location services are available
 //Lines below are to check if location services are enabled
-  GeolocationStatus geolocationStatus =
-      await Geolocator().checkGeolocationPermissionStatus();
+  LocationPermission geolocationStatus = await Geolocator.checkPermission();
 //If we get access to the location services, we should get the current location, and return it
-  if (geolocationStatus == GeolocationStatus.granted) {
+  if (geolocationStatus == LocationPermission.always ||
+      geolocationStatus == LocationPermission.whileInUse) {
 //Get the current location and return it
-    Position position = await Geolocator()
-        .getCurrentPosition(desiredAccuracy: LocationAccuracy.high);
+    Position position = await Geolocator.getCurrentPosition(
+        desiredAccuracy: LocationAccuracy.high);
     return position;
   }
 //Else, if we get any other value, we will return the last known position
   else {
-    Position position = await Geolocator()
-        .getLastKnownPosition(desiredAccuracy: LocationAccuracy.high);
+    Position position = await Geolocator.getLastKnownPosition();
     return position;
   }
 }
@@ -74,6 +74,7 @@ class GoogleMapsState extends State<GoogleMaps> {
   //static List<String> nameList = [];
   BitmapDescriptor myIcon;
   BitmapDescriptor finalIcon;
+
   //static StreamSubscription<QuerySnapshot> memberListener;
 
 //Initializing center of map
@@ -133,7 +134,6 @@ class GoogleMapsState extends State<GoogleMaps> {
   @override
   void dispose() {
     super.dispose();
-  
   }
 
   void setCircle(LatLng point) {
@@ -302,19 +302,6 @@ class GoogleMapsState extends State<GoogleMaps> {
     }
   }
 
-  //This function will be used to update the travel time every minute
-  /*void updateTravelTime() async {
-    Timer.periodic(timeReset, (timer) {
-      //If both the current location and finalLatLng are not null, only then do we calculate the travel time
-      if (currLocation != null && finalLatLng != null) {
-        // if(!mounted) {
-        //   return;
-        // }
-        calculateTravelTime();
-      }
-    });
-  }*/
-
 //Function used to get users original position
   Future<void> _getUserLocation() async {
     currPosition = await currentLocation();
@@ -326,8 +313,8 @@ class GoogleMapsState extends State<GoogleMaps> {
 //Getting the user address from the location coordinates
   Future<void> _getUserAddress() async {
     try {
-      List<Placemark> p = await Geolocator()
-          .placemarkFromCoordinates(_center.latitude, _center.longitude);
+      List<Placemark> p =
+          await placemarkFromCoordinates(_center.latitude, _center.longitude);
       Placemark place = p[0];
 
       //We check the platform as GeoCoding changes between iOS and Android
@@ -357,24 +344,29 @@ class GoogleMapsState extends State<GoogleMaps> {
         .collection("users")
         .snapshots()
         .listen((snapshot) async {
-        Map<dynamic, dynamic> names = FirebaseFunctions.roomData["userNames"] == null ? {} : FirebaseFunctions.roomData["userNames"];
-        Map<dynamic, dynamic> imagesURL = FirebaseFunctions.roomData["profileImages"] == null ? {} : FirebaseFunctions.roomData["profileImages"];
-        
-        for(var doc in snapshot.documents) {
-          var imageURL = doc.data["profileImage"];
-          if (imageURL!= null){   
-              imagesURL[doc.documentID] = NetworkImage(imageURL);     
-          }
-          names[doc.documentID] = doc.data["userName"];
+      Map<dynamic, dynamic> names =
+          FirebaseFunctions.roomData["userNames"] == null
+              ? {}
+              : FirebaseFunctions.roomData["userNames"];
+      Map<dynamic, dynamic> imagesURL =
+          FirebaseFunctions.roomData["profileImages"] == null
+              ? {}
+              : FirebaseFunctions.roomData["profileImages"];
+
+      for (var doc in snapshot.documents) {
+        var imageURL = doc.data["profileImage"];
+        if (imageURL != null) {
+          imagesURL[doc.documentID] = NetworkImage(imageURL);
         }
+        names[doc.documentID] = doc.data["userName"];
+      }
 
-        FirebaseFunctions.roomData["userNames"] =  names;
-        FirebaseFunctions.roomData["profileImages"] = imagesURL;
+      FirebaseFunctions.roomData["userNames"] = names;
+      FirebaseFunctions.roomData["profileImages"] = imagesURL;
 
-        clearOtherUserMarkers();
-        await callAddOtherUserMarkers(snapshot);
-        await findMidpoint(_markers);
-
+      clearOtherUserMarkers();
+      await callAddOtherUserMarkers(snapshot);
+      await findMidpoint(_markers);
     });
   }
 
@@ -458,8 +450,8 @@ class GoogleMapsState extends State<GoogleMaps> {
 //Function to get the address for the midpoint from the
   Future<void> placefromLatLng(LatLng mid) async {
 //Here, I will get the placemark from the coordinates
-    List<Placemark> p = await Geolocator()
-        .placemarkFromCoordinates(mid.latitude, mid.longitude);
+    List<Placemark> p =
+        await placemarkFromCoordinates(mid.latitude, mid.longitude);
 
     Placemark place = p[0];
     setState(() {
@@ -609,25 +601,27 @@ class GoogleMapsState extends State<GoogleMaps> {
 
   void searchAndNavigate() async {
     try {
-      //Get the placemark from the search address, and then store the center and userAddress
-      await Geolocator().placemarkFromAddress(searchAddr).then((value) async {
-        //Set our _center location to the new position
-        _center =
-            LatLng(value[0].position.latitude, value[0].position.longitude);
+      //Switching to google geocode api, because package:geocoding/geocoding.dart API wouldn't find results for iOS sometimes
+      //Problem was with iOS maps, and not the API
+      var response = await http.post(
+          "https://maps.googleapis.com/maps/api/geocode/json?address=$searchAddr&key=$mapsAPI_KEY");
+      if (response.statusCode == 200) {
+        var decoded = await convert.jsonDecode(response.body);
+        //Get the placemark from the search address, and then store it in _center
+        _center = LatLng(decoded['results'][0]['geometry']['location']['lat'],
+            decoded['results'][0]['geometry']['location']['lng']);
+      }
 //Set our _lastMapPosition also to the new position
-        _lastMapPosition = _center;
-        //Now I replace the users current position marker with the new marker
-        await _onAddMarkerButtonPressed();
+      _lastMapPosition = _center;
+      //Now I replace the users current position marker with the new marker
+      await _onAddMarkerButtonPressed();
 //With the placemark that will be stored in 'value', we move our camera to that position.
-        mapController.animateCamera(CameraUpdate.newCameraPosition(
-            CameraPosition(
-                target: LatLng(
-                    value[0].position.latitude, value[0].position.longitude),
-                zoom: 15.0)));
-      });
+      mapController.animateCamera(CameraUpdate.newCameraPosition(CameraPosition(
+          target: LatLng(_center.latitude, _center.longitude), zoom: 15.0)));
       Global.errorFindingUserAddress = false;
       Global.errorFindingUserAddressListener.value ^= true;
     } catch (e) {
+      print(e);
       Global.errorFindingUserAddress = true;
       Global.errorFindingUserAddressListener.value ^= true;
     }

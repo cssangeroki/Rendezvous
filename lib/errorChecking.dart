@@ -23,15 +23,18 @@ class _AddressSearchBarErrorState extends State<AddressSearchBarError> {
 
   void listenToSearchAddressError() {
     Global.errorFindingUserAddressListener.addListener(() {
+      if (!mounted){
+        return;
+      }
       setState(() {});
     });
   }
 
   @override
   void dispose() {
+    Global.errorFindingUserAddressListener.removeListener(() {});
     // TODO: implement dispose
     super.dispose();
-    Global.errorFindingUserAddressListener.removeListener(() {});
   }
 
   @override
