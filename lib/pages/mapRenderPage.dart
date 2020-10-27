@@ -876,7 +876,13 @@ class _MapRenderState extends State<MapRender>
                         ),
                       ),
                       SizedBox(height: 5),
-                      SizedBox(height: 5),
+                      Container(
+                        child: Text(
+                          "Tap for more information",
+                          style: TextStyle(color: Colors.grey),
+                        ),
+                      ),
+                      // SizedBox(height: 5),
                     ],
                   ),
                 )
