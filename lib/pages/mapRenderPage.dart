@@ -1042,11 +1042,10 @@ class _MapRenderState extends State<MapRender>
           child: FittedBox(
             child: FloatingActionButton(
               heroTag: null,
-              backgroundColor: Color(Global.backgroundColor),
+              backgroundColor: Colors.greenAccent,
               child: Icon(
-                Icons.check,
+                Icons.check_circle,
                 size: 35,
-                color: Colors.green,
                 //color: Color(0xff21bf73),
               ),
               elevation: 4,
