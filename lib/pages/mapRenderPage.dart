@@ -1090,7 +1090,7 @@ class _MapRenderState extends State<MapRender>
         child: Center(
           child: Text(
             'No results found for ${Global.finalCategory} within ${Global
-                .finalRad}mi',
+                .finalRad}mi.\nTry increasing the search radius or changing the search category',
             style:
             GoogleFonts.roboto(fontSize: 18, fontWeight: FontWeight.bold),
           ),

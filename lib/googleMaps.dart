@@ -455,8 +455,16 @@ class GoogleMapsState extends State<GoogleMaps> {
 
     Placemark place = p[0];
     setState(() {
-      midAddress =
-          "${place.name}, ${place.subLocality}, ${place.locality}, ${place.postalCode}, ${place.country}";
+      //If platform is iOS
+      if (Platform.isIOS) {
+        midAddress =
+            "${place.name}, ${place.subLocality}, ${place.locality}, ${place.postalCode}, ${place.country}";
+      }
+      //If platform is Android
+      else {
+        midAddress =
+            "${place.name}, ${place.thoroughfare}, ${place.locality}, ${place.postalCode}, ${place.country}";
+      }
     });
   }
 
