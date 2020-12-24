@@ -1,0 +1,47 @@
+{
+  "project_info": {
+    "project_number": "1013598496349",
+    "firebase_url": "https://rendezvous-b51b4.firebaseio.com",
+    "project_id": "rendezvous-b51b4",
+    "storage_bucket": "rendezvous-b51b4.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:1013598496349:android:8d833a0d6538995e668fb4",
+        "android_client_info": {
+          "package_name": "com.Rendezous.Rendezvous"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "1013598496349-2265bdmo50srp6rr85rsjqqfjihovlam.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyDrW8DpCC0qSP7HlARua2vnkSFTjK7u11E"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "1013598496349-2265bdmo50srp6rr85rsjqqfjihovlam.apps.googleusercontent.com",
+              "client_type": 3
+            },
+            {
+              "client_id": "1013598496349-ucf3vbtgib75tb25jri7h4meup43fluf.apps.googleusercontent.com",
+              "client_type": 2,
+              "ios_info": {
+                "bundle_id": "com.Rendezvous.Rendezvous"
+              }
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
