@@ -36,6 +36,9 @@ import 'package:google_maps_flutter/google_maps_flutter.dart';
 //For the share buttons for room code and
 import '../shareButton.dart';
 
+//For final location setting
+import '../finalLocationSearchBar.dart';
+
 const String mapsAPI_KEY = "AIzaSyBV961Ztopz9vyZrJq0AYAMJUTHmluu3FM";
 //Below are variables we will use for the sliders
 double midSliderVal = 1;
@@ -1252,6 +1255,20 @@ class _MapRenderState extends State<MapRender>
                       .roomData["Final Location"]}, ${FirebaseFunctions
                       .roomData["Final Location Address"]}");
             }),
+          ),
+          FinalLocationSearchBar(),
+          Container(
+          padding: EdgeInsets.fromLTRB(10, 0, 0, 0),
+          child: RichText(
+            text: TextSpan(
+                text: "Select final location on map, or enter your own here!",
+                style: TextStyle(
+                  color: Colors.lightBlue,
+                  fontStyle: FontStyle.italic
+                )
+            ),
+            softWrap: true,
+            ),
           ),
           Container(
             child: ListTile(

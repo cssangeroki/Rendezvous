@@ -59,6 +59,8 @@ class Global {
 
   static String userAddress;
 
+  static String finalAddress;
+
   //Variables used to display travel time
   static int hours;
   static int minutes;

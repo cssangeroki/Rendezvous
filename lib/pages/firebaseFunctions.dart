@@ -340,8 +340,7 @@ class FirebaseFunctions {
   }
 
   //Creating a function that will set the final position
-  static void setFinalPosition(
-      String finalLocName, String finalLocAddress, LatLng finalLatLng) async {
+  static void setFinalPosition(String finalLocName, String finalLocAddress, LatLng finalLatLng) async {
     //In this function, I want to push the finalLocName and finalLocAddress to firebase
     await Firestore.instance
         .collection("rooms")
