@@ -39,6 +39,9 @@ import '../shareButton.dart';
 //For final location setting
 import '../finalLocationSearchBar.dart';
 
+//Needed for notifications
+import '../notifications.dart';
+
 const String mapsAPI_KEY = "AIzaSyBV961Ztopz9vyZrJq0AYAMJUTHmluu3FM";
 //Below are variables we will use for the sliders
 double midSliderVal = 1;
@@ -62,10 +65,13 @@ class MapRender extends StatefulWidget {
 }
 
 class Message {
+  static Notifications notifications = Notifications();
   static List messages = [];
 
   static Future<List<Widget>> getAndUpdateMessages(size,
       {isUpdate = false, var message}) async {
+    print("Updating messages");
+    List oldMessages = messages;
     if (!isUpdate) {
       messages = await BackendMethods.getMessages(
           FirebaseFunctions.roomData["groupChatID"]);
@@ -138,6 +144,16 @@ class Message {
 
     if (msgList.length == 0) {
       msgList.add(Message.createDayTitle("No messages found"));
+    }
+
+    if (oldMessages != messages){
+      try {
+        print("Add notification here");
+        notifications.showNotification("New message");
+      }
+      on Exception{
+        print("Error with notifications");
+      }
     }
 
     return msgList;

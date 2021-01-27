@@ -65,10 +65,11 @@ class Notifications{
   }
 
   //This function will be used to show the notification
-  Future showNotification(String message) async{
+  Future<void> showNotification(String message) async{
     await notify.show(0, 'Rendezvous',
         message,
-        platformChannelSpecifics, payload: 'Default_Sound');
+        platformChannelSpecifics);
+    return;
   }
 
   Future onDidReceiveLocalNotification(
