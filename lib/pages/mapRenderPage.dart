@@ -72,6 +72,7 @@ class Message {
       {isUpdate = false, var message}) async {
     print("Updating messages");
     List oldMessages = messages;
+    // print("oldmessages = " + oldMessages.toString());
     if (!isUpdate) {
       messages = await BackendMethods.getMessages(
           FirebaseFunctions.roomData["groupChatID"]);
@@ -145,11 +146,29 @@ class Message {
     if (msgList.length == 0) {
       msgList.add(Message.createDayTitle("No messages found"));
     }
-
-    if (oldMessages != messages){
+    var newMessages = messages.sublist(oldMessages.length);
+    print("Num old messages: " + oldMessages.length.toString());
+    // for (var message in messages){
+    //   if (oldMessages.contains(message)){
+    //     print("Element in list");
+    //     newMessages.add(message);
+    //   }
+    //   else{
+    //     print("Old message");
+    //   }
+    // }
+    print("New messages: " + newMessages.length.toString());
+    for (var message in newMessages){
       try {
-        print("Add notification here");
-        notifications.showNotification("New message");
+        //print("Add notification here");
+        if (message["from"] != FirebaseFunctions.currentUID) {
+          print("New message");
+          print("incoming UID:" + message["from"] + " currentUID:" + FirebaseFunctions.currentUID);
+          notifications.showNotification(message["body"]);
+        }
+        else{
+          print("Not notifications!");
+        }
       }
       on Exception{
         print("Error with notifications");
