@@ -164,10 +164,10 @@ class Message {
         if (message["from"] != FirebaseFunctions.currentUID) {
           print("New message");
           print("incoming UID:" + message["from"] + " currentUID:" + FirebaseFunctions.currentUID);
-          notifications.showNotification(message["body"]);
+          notifications.showNotification(message["body"], message["from"].hashCode);
         }
         else{
-          print("Not notifications!");
+          print("No notifications!");
         }
       }
       on Exception{
@@ -1292,6 +1292,8 @@ class _MapRenderState extends State<MapRender>
             }),
           ),
           FinalLocationSearchBar(),
+        (FirebaseFunctions.currentUID != FirebaseFunctions.roomData["host UID"]) ?
+        Container() :
           Container(
           padding: EdgeInsets.fromLTRB(10, 0, 0, 0),
           child: RichText(

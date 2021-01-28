@@ -107,7 +107,9 @@ class _FinalLocationSearchBarState extends State<FinalLocationSearchBar> {
 
   @override
   Widget build(BuildContext context) {
-    return Container(
+    return (FirebaseFunctions.currentUID != FirebaseFunctions.roomData["host UID"]) ?
+        Container() :
+    Container(
       margin: EdgeInsets.fromLTRB(15.0, 15.0, 15.0, 15.0),
       height: 50.0,
       width: double.infinity,
