@@ -1,16 +1,17 @@
 import 'package:firebase_dynamic_links/firebase_dynamic_links.dart';
 
+// here we add parameters to URI,(pass data through dynamic link)
 class DynamicLinkService {
   static Future<String> createAppLink(String title) async {
     final DynamicLinkParameters parameters = DynamicLinkParameters(
-      uriPrefix: 'https://rendezvous.page.link',
-      link: Uri.parse('https://rendezvous.page.link'),
+      uriPrefix: 'https://rendezvousdynamic.page.link',
+      link: Uri.parse('https://rendezvous.page.link.com'),
       androidParameters: AndroidParameters(
           packageName: 'com.Rendezous.Rendezvous', minimumVersion: 9),
       iosParameters: IosParameters(
         bundleId: 'com.Rendezvous.Rendezvous',
         minimumVersion: '10', // ios version needs to be updated
-        appStoreId: '1435066055', // fake store id need real when when created.
+        appStoreId: '670881887', // updated app store id.
       ),
       dynamicLinkParametersOptions: DynamicLinkParametersOptions(
         shortDynamicLinkPathLength: ShortDynamicLinkPathLength.unguessable,

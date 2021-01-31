@@ -42,6 +42,10 @@ import '../finalLocationSearchBar.dart';
 //Needed for notifications
 import '../notifications.dart';
 
+// needed for dynamic links
+import 'package:link/link.dart';
+import "../dynamicLinks.dart";
+
 const String mapsAPI_KEY = "AIzaSyBV961Ztopz9vyZrJq0AYAMJUTHmluu3FM";
 //Below are variables we will use for the sliders
 double midSliderVal = 1;
@@ -107,14 +111,14 @@ class Message {
       }
 
       NetworkImage profileImage =
-      FirebaseFunctions.roomData["profileImages"][message["from"]];
+          FirebaseFunctions.roomData["profileImages"][message["from"]];
       String name =
           FirebaseFunctions.roomData["userNames"][message["from"]] ?? null;
 
       if (profileImage == null || name == null) {
         // if one of them is null, have to run bottom code
         Map<String, dynamic> attributes =
-        convert.jsonDecode(message["attributes"]);
+            convert.jsonDecode(message["attributes"]);
         String profileImageURL = attributes["profileImage"];
         // when the user of this message left the chat, here's the backup data
         NetworkImage cachedData = Global.imageCache[profileImageURL];
@@ -158,18 +162,20 @@ class Message {
     //   }
     // }
     // print("New messages: " + newMessages.length.toString());
-    for (var message in newMessages){
+    for (var message in newMessages) {
       try {
         //print("Add notification here");
         if (message["from"] != FirebaseFunctions.currentUID) {
-          print("incoming UID:" + message["from"] + " currentUID:" + FirebaseFunctions.currentUID);
-          notifications.showNotification(message["body"], message["from"].hashCode);
-        }
-        else{
+          print("incoming UID:" +
+              message["from"] +
+              " currentUID:" +
+              FirebaseFunctions.currentUID);
+          notifications.showNotification(
+              message["body"], message["from"].hashCode);
+        } else {
           print("No notifications!");
         }
-      }
-      on Exception{
+      } on Exception {
         print("Error with notifications");
       }
     }
@@ -203,14 +209,14 @@ class Message {
                 height: size * 0.08,
                 child: showAnonymous
                     ? Image(
-                  image: AssetImage('images/anonymous.png'),
-                )
+                        image: AssetImage('images/anonymous.png'),
+                      )
                     : null,
                 decoration: !showAnonymous
                     ? new BoxDecoration(
-                    shape: BoxShape.circle,
-                    image:
-                    new DecorationImage(fit: BoxFit.cover, image: img))
+                        shape: BoxShape.circle,
+                        image:
+                            new DecorationImage(fit: BoxFit.cover, image: img))
                     : null,
               ),
               Align(
@@ -225,7 +231,7 @@ class Message {
                               children: <Widget>[
                                 Column(
                                     crossAxisAlignment:
-                                    CrossAxisAlignment.start,
+                                        CrossAxisAlignment.start,
                                     children: <Widget>[
                                       Padding(
                                           padding: EdgeInsets.fromLTRB(
@@ -234,7 +240,7 @@ class Message {
                                               textAlign: TextAlign.left,
                                               style: TextStyle(
                                                   fontWeight:
-                                                  FontWeight.bold))),
+                                                      FontWeight.bold))),
                                       Padding(
                                           padding: EdgeInsets.fromLTRB(
                                               20, 0, 20.0, 10),
@@ -250,11 +256,11 @@ class Message {
                                           child: Text(
                                               BackendMethods
                                                   .convertDateToPresentDate(
-                                                  date),
+                                                      date),
                                               textAlign: TextAlign.right,
                                               style: TextStyle(
                                                   fontStyle:
-                                                  FontStyle.italic))),
+                                                      FontStyle.italic))),
                                     ])
                               ]))))
             ])));
@@ -311,10 +317,7 @@ class _MapRenderState extends State<MapRender>
   void callbackSocket(String type, data) async {
     if (type == "messageAdded") {
       Future<List<Widget>> futureMsgs = Message.getAndUpdateMessages(
-          MediaQuery
-              .of(context)
-              .size
-              .width * 0.75);
+          MediaQuery.of(context).size.width * 0.75);
 
       futureMsgs.then((msgs) async {
         setState(() {
@@ -350,9 +353,9 @@ class _MapRenderState extends State<MapRender>
           locChanged = true;
         }
         FirebaseFunctions.roomData["Final Location"] =
-        event.data["Final Location"];
+            event.data["Final Location"];
         FirebaseFunctions.roomData["Final Location Address"] =
-        event.data["Final Location Address"];
+            event.data["Final Location Address"];
         FirebaseFunctions.roomData["Final LatLng"] = event.data["Final LatLng"];
         if (locChanged == true) {
           //Global.finalLocationChanged.notifyListeners();
@@ -372,7 +375,7 @@ class _MapRenderState extends State<MapRender>
         min = Global.minutes;
         if (hours == -1 || min == -1) {
           timeDisplayText =
-          "Sorry, a problem occurred retrieving the travel time";
+              "Sorry, a problem occurred retrieving the travel time";
         } else {
           timeDisplayText = "Approximately ${hours}hrs ${min}min";
         }
@@ -457,9 +460,7 @@ class _MapRenderState extends State<MapRender>
     }
     //Searching for places similar to the location being searched. Biased to 100km radius of the user current location
     var response = await http.post(
-        "https://maps.googleapis.com/maps/api/place/queryautocomplete/json?key=$mapsAPI_KEY&location=${Global
-            .userPos.latitude},${Global.userPos
-            .longitude}&radius=100000&input=$searchString");
+        "https://maps.googleapis.com/maps/api/place/queryautocomplete/json?key=$mapsAPI_KEY&location=${Global.userPos.latitude},${Global.userPos.longitude}&radius=100000&input=$searchString");
     if (response.statusCode == 200) {
       var decoded = await convert.jsonDecode(response.body);
       //If the we the http request fails, let the user know we are unable to find any suggestions
@@ -673,10 +674,7 @@ class _MapRenderState extends State<MapRender>
         ),
         Expanded(
           child: Container(
-            width: MediaQuery
-                .of(context)
-                .size
-                .width * 0.88,
+            width: MediaQuery.of(context).size.width * 0.88,
             child: ListView.builder(
               itemCount: _arrLength,
               itemBuilder: (BuildContext context, int index) {
@@ -701,28 +699,26 @@ class _MapRenderState extends State<MapRender>
                       Container(
                         //padding: EdgeInsets.fromLTRB(10, 0, 10, 0),
 
-                        /*child: Link(
-                  url: Global.urls[index],*/
-                        child: Row(
-                          children: <Widget>[
-                            /*Center(
+                        child: Link(
+                          url: Global.urls[index],
+                          child: Row(
+                            children: <Widget>[
+                              /*Center(
                             child: */
-                            Container(
-                              width: MediaQuery
-                                  .of(context)
-                                  .size
-                                  .width * 0.88,
-                              child: Column(
-                                mainAxisSize: MainAxisSize.min,
-                                children: <Widget>[
-                                  _collapsedContainer(index),
-                                  _expandedContainer(index),
-                                ],
-                                // ),
+                              Container(
+                                width: MediaQuery.of(context).size.width * 0.88,
+                                child: Column(
+                                  mainAxisSize: MainAxisSize.min,
+                                  children: <Widget>[
+                                    _collapsedContainer(index),
+                                    _expandedContainer(index),
+                                  ],
+                                  // ),
+                                ),
                               ),
-                            ),
-                            //),
-                          ],
+                              //),
+                            ],
+                          ),
                         ),
                       ),
                     ],
@@ -849,34 +845,31 @@ class _MapRenderState extends State<MapRender>
                     height: !_isExpanded[index] ? 90 : 160,
                     width: !_isExpanded[index]
                         ? 90
-                        : MediaQuery
-                        .of(context)
-                        .size
-                        .width * 0.88,
+                        : MediaQuery.of(context).size.width * 0.88,
                     duration: Duration(milliseconds: 950),
                     curve: Curves.fastLinearToSlowEaseIn,
                     padding: !_isExpanded[index] ? EdgeInsets.all(8) : null,
                     child: !_isExpanded[index]
                         ? ClipRRect(
-                      borderRadius: BorderRadius.all(Radius.circular(10)),
-                      child: Image.network(
-                        Global.images[index] == ''
-                            ? 'https://firebasestorage.googleapis.com/v0/b/rendezvous-b51b4.appspot.com/o/NoImage.png?alt=media&token=1db51462-9844-4073-8252-54622e5283d0'
-                            : '${Global.images[index]}',
-                        fit: BoxFit.cover,
-                      ),
-                    )
+                            borderRadius: BorderRadius.all(Radius.circular(10)),
+                            child: Image.network(
+                              Global.images[index] == ''
+                                  ? 'https://firebasestorage.googleapis.com/v0/b/rendezvous-b51b4.appspot.com/o/NoImage.png?alt=media&token=1db51462-9844-4073-8252-54622e5283d0'
+                                  : '${Global.images[index]}',
+                              fit: BoxFit.cover,
+                            ),
+                          )
                         : ClipRRect(
-                      borderRadius: BorderRadius.only(
-                          topLeft: Radius.circular(10),
-                          topRight: Radius.circular(10)),
-                      child: Image.network(
-                        Global.images[index] == ''
-                            ? 'https://firebasestorage.googleapis.com/v0/b/rendezvous-b51b4.appspot.com/o/NoImage.png?alt=media&token=1db51462-9844-4073-8252-54622e5283d0'
-                            : '${Global.images[index]}',
-                        fit: BoxFit.cover,
-                      ),
-                    ),
+                            borderRadius: BorderRadius.only(
+                                topLeft: Radius.circular(10),
+                                topRight: Radius.circular(10)),
+                            child: Image.network(
+                              Global.images[index] == ''
+                                  ? 'https://firebasestorage.googleapis.com/v0/b/rendezvous-b51b4.appspot.com/o/NoImage.png?alt=media&token=1db51462-9844-4073-8252-54622e5283d0'
+                                  : '${Global.images[index]}',
+                              fit: BoxFit.cover,
+                            ),
+                          ),
                   ),
                 ),
                 AnimatedContainer(
@@ -885,47 +878,47 @@ class _MapRenderState extends State<MapRender>
                 ),
                 !_isExpanded[index]
                     ? Flexible(
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: <Widget>[
-                      MergeSemantics(
-                        child: Row(
+                        child: Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
                           children: <Widget>[
-                            Flexible(
-                              child: Container(
-                                width: !_isExpanded[index]
-                                    ? double.infinity
-                                    : 0,
-                                padding: EdgeInsets.fromLTRB(0, 0, 0, 0),
-                                child: Text(
-                                  "${Global.names[index]} ",
-                                  overflow: !_isExpanded[index]
-                                      ? TextOverflow.ellipsis
-                                      : null,
-                                  softWrap: true,
-                                  style: GoogleFonts.roboto(
-                                      fontWeight: FontWeight.w700,
-                                      fontSize: 18),
-                                ),
+                            MergeSemantics(
+                              child: Row(
+                                children: <Widget>[
+                                  Flexible(
+                                    child: Container(
+                                      width: !_isExpanded[index]
+                                          ? double.infinity
+                                          : 0,
+                                      padding: EdgeInsets.fromLTRB(0, 0, 0, 0),
+                                      child: Text(
+                                        "${Global.names[index]} ",
+                                        overflow: !_isExpanded[index]
+                                            ? TextOverflow.ellipsis
+                                            : null,
+                                        softWrap: true,
+                                        style: GoogleFonts.roboto(
+                                            fontWeight: FontWeight.w700,
+                                            fontSize: 18),
+                                      ),
+                                    ),
+                                  ),
+                                ],
                               ),
                             ),
+                            SizedBox(height: 5),
+                            Container(
+                              child: Text(
+                                "Tap for more information",
+                                style: TextStyle(color: Colors.grey),
+                              ),
+                            ),
+                            // SizedBox(height: 5),
                           ],
                         ),
-                      ),
-                      SizedBox(height: 5),
-                      Container(
-                        child: Text(
-                          "Tap for more information",
-                          style: TextStyle(color: Colors.grey),
-                        ),
-                      ),
-                      // SizedBox(height: 5),
-                    ],
-                  ),
-                )
+                      )
                     : Container(
-                  color: Colors.transparent,
-                ),
+                        color: Colors.transparent,
+                      ),
               ],
             ),
           ),
@@ -937,11 +930,10 @@ class _MapRenderState extends State<MapRender>
   Widget starRating(int index) {
     double rating = Global.ratings[index].toDouble();
     return RatingBarIndicator(
-      itemBuilder: (context, _) =>
-          Icon(
-            Icons.star,
-            color: Color(Global.yellowColor),
-          ),
+      itemBuilder: (context, _) => Icon(
+        Icons.star,
+        color: Color(Global.yellowColor),
+      ),
       rating: rating,
       itemCount: 5,
       itemSize: 25.0,
@@ -966,8 +958,7 @@ class _MapRenderState extends State<MapRender>
                   children: <Widget>[
                     Row(children: <Widget>[
                       Container(
-                        child: starRating(
-                            index),
+                        child: starRating(index),
                       ),
                       Container(
                         padding: EdgeInsets.fromLTRB(10, 0, 0, 0),
@@ -984,10 +975,7 @@ class _MapRenderState extends State<MapRender>
                       ),
                     ]),
                     Container(
-                      width: MediaQuery
-                          .of(context)
-                          .size
-                          .width * 0.5,
+                      width: MediaQuery.of(context).size.width * 0.5,
                       padding: EdgeInsets.fromLTRB(0, 10, 0, 0),
                       child: Text(
                         '${Global.names[index]}',
@@ -999,14 +987,9 @@ class _MapRenderState extends State<MapRender>
                     ),
                     Container(
                       padding: EdgeInsets.fromLTRB(0, 10, 0, 0),
-                      width: MediaQuery
-                          .of(context)
-                          .size
-                          .width * 0.5,
+                      width: MediaQuery.of(context).size.width * 0.5,
                       child: Text(
-                        "${Global.addresses[index]} \n${Global
-                            .cities[index]}, ${Global.states[index]} \n${Global
-                            .zipCodes[index]} ",
+                        "${Global.addresses[index]} \n${Global.cities[index]}, ${Global.states[index]} \n${Global.zipCodes[index]} ",
                         softWrap: true,
                         style: GoogleFonts.roboto(fontSize: 16),
                         textAlign: TextAlign.left,
@@ -1014,10 +997,7 @@ class _MapRenderState extends State<MapRender>
                     ),
                     Container(
                       padding: EdgeInsets.fromLTRB(0, 10, 0, 0),
-                      width: MediaQuery
-                          .of(context)
-                          .size
-                          .width * 0.5,
+                      width: MediaQuery.of(context).size.width * 0.5,
                       child: Text(
                         Global.phoneNums[index] == ''
                             ? ''
@@ -1072,28 +1052,28 @@ class _MapRenderState extends State<MapRender>
     if (FirebaseFunctions.currentUID ==
         FirebaseFunctions.roomData["host UID"]) {
       return //Final Location Button
-        Container(
-          margin: EdgeInsets.fromLTRB(40, 20, 0, 0),
-          height: 70,
-          width: 70,
-          child: FittedBox(
-            child: FloatingActionButton(
-              heroTag: null,
-              backgroundColor: Colors.greenAccent,
-              child: Icon(
-                Icons.check_circle,
-                size: 35,
-                //color: Color(0xff21bf73),
-              ),
-              elevation: 4,
-              onPressed: () {
-                _showDialog();
-                FirebaseFunctions.setFinalPosition(Global.names[index],
-                    Global.locations[index], Global.resultCords[index]);
-              },
+          Container(
+        margin: EdgeInsets.fromLTRB(40, 20, 0, 0),
+        height: 70,
+        width: 70,
+        child: FittedBox(
+          child: FloatingActionButton(
+            heroTag: null,
+            backgroundColor: Colors.greenAccent,
+            child: Icon(
+              Icons.check_circle,
+              size: 35,
+              //color: Color(0xff21bf73),
             ),
+            elevation: 4,
+            onPressed: () {
+              _showDialog();
+              FirebaseFunctions.setFinalPosition(Global.names[index],
+                  Global.locations[index], Global.resultCords[index]);
+            },
           ),
-        );
+        ),
+      );
     }
     //Otherwise, we return an empty container
     return Container();
@@ -1114,10 +1094,9 @@ class _MapRenderState extends State<MapRender>
         margin: EdgeInsets.fromLTRB(0, 0, 0, 40),
         child: Center(
           child: Text(
-            'Showing ${Global.arrLength} results for: ${Global
-                .finalCategory} within ${Global.finalRad}mi',
+            'Showing ${Global.arrLength} results for: ${Global.finalCategory} within ${Global.finalRad}mi',
             style:
-            GoogleFonts.roboto(fontSize: 18, fontWeight: FontWeight.bold),
+                GoogleFonts.roboto(fontSize: 18, fontWeight: FontWeight.bold),
           ),
         ),
       );
@@ -1126,10 +1105,9 @@ class _MapRenderState extends State<MapRender>
         margin: EdgeInsets.fromLTRB(0, 0, 0, 40),
         child: Center(
           child: Text(
-            'No results found for ${Global.finalCategory} within ${Global
-                .finalRad}mi.\nTry increasing the search radius or changing the search category',
+            'No results found for ${Global.finalCategory} within ${Global.finalRad}mi.\nTry increasing the search radius or changing the search category',
             style:
-            GoogleFonts.roboto(fontSize: 18, fontWeight: FontWeight.bold),
+                GoogleFonts.roboto(fontSize: 18, fontWeight: FontWeight.bold),
           ),
         ),
       );
@@ -1143,11 +1121,11 @@ class _MapRenderState extends State<MapRender>
               children: <Widget>[
                 Container(
                     child: Text(
-                      "Searching for: ${Global.finalCategory}",
-                      softWrap: true,
-                      style: GoogleFonts.roboto(
-                          fontSize: 18, fontWeight: FontWeight.bold),
-                    )),
+                  "Searching for: ${Global.finalCategory}",
+                  softWrap: true,
+                  style: GoogleFonts.roboto(
+                      fontSize: 18, fontWeight: FontWeight.bold),
+                )),
                 Padding(
                   padding: EdgeInsets.fromLTRB(5, 0, 0, 0),
                   child: Center(
@@ -1247,10 +1225,7 @@ class _MapRenderState extends State<MapRender>
 
         collapsed: _collapsedSlideUpPanel(),
         minHeight: 135,
-        maxHeight: MediaQuery
-            .of(context)
-            .size
-            .height * 0.85,
+        maxHeight: MediaQuery.of(context).size.height * 0.85,
         body: GoogleMaps(),
       ),
     );
@@ -1258,10 +1233,7 @@ class _MapRenderState extends State<MapRender>
 
   Widget _tab2Contents() {
     return new Container(
-      height: MediaQuery
-          .of(context)
-          .size
-          .height,
+      height: MediaQuery.of(context).size.height,
       width: double.infinity,
       child: ListView(
         children: <Widget>[
@@ -1278,34 +1250,30 @@ class _MapRenderState extends State<MapRender>
             padding: EdgeInsets.fromLTRB(30, 0, 0, 10),
             child: SelectableText(
                 FirebaseFunctions.roomData["Final Location"] != null
-                    ? "${FirebaseFunctions
-                    .roomData["Final Location"]},\n${FirebaseFunctions
-                    .roomData["Final Location Address"]}"
+                    ? "${FirebaseFunctions.roomData["Final Location"]},\n${FirebaseFunctions.roomData["Final Location Address"]}"
                     : "No location set",
                 style: textSize20(),
                 enableInteractiveSelection: true, onTap: () {
               Share.share(
-                  "${FirebaseFunctions
-                      .roomData["Final Location"]}, ${FirebaseFunctions
-                      .roomData["Final Location Address"]}");
+                  "${FirebaseFunctions.roomData["Final Location"]}, ${FirebaseFunctions.roomData["Final Location Address"]}");
             }),
           ),
           FinalLocationSearchBar(),
-        (FirebaseFunctions.currentUID != FirebaseFunctions.roomData["host UID"]) ?
-        Container() :
-          Container(
-          padding: EdgeInsets.fromLTRB(10, 0, 0, 0),
-          child: RichText(
-            text: TextSpan(
-                text: "Select final location on map, or enter your own here!",
-                style: TextStyle(
-                  color: Colors.lightBlue,
-                  fontStyle: FontStyle.italic
-                )
-            ),
-            softWrap: true,
-            ),
-          ),
+          (FirebaseFunctions.currentUID !=
+                  FirebaseFunctions.roomData["host UID"])
+              ? Container()
+              : Container(
+                  padding: EdgeInsets.fromLTRB(10, 0, 0, 0),
+                  child: RichText(
+                    text: TextSpan(
+                        text:
+                            "Select final location on map, or enter your own here!",
+                        style: TextStyle(
+                            color: Colors.lightBlue,
+                            fontStyle: FontStyle.italic)),
+                    softWrap: true,
+                  ),
+                ),
           Container(
             child: ListTile(
               title: Text(
@@ -1323,9 +1291,8 @@ class _MapRenderState extends State<MapRender>
               enableInteractiveSelection: true,
             ),
           ),
-          ShareButton("Share Address", "Final Location: ${FirebaseFunctions
-              .roomData["Final Location"]}, ${FirebaseFunctions
-              .roomData["Final Location Address"]}"),
+          ShareButton("Share Address",
+              "Final Location: ${FirebaseFunctions.roomData["Final Location"]}, ${FirebaseFunctions.roomData["Final Location Address"]}"),
           Routes(),
         ],
       ),
@@ -1440,10 +1407,7 @@ class _MapRenderState extends State<MapRender>
 
   Widget _tab1Contents() {
     return Container(
-      height: MediaQuery
-          .of(context)
-          .size
-          .height,
+      height: MediaQuery.of(context).size.height,
       width: double.infinity,
       child: ListView(
         children: <Widget>[
@@ -1510,27 +1474,29 @@ class _MapRenderState extends State<MapRender>
               onTap: null,
             ),
           ),
-              Container(
-                padding: EdgeInsets.fromLTRB(0, 0, 0, 0),
-                child: ListTile(
-                  title: SelectableText(
-                    "${FirebaseFunctions.roomData["roomCode"]}" ??
-                        "roomCode is Null",
-                    style: textSize35(),
-                    enableInteractiveSelection: true,
-                    onTap: () async {
-                      Share.share(
-                        "Let's Rendezvous! Room code: ${FirebaseFunctions
-                            .roomData["roomCode"]}", //\n$link",
-                        subject: "Let's Rendezvous! Join my room!",
-                      );
-                    },
-                  ),
-                  onTap: null,
-                ),
+          Container(
+            padding: EdgeInsets.fromLTRB(0, 0, 0, 0),
+            child: ListTile(
+              title: SelectableText(
+                "${FirebaseFunctions.roomData["roomCode"]}" ??
+                    "roomCode is Null",
+                style: textSize35(),
+                enableInteractiveSelection: true,
+                onTap: () async {
+                  String link =
+                      await DynamicLinkService.createAppLink("Join my room!");
+                  Share.share(
+                    "Let's Rendezvous! Room code: ${FirebaseFunctions.roomData["roomCode"]} \n$link",
+                    subject: "Let's Rendezvous! Join my room!",
+                  );
+                },
               ),
-            ShareButton("Share Code", "Let's Rendezvous! Room code: ${FirebaseFunctions
-                .roomData["roomCode"]}"),
+              onTap: null,
+            ),
+          ),
+          // need to add dynamic link here
+          ShareButton("Share Code",
+              "Let's Rendezvous! Room code: ${FirebaseFunctions.roomData["roomCode"]}"),
           _leaveRoomButton(),
           Container(
             height: 120.0,
@@ -1547,10 +1513,10 @@ class _MapRenderState extends State<MapRender>
       children: <Widget>[
         Expanded(
             child: Text(
-              hint,
-              style: TextStyle(fontSize: 16.0, color: Colors.lightBlue),
-              softWrap: true,
-            )),
+          hint,
+          style: TextStyle(fontSize: 16.0, color: Colors.lightBlue),
+          softWrap: true,
+        )),
       ],
     );
   }
@@ -1625,10 +1591,7 @@ class _MapRenderState extends State<MapRender>
 
   Widget _tab3Contents() {
     //double width = MediaQuery.of(context).size.width;
-    double height = MediaQuery
-        .of(context)
-        .size
-        .height;
+    double height = MediaQuery.of(context).size.height;
 
     if (!didRetrieveMessages) {
       setState(() {
@@ -1636,19 +1599,13 @@ class _MapRenderState extends State<MapRender>
       });
       WidgetsBinding.instance.addPostFrameCallback((timeStamp) {
         Future<List<Widget>> futureMsgs = Message.getAndUpdateMessages(
-            MediaQuery
-                .of(context)
-                .size
-                .width * 0.75);
+            MediaQuery.of(context).size.width * 0.75);
 
         futureMsgs.then((msgs) async {
           await BackendMethods.establishSocket(callbackSocket);
           setState(() {
             messages = msgs;
-            height = MediaQuery
-                .of(context)
-                .size
-                .width * 0.75;
+            height = MediaQuery.of(context).size.width * 0.75;
           });
         });
       });
@@ -1673,10 +1630,7 @@ class _MapRenderState extends State<MapRender>
           });
         },
         child: Container(
-            height: MediaQuery
-                .of(context)
-                .size
-                .height,
+            height: MediaQuery.of(context).size.height,
             width: double.infinity,
             child: Column(children: <Widget>[
               Container(
@@ -1741,8 +1695,7 @@ class _MapRenderState extends State<MapRender>
                                       if (keyboardPadding == 0.0) {
                                         waiting().then((value) {
                                           double keyboardHeight =
-                                              MediaQuery
-                                                  .of(context)
+                                              MediaQuery.of(context)
                                                   .viewInsets
                                                   .bottom;
                                           if (keyboardHeight != 0.0) {
@@ -1769,7 +1722,7 @@ class _MapRenderState extends State<MapRender>
                                             borderRadius: BorderRadius.all(
                                                 Radius.circular(25.0)),
                                             borderSide:
-                                            BorderSide(color: Colors.grey)),
+                                                BorderSide(color: Colors.grey)),
                                         focusedBorder: OutlineInputBorder(
                                             borderRadius: BorderRadius.all(
                                                 Radius.circular(25.0)),
@@ -1783,7 +1736,7 @@ class _MapRenderState extends State<MapRender>
                                         color: doSendMessage
                                             ? Color.fromRGBO(106, 171, 249, 1.0)
                                             : Color.fromRGBO(
-                                            236, 236, 236, 1.0),
+                                                236, 236, 236, 1.0),
                                         onPressed: () async {
                                           if (messageBody != null &&
                                               doSendMessage) {
@@ -1817,10 +1770,7 @@ class _MapRenderState extends State<MapRender>
       ),
       // 0.88
       child: Container(
-          width: MediaQuery
-              .of(context)
-              .size
-              .width * 0.88,
+          width: MediaQuery.of(context).size.width * 0.88,
           child: Drawer(
             key: _drawerKey,
             child: DefaultTabController(
@@ -1829,10 +1779,7 @@ class _MapRenderState extends State<MapRender>
                 mainAxisSize: MainAxisSize.max,
                 children: <Widget>[
                   Container(
-                    height: MediaQuery
-                        .of(context)
-                        .size
-                        .height * 0.08,
+                    height: MediaQuery.of(context).size.height * 0.08,
                   ),
                   Container(
                     height: 40,
@@ -1841,9 +1788,9 @@ class _MapRenderState extends State<MapRender>
                         labelColor: Colors.black,
                         unselectedLabelColor: Colors.black38,
                         labelStyle:
-                        TextStyle(fontSize: 20, fontFamily: 'Roboto'),
+                            TextStyle(fontSize: 20, fontFamily: 'Roboto'),
                         unselectedLabelStyle:
-                        TextStyle(fontSize: 15, fontFamily: 'Roboto'),
+                            TextStyle(fontSize: 15, fontFamily: 'Roboto'),
                         indicator: BubbleTabIndicator(
                           indicatorColor: Color(Global.yellowColor),
                           padding: EdgeInsets.fromLTRB(-24, -12, -24, 16),
@@ -1870,7 +1817,6 @@ class _MapRenderState extends State<MapRender>
           )),
     );
   }
-
 
   @override
   Widget build(BuildContext context) {

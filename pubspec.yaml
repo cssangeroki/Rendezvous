@@ -76,6 +76,9 @@ dependencies:
   #This is used to launch the native maps app on the phone
   url_launcher: ^5.5.2
 
+  # for notifications
+  flutter_local_notifications: ^3.0.3
+
 dev_dependencies:
   flutter_test:
     sdk: flutter
