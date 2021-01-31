@@ -157,12 +157,11 @@ class Message {
     //     print("Old message");
     //   }
     // }
-    print("New messages: " + newMessages.length.toString());
+    // print("New messages: " + newMessages.length.toString());
     for (var message in newMessages){
       try {
         //print("Add notification here");
         if (message["from"] != FirebaseFunctions.currentUID) {
-          print("New message");
           print("incoming UID:" + message["from"] + " currentUID:" + FirebaseFunctions.currentUID);
           notifications.showNotification(message["body"], message["from"].hashCode);
         }

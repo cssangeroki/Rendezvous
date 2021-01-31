@@ -22,7 +22,9 @@ class Notifications{
       'your channel id', 'your channel name', 'your channel description',
       importance: Importance.max,
       priority: Priority.high,
-      showWhen: false);
+      showWhen: false,
+      channelShowBadge: true,
+  );
   static const IOSNotificationDetails iosPlatformChannelSpecifics = IOSNotificationDetails(presentAlert: true, presentBadge: true, presentSound: true, subtitle: "New Messages");
   static const NotificationDetails platformChannelSpecifics = NotificationDetails(android: androidPlatformChannelSpecifics, iOS: iosPlatformChannelSpecifics);
   bool result = false;
@@ -47,7 +49,7 @@ class Notifications{
     notify.initialize(initializationSettings);
   }
 
-  Future selectNotification(String payload) async {
+  Future<void> selectNotification(String payload) async {
     if (payload != null) {
       debugPrint('notification payload: $payload');
     }
@@ -65,8 +67,8 @@ class Notifications{
   }
 
   //This function will be used to show the notification
-  Future<void> showNotification(String message) async{
-    await notify.show(0, 'Rendezvous',
+  Future<void> showNotification(String message, int id) async{
+    await notify.show(id, 'Rendezvous',
         message,
         platformChannelSpecifics);
     return;
