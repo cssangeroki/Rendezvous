@@ -131,6 +131,7 @@ class BackendMethods {
     if(res.statusCode == 200) {
         return jsonDecode(res.body);
     } else {
+      print("Error in createGroupChat(), backendFunctions.dart. Error creating groupchat");
         return {"error":1};
     }
   }

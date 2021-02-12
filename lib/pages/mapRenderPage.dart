@@ -55,7 +55,7 @@ bool slideUpPanelCollapsed = true;
 String newAddress;
 
 //Here I'm creating a reference to our firebase
-final firebase = Firestore.instance;
+final firebase = FirebaseFirestore.instance;
 GlobalKey<_MapRenderState> renderKey = GlobalKey<_MapRenderState>();
 
 class MapRender extends StatefulWidget {
@@ -337,26 +337,26 @@ class _MapRenderState extends State<MapRender>
     var locChanged = false;
     roomListener = firebase
         .collection("rooms")
-        .document(roomDocID)
+        .doc(roomDocID)
         .snapshots()
         .listen((event) {
       if (!mounted) {
         return;
       }
       setState(() {
-        FirebaseFunctions.roomData["groupChatID"] = event.data["groupChatID"];
-        FirebaseFunctions.roomData["host"] = event.data["host"];
-        FirebaseFunctions.roomData["host UID"] = event.data["host UID"];
+        FirebaseFunctions.roomData["groupChatID"] = event.data()["groupChatID"];
+        FirebaseFunctions.roomData["host"] = event.data()["host"];
+        FirebaseFunctions.roomData["host UID"] = event.data()["host UID"];
         //If the final location changed, we will alert the listener so that the route can be changed
         if (FirebaseFunctions.roomData["Final Location"] !=
-            event.data["Final Location"]) {
+            event.data()["Final Location"]) {
           locChanged = true;
         }
         FirebaseFunctions.roomData["Final Location"] =
-            event.data["Final Location"];
+            event.data()["Final Location"];
         FirebaseFunctions.roomData["Final Location Address"] =
-            event.data["Final Location Address"];
-        FirebaseFunctions.roomData["Final LatLng"] = event.data["Final LatLng"];
+            event.data()["Final Location Address"];
+        FirebaseFunctions.roomData["Final LatLng"] = event.data()["Final LatLng"];
         if (locChanged == true) {
           //Global.finalLocationChanged.notifyListeners();
           Global.finalLocationChanged.value ^= true;
@@ -1327,16 +1327,16 @@ class _MapRenderState extends State<MapRender>
           String groupChatID = FirebaseFunctions.roomData["groupChatID"];
           String memberID = FirebaseFunctions.currentUserData["memberID"];
 
-          await Firestore.instance
+          await FirebaseFirestore.instance
               .collection("rooms")
-              .document(roomCodeString)
+              .doc(roomCodeString)
               .collection("users")
-              .getDocuments()
+              .get()
               .then((data) {
             Global.memberListener.cancel();
             roomListener.cancel();
             FirebaseFunctions.removeCurrentUserFromRoom(
-                roomCodeString, data.documents.length,
+                roomCodeString, data.docs.length,
                 groupChatID: groupChatID, memberID: memberID);
           });
 

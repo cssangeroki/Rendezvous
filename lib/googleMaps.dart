@@ -24,7 +24,7 @@ import 'package:http/http.dart' as http;
 import 'dart:convert' as convert;
 
 //Here I'm creating a reference to our firebase
-final firebase = Firestore.instance;
+final firebase = FirebaseFirestore.instance;
 String _mapStyle;
 const String mapsAPI_KEY = "AIzaSyBV961Ztopz9vyZrJq0AYAMJUTHmluu3FM";
 GlobalKey<GoogleMapsState> mapsKey = GlobalKey<GoogleMapsState>();
@@ -340,7 +340,7 @@ class GoogleMapsState extends State<GoogleMaps> {
   Future<void> _initMarkers() async {
     Global.memberListener = firebase
         .collection("rooms")
-        .document(roomDocID)
+        .doc(roomDocID)
         .collection("users")
         .snapshots()
         .listen((snapshot) async {
@@ -353,12 +353,12 @@ class GoogleMapsState extends State<GoogleMaps> {
               ? {}
               : FirebaseFunctions.roomData["profileImages"];
 
-      for (var doc in snapshot.documents) {
-        var imageURL = doc.data["profileImage"];
+      for (var doc in snapshot.docs) {
+        var imageURL = doc.data()["profileImage"];
         if (imageURL != null) {
-          imagesURL[doc.documentID] = NetworkImage(imageURL);
+          imagesURL[doc.id] = NetworkImage(imageURL);
         }
-        names[doc.documentID] = doc.data["userName"];
+        names[doc.id] = doc.data()["userName"];
       }
 
       FirebaseFunctions.roomData["userNames"] = names;
@@ -385,11 +385,11 @@ class GoogleMapsState extends State<GoogleMaps> {
   Future<void> callAddOtherUserMarkers(QuerySnapshot snapshot) async {
     List<String> userNames = [];
     //userNames.clear();
-    for (var user in snapshot.documents) {
-      String newUserName = user.data["userName"];
+    for (var user in snapshot.docs) {
+      String newUserName = user["userName"];
       userNames.add(newUserName);
       //If the user is not equal to the current user, then we need to add that users location to markers
-      if (user.documentID != userDocID) {
+      if (user.id != userDocID) {
         await addOtherUserMarkers(user);
       }
     }
@@ -408,18 +408,18 @@ class GoogleMapsState extends State<GoogleMaps> {
   //In this function, I iterate through every user in the document, and get there location and add it to markers
   //All other users will have their BitMapDescriptor as Magenta in color, so that we can differentiate from other users
   Future<void> addOtherUserMarkers(DocumentSnapshot userLocations) async {
-    GeoPoint newUserLoc = userLocations.data["location"];
+    GeoPoint newUserLoc = userLocations["location"];
     //If for some reason the user doesn't have a location yet, simply return
     if (newUserLoc == null) {
       return;
     }
-    String newUserName = userLocations.data["userName"];
+    String newUserName = userLocations["userName"];
     setState(() {
       //if the user is already in our markers array, I will just update their position
       _markers.removeWhere(
-          (marker) => marker.markerId.value == userLocations.documentID);
+          (marker) => marker.markerId.value == userLocations.id);
       _markers.add(Marker(
-          markerId: MarkerId(userLocations.documentID),
+          markerId: MarkerId(userLocations.id),
           position: LatLng(newUserLoc.latitude, newUserLoc.longitude),
           infoWindow: InfoWindow(title: newUserName, snippet: ""),
           icon: BitmapDescriptor.defaultMarkerWithHue(
@@ -560,10 +560,10 @@ class GoogleMapsState extends State<GoogleMaps> {
   void updateUserLocation() async {
     await firebase
         .collection("rooms")
-        .document(roomDocID)
+        .doc(roomDocID)
         .collection("users")
-        .document(userDocID)
-        .updateData(
+        .doc(userDocID)
+        .update(
             {"location": GeoPoint(_center.latitude, _center.longitude)});
   }
 

@@ -68,6 +68,7 @@ class Notifications{
 
   //This function will be used to show the notification
   Future<void> showNotification(String message, int id) async{
+    if (message == null) return;
     await notify.show(id, 'Rendezvous',
         message,
         platformChannelSpecifics);

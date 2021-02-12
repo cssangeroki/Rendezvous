@@ -30,7 +30,7 @@ class FirebaseFunctions {
   };
 
   static refreshChatToken(String token) async {
-      await Firestore.instance.collection("users").document(FirebaseFunctions?.currentUID).updateData({
+      await FirebaseFirestore.instance.collection("users").doc(FirebaseFunctions?.currentUID).update({
           "chatToken" : token
       }).then((value) {
           FirebaseFunctions.currentUserData["chatToken"] = token;
@@ -38,9 +38,9 @@ class FirebaseFunctions {
   }
 
   static uploadImage(String path, String fileName, File img) async {
-      final StorageReference storageReference = FirebaseStorage().ref().child(path).child(fileName);
-      final StorageUploadTask uploadTask = storageReference.putFile(img);
-      await uploadTask.onComplete;
+      final Reference storageReference = FirebaseStorage.instance.ref().child(path).child(fileName);
+      final UploadTask uploadTask = storageReference.putFile(img);
+      await uploadTask.whenComplete(() => {});
       // Return the image url
 
       String url = await storageReference.getDownloadURL();
@@ -51,31 +51,31 @@ class FirebaseFunctions {
 
   static refreshFirebaseRoomData() async {
     if (FirebaseFunctions.currentUserData["roomCode"] != null) {
-      await Firestore.instance
+      await FirebaseFirestore.instance
           .collection("rooms")
-          .document(currentUserData["roomCode"])
+          .doc(currentUserData["roomCode"])
           .get()
           .then((snapshot) {
-        FirebaseFunctions.roomData["roomCode"] = snapshot.data["roomCode"];
-        FirebaseFunctions.roomData["host"] = snapshot.data["host"];
-        FirebaseFunctions.roomData["host UID"] = snapshot.data["host UID"];
+        FirebaseFunctions.roomData["roomCode"] = snapshot.data()["roomCode"];
+        FirebaseFunctions.roomData["host"] = snapshot.data()["host"];
+        FirebaseFunctions.roomData["host UID"] = snapshot.data()["host UID"];
         FirebaseFunctions.roomData["Final Location"] =
-            snapshot.data["Final Location"];
+            snapshot.data()["Final Location"];
         FirebaseFunctions.roomData["Final Location Address"] =
-            snapshot.data["Final Location Address"];
-        FirebaseFunctions.roomData["Final LatLng"] = snapshot.data["Final LatLng"];
-        FirebaseFunctions.roomData["groupChatID"] = snapshot.data["groupChatID"];
+            snapshot.data()["Final Location Address"];
+        FirebaseFunctions.roomData["Final LatLng"] = snapshot.data()["Final LatLng"];
+        FirebaseFunctions.roomData["groupChatID"] = snapshot.data()["groupChatID"];
       });
 
-      await Firestore.instance.collection("rooms")
-          .document(currentUserData["roomCode"]).collection('users').getDocuments().then((v) {
+      await FirebaseFirestore.instance.collection("rooms")
+          .doc(currentUserData["roomCode"]).collection('users').get().then((v) {
                var names = {};
                var imagesURL = {};
-              for(var doc in v.documents) {
-                  names[doc.documentID] = doc.data["userName"];
-                  var imageURL = doc.data["profileImage"];
+              for(var doc in v.docs) {
+                  names[doc.id] = doc.data()["userName"];
+                  var imageURL = doc.data()["profileImage"];
                   if (imageURL!= null) {   
-                      imagesURL[doc.documentID] = NetworkImage(imageURL);     
+                      imagesURL[doc.id] = NetworkImage(imageURL);
                   }
               }
               FirebaseFunctions.roomData["userNames"] = names;
@@ -87,12 +87,12 @@ class FirebaseFunctions {
   static pushUserLocation(double latitude, double longitude) {
     GeoPoint point = GeoPoint(latitude, longitude);
 
-    Firestore.instance
+    FirebaseFirestore.instance
         .collection("rooms")
-        .document(FirebaseFunctions.currentUserData["roomCode"])
+        .doc(FirebaseFunctions.currentUserData["roomCode"])
         .collection("users")
-        .document(FirebaseFunctions?.currentUID)
-        .updateData({
+        .doc(FirebaseFunctions?.currentUID)
+        .update({
       "location": point,
     }).catchError((e) {
       print(e.toString());
@@ -103,21 +103,21 @@ class FirebaseFunctions {
   }
 
   static refreshFirebaseUserData() async {
-    await Firestore.instance
+    await FirebaseFirestore.instance
         .collection("users")
-        .document(FirebaseFunctions?.currentUID)
+        .doc(FirebaseFunctions?.currentUID)
         .get()
         .then((snapshot) {
       if (snapshot.exists) {
-        FirebaseFunctions.currentUserData = snapshot.data;
-        if(snapshot.data["profileImage"] != null) {
-            Global.profileImage = NetworkImage(snapshot.data["profileImage"]);
+        FirebaseFunctions.currentUserData = snapshot.data();
+        if(snapshot.data()["profileImage"] != null) {
+            Global.profileImage = NetworkImage(snapshot.data()["profileImage"]);
         }
       } else {
-        Firestore.instance
+        FirebaseFirestore.instance
             .collection("users")
-            .document(FirebaseFunctions?.currentUID)
-            .setData({
+            .doc(FirebaseFunctions?.currentUID)
+            .set({
           "userName": null,
           "userID": FirebaseFunctions?.currentUID
         }).then((value) {
@@ -133,7 +133,7 @@ class FirebaseFunctions {
   static checkExist(String roomName) async {
     bool exists = false;
     try {
-      await Firestore.instance.document("rooms/$roomName").get().then((doc) {
+      await FirebaseFirestore.instance.doc("rooms/$roomName").get().then((doc) {
         if (doc.exists)
           exists = true;
         else
@@ -178,38 +178,38 @@ class FirebaseFunctions {
     }
 
 
-    await Firestore.instance
+    await FirebaseFirestore.instance
         .collection("rooms")
-        .document(roomCode)
+        .doc(roomCode)
         .collection("users")
-        .document(FirebaseFunctions?.currentUID)
-        .setData(roomData).then((value) async {
+        .doc(FirebaseFunctions?.currentUID)
+        .set(roomData).then((value) async {
       FirebaseFunctions.currentUserData["roomCode"] = roomCode;
       //this line gets the host when the user joins the room
-      await Firestore.instance
+      await FirebaseFirestore.instance
           .collection("rooms")
-          .document(roomCode)
+          .doc(roomCode)
           .get()
           .then((value) async {
 
 
             if(callBackend) {
-                var memberData = await BackendMethods.joinGroupChat(FirebaseFunctions?.currentUID, value.data["groupChatID"]);
+                var memberData = await BackendMethods.joinGroupChat(FirebaseFunctions?.currentUID, value.data()["groupChatID"]);
                 memberID = memberData["sid"];
                 userData["memberID"] = memberID;
             }
 
             FirebaseFunctions.currentUserData["memberID"] = memberID;
-            roomData["host"] = value.data["host"];
-            roomData["host UID"] = value.data["host UID"];
-            roomData["Final Location"] = value.data["Final Location"];
-            roomData["Final Location Address"] = value.data["Final Location Address"];
-            roomData["Final LatLng"] = value.data["Final LatLng"];
+            roomData["host"] = value.data()["host"];
+            roomData["host UID"] = value.data()["host UID"];
+            roomData["Final Location"] = value.data()["Final Location"];
+            roomData["Final Location Address"] = value.data()["Final Location Address"];
+            roomData["Final LatLng"] = value.data()["Final LatLng"];
       });
-      await Firestore.instance
+      await FirebaseFirestore.instance
           .collection("users")
-          .document(FirebaseFunctions?.currentUID)
-          .updateData(userData).then((result) {
+          .doc(FirebaseFunctions?.currentUID)
+          .update(userData).then((result) {
         return true;
       });
     }).catchError((err) {
@@ -219,7 +219,7 @@ class FirebaseFunctions {
   }
 
   static deleteRoom(String roomCode) async {
-    await Firestore.instance.collection("rooms").document(roomCode).delete();
+    await FirebaseFirestore.instance.collection("rooms").doc(roomCode).delete();
   }
 
   static removeCurrentUserFromRoom(String roomCode, int membersLength, {memberID="", groupChatID=""}) async {
@@ -228,15 +228,15 @@ class FirebaseFunctions {
     }
     await BackendMethods.leaveRoom(groupChatID, memberID, membersLength);
 
-    await Firestore.instance
+    await FirebaseFirestore.instance
         .collection("users")
-        .document(FirebaseFunctions.currentUID)
-        .updateData({"roomCode": null}).then((result) async {
-      await Firestore.instance
+        .doc(FirebaseFunctions.currentUID)
+        .update({"roomCode": null}).then((result) async {
+      await FirebaseFirestore.instance
           .collection("rooms")
-          .document(roomCode)
+          .doc(roomCode)
           .collection("users")
-          .document(FirebaseFunctions?.currentUID)
+          .doc(FirebaseFunctions?.currentUID)
           .delete()
           .then((value) {});
       //If there is more than 1 person in the room, we will change the host to the next user in the room
@@ -270,21 +270,21 @@ class FirebaseFunctions {
     if (roomData["host"] != currentUserData["userName"]) {
       return;
     }
-    await Firestore.instance
+    await FirebaseFirestore.instance
         .collection("rooms")
-        .document(roomData["roomCode"])
+        .doc(roomData["roomCode"])
         .collection("users")
-        .getDocuments()
+        .get()
         .then((value) {
-      var userDocs = value.documents;
-      roomData["host"] = userDocs[0].data["userName"];
-      roomData["host UID"] = userDocs[0].documentID;
+      var userDocs = value.docs;
+      roomData["host"] = userDocs[0].data()["userName"];
+      roomData["host UID"] = userDocs[0].id;
     });
     //Might have to change this line in case a different host shows up for everyone
-    await Firestore.instance
+    await FirebaseFirestore.instance
         .collection("rooms")
-        .document(roomData["roomCode"])
-        .updateData({"host": roomData["host"], "host UID": roomData["host UID"]});
+        .doc(roomData["roomCode"])
+        .update({"host": roomData["host"], "host UID": roomData["host UID"]});
   }
 
   static createFirebaseRoom(String userName) async {
@@ -296,9 +296,9 @@ class FirebaseFunctions {
       var roomCodeSecureRandom = SecureRandom();
       roomCode = roomCodeSecureRandom.nextString(
           length: 5, charset: 'abcdefghijklmnopqrstuvwxyz');
-      await Firestore.instance
+      await FirebaseFirestore.instance
           .collection("rooms")
-          .document(roomCode)
+          .doc(roomCode)
           .get()
           .then((value) {
         if (!value.exists) {
@@ -315,37 +315,52 @@ class FirebaseFunctions {
     FirebaseFunctions.roomData["host UID"] = currentUID;
     // stores the room to database
 
-    var groupChatData = await BackendMethods.createGroupChat(FirebaseFunctions?.currentUID);
-    String groupChatID = groupChatData['groupChat']['sid'];
-    String memberID = groupChatData['host']['sid'];
+    try {
+      var groupChatData = await BackendMethods.createGroupChat(
+          FirebaseFunctions?.currentUID);
+      String groupChatID = groupChatData['groupChat']['sid'];
+      String memberID = groupChatData['host']['sid'];
 
-    FirebaseFunctions.roomData["groupChatID"] = groupChatID;
+      FirebaseFunctions.roomData["groupChatID"] = groupChatID;
 
-    await Firestore.instance
-        .collection("rooms")
-        .document(roomCode)
-        .setData({"roomCode": roomCode, "host": userName, "host UID": currentUID, "groupChatID": groupChatID}).then((value) async {
-      await Firestore.instance
-          .collection("users")
-          .document(FirebaseFunctions?.currentUID)
-          .updateData({"userName": userName, "roomCode": roomCode, "memberID": memberID}).then(
-              (value) async {
-        await FirebaseFunctions.addCurrentUserToRoom(roomCode, callBackend: false, memberCode: memberID);
-        return roomCode;
-      }).catchError((e) {
-        print(e.toString());
-        return null;
+      await FirebaseFirestore.instance
+          .collection("rooms")
+          .doc(roomCode)
+          .set({
+        "roomCode": roomCode,
+        "host": userName,
+        "host UID": currentUID,
+        "groupChatID": groupChatID
+      }).then((value) async {
+        await FirebaseFirestore.instance
+            .collection("users")
+            .doc(FirebaseFunctions?.currentUID)
+            .update(
+            {"userName": userName, "roomCode": roomCode, "memberID": memberID})
+            .then(
+                (value) async {
+              await FirebaseFunctions.addCurrentUserToRoom(
+                  roomCode, callBackend: false, memberCode: memberID);
+              return roomCode;
+            })
+            .catchError((e) {
+          print(e.toString());
+          return null;
+        });
       });
-    });
+    }catch (e){
+      print("Error in createFirebaseRoom");
+      print(e);
+    }
   }
 
   //Creating a function that will set the final position
   static void setFinalPosition(String finalLocName, String finalLocAddress, LatLng finalLatLng) async {
     //In this function, I want to push the finalLocName and finalLocAddress to firebase
-    await Firestore.instance
+    await FirebaseFirestore.instance
         .collection("rooms")
-        .document(FirebaseFunctions.roomData["roomCode"])
-        .updateData({
+        .doc(FirebaseFunctions.roomData["roomCode"])
+        .update({
       "Final Location": finalLocName,
       "Final Location Address": finalLocAddress,
       "Final LatLng": GeoPoint(finalLatLng.latitude, finalLatLng.longitude)

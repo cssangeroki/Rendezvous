@@ -6,23 +6,32 @@ import 'pages/mapRenderPage.dart';
 import 'globalVar.dart';
 
 import 'package:firebase_auth/firebase_auth.dart';
+import 'package:firebase_core/firebase_core.dart';
 
 void main() async {
   //runApp(MyApp());
   WidgetsFlutterBinding.ensureInitialized();
+  await Firebase.initializeApp();
   await _signInAnonymously();
   runApp(MyApp());
 }
 
 Future<void> _signInAnonymously() async {
   try {
-    final AuthResult result = await FirebaseAuth.instance.signInAnonymously();
-    FirebaseUser user = result.user;
+    final UserCredential result = await FirebaseAuth.instance.signInAnonymously();
+    User user = result.user;
+    if (user == null){
+      print("Error writing user to the database");
+    }
+    else{
+      print(FirebaseFunctions.currentUID);
+    }
     FirebaseFunctions.currentUID = user.uid;
 
     await FirebaseFunctions.refreshFirebaseUserData();
     await FirebaseFunctions.refreshFirebaseRoomData();
   } catch (e) {
+    print("Error writing user to database");
     print(e);
   }
 }
@@ -32,6 +41,7 @@ void pushToHomeScreen(BuildContext context) {
 }
 
 class MyApp extends StatelessWidget {
+
   @override
   Widget build(BuildContext context) {
     SystemChrome.setPreferredOrientations([
