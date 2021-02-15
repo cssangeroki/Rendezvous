@@ -10,6 +10,9 @@ import Firebase
     didFinishLaunchingWithOptions launchOptions: [UIApplication.LaunchOptionsKey: Any]?
   ) -> Bool {
     GeneratedPluginRegistrant.register(with: self)
+    
+    // Use Firebase library to configure APIs
+    FirebaseApp.configure()
 
     //Google Maps API key
     GMSServices.provideAPIKey("AIzaSyAFGuq9qZc6xGWB6S5NHZgpyExhUldiwjU")

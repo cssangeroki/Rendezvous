@@ -149,7 +149,7 @@ class _FinalLocationSearchBarState extends State<FinalLocationSearchBar> {
             enabledBorder: OutlineInputBorder(
               borderSide: BorderSide(color: Colors.black, width: 1.5),
             ),
-            hintText: "Enter your address...",
+            hintText: "Enter final location address...",
             contentPadding: EdgeInsets.only(left: 15.0, top: 15.0),
             suffixIcon: IconButton(
               icon: Icon(Icons.search),

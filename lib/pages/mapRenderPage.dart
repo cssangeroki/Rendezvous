@@ -41,6 +41,7 @@ import '../finalLocationSearchBar.dart';
 
 //Needed for notifications
 import '../notifications.dart';
+import 'package:firebase_messaging/firebase_messaging.dart';
 
 // needed for dynamic links
 import 'package:link/link.dart';
@@ -303,6 +304,8 @@ class _MapRenderState extends State<MapRender>
 
   var _isExpanded = new List<bool>.filled(50, false, growable: true);
 
+  Notifications notifications;
+
   @override
   void initState() {
     super.initState();
@@ -312,6 +315,39 @@ class _MapRenderState extends State<MapRender>
     nameListListener();
     listenToRoom();
     searchingForCategory();
+
+    notifications = Notifications();
+
+    // print("Initialising firebase stuff");
+    // FirebaseMessaging.onBackgroundMessage(myBackgroundMessageHandler);
+    // FirebaseMessaging.instance
+    //     .getInitialMessage()
+    //     .then((RemoteMessage message) {
+    //   print("Received some message");
+    //   try {
+    //     if (message != null) {
+    //       print("received Message");
+    //       //showNotification(message.toString(), 0);
+    //     }
+    //   }catch(e){
+    //     print("Error receiving message");
+    //     print(e);
+    //   }
+    // });
+    // FirebaseMessaging.onMessage.listen((RemoteMessage message) {
+    //   print("Entered onMessage()");
+    //   RemoteNotification notification = message.notification;
+    //   AndroidNotification android = message.notification?.android;
+    //
+    //   if (notification != null && android != null) {
+    //     //showNotification(notification.body, 0);
+    //   }
+    // });
+    // FirebaseMessaging.onMessageOpenedApp.listen((RemoteMessage message) {
+    //   print('A new onMessageOpenedApp event was published!');
+    //   //selectNotification("new notification");
+    // });
+    // print("Done initialising firebase stuff");
   }
 
   void callbackSocket(String type, data) async {

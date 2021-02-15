@@ -1,6 +1,8 @@
 //This page will be used to display message notifications in the background
+//com.example.flutter_complete_guide
 
 import 'package:Rendezvous/pages/mapRenderPage.dart';
+import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'dart:async';
@@ -9,6 +11,25 @@ import 'dart:async';
 
 //Needed for notifications
 import 'package:flutter_local_notifications/flutter_local_notifications.dart';
+import 'package:firebase_messaging/firebase_messaging.dart';
+
+Future<void> myBackgroundMessageHandler(RemoteMessage message) async {
+  print("received background message");
+  if (message.data != null) {
+    // Handle data message
+    final dynamic data = message.data;
+    print(data.toString());
+  }
+
+  if (message.notification != null) {
+    // Handle notification message
+    final RemoteNotification notification = message.notification;
+    print(notification.toString());
+    //showNotification(notification.body, 0);
+  }
+
+  // Or do other work.
+}
 
 class Notifications{
   static final AndroidInitializationSettings initializationSettingsAndroid = AndroidInitializationSettings('rendezvous_icon');
@@ -30,9 +51,16 @@ class Notifications{
   bool result = false;
 
   FlutterLocalNotificationsPlugin notify;
+
+  FirebaseMessaging _firebaseMessaging = FirebaseMessaging.instance;
+
+  //Constructor
   Notifications(){
+    print("Entered notifications constructor");
     this.initializeNotificationSettings();
+    this.initializeFirebaseMessaging();
   }
+
   void initializeNotificationSettings() async {
     initializationSettingsIOS = IOSInitializationSettings(onDidReceiveLocalNotification: onDidReceiveLocalNotification);
     await flutterLocalNotificationsPlugin.initialize(initializationSettings,
@@ -48,6 +76,52 @@ class Notifications{
     notify = new FlutterLocalNotificationsPlugin();
     notify.initialize(initializationSettings);
   }
+
+  void initializeFirebaseMessaging() async {
+    print("Entered initializeFirebaseMessaging");
+
+    //await Firebase.initializeApp();
+
+    // Set the background messaging handler early on, as a named top-level function
+    FirebaseMessaging.onBackgroundMessage(myBackgroundMessageHandler);
+    FirebaseMessaging.instance
+        .getInitialMessage()
+        .then((RemoteMessage message) {
+          print("Received some message");
+           try {
+             if (message != null) {
+               print("received Message");
+               showNotification(message.toString(), 0);
+             }
+           }catch(e){
+             print("Error receiving message");
+             print(e);
+           }
+    });
+    FirebaseMessaging.onMessage.listen((RemoteMessage message) {
+      print("Entered onMessage()");
+      RemoteNotification notification = message.notification;
+      AndroidNotification android = message.notification?.android;
+
+      if (notification != null && android != null) {
+        showNotification(notification.body, 0);
+      }
+    });
+    FirebaseMessaging.onMessageOpenedApp.listen((RemoteMessage message) {
+      print('A new onMessageOpenedApp event was published!');
+      selectNotification("new notification");
+    });
+  }
+
+  //This function will be used to show the notification
+  Future<void> showNotification(String message, int id) async{
+    if (message == null) return;
+    await notify.show(id, 'Rendezvous',
+        message,
+        platformChannelSpecifics);
+    return;
+  }
+
 
   Future<void> selectNotification(String payload) async {
     if (payload != null) {
@@ -66,14 +140,6 @@ class Notifications{
         payload: 'item x');
   }
 
-  //This function will be used to show the notification
-  Future<void> showNotification(String message, int id) async{
-    if (message == null) return;
-    await notify.show(id, 'Rendezvous',
-        message,
-        platformChannelSpecifics);
-    return;
-  }
 
   Future onDidReceiveLocalNotification(
       int id, String title, String body, String payload) async {

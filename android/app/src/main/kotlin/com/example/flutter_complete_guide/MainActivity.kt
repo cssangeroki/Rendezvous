@@ -1,4 +1,4 @@
-package com.example.flutter_complete_guide
+package com.Rendezous.Rendezvous
 
 import io.flutter.embedding.android.FlutterActivity
 
